@@ -146,3 +146,10 @@ details.more > summary { font-size: 13px; }
 .kv-table { width: 100%; font-size: 13px; border-collapse: collapse; }
 .kv-table td { padding: 6px 4px; border-bottom: 1px solid var(--line2); }
 .kv-table td:first-child { color: var(--muted); width: 120px; }
+
+/* 변경 감시 */
+.act-list { max-height: 50vh; overflow: auto; margin: 10px 0; border: 1px solid var(--line); border-radius: 10px; }
+.act-item { padding: 10px 12px; border-bottom: 1px solid var(--line2); font-size: 13px; }
+.act-item:last-child { border-bottom: 0; }
+.act-item ul { margin: 4px 0; padding-left: 18px; }
+button.danger.small { background: var(--err-soft); }

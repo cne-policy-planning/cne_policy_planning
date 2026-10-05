@@ -125,7 +125,24 @@
       return { commitSha: c.sha, treeSha };
     }
 
-    return { api, getHead, getBlobText, verify, commit, get lastExpiry() { return lastExpiry; } };
+    /** 최근 커밋 목록(최신순) */
+    async function listCommits(perPage) {
+      const list = await api(`/commits?sha=${encodeURIComponent(cfg.branch || 'main')}&per_page=${perPage || 30}`);
+      return (list || []).map(c => ({
+        sha: c.sha,
+        message: (c.commit && c.commit.message) || '',
+        date: (c.commit && ((c.commit.committer && c.commit.committer.date) || (c.commit.author && c.commit.author.date))) || null,
+        author: (c.author && c.author.login) || (c.commit && c.commit.author && c.commit.author.name) || '알 수 없음',
+        parents: (c.parents || []).map(p => p.sha)
+      }));
+    }
+    /** 커밋 하나에서 바뀐 파일 */
+    async function commitFiles(sha) {
+      const c = await api(`/commits/${sha}`);
+      return (c.files || []).map(f => ({ path: f.filename, status: f.status }));
+    }
+
+    return { api, getHead, getBlobText, verify, commit, listCommits, commitFiles, get lastExpiry() { return lastExpiry; } };
   }
 
   /** git이 쓰는 파일 지문(blob SHA-1). 바뀐 파일만 올리기 위해 비교한다 */

@@ -110,6 +110,16 @@
     return { changed, deletions };
   }
 
+  /** 자료 목록 파일 검사: 망가졌으면 "자료 없음"으로 읽지 않고 멈춘다(그대로 반영하면 전체 자료가 지워지므로) */
+  function parseDocList(text) {
+    let json;
+    try { json = JSON.parse(text); } catch (e) { json = null; }
+    if (!json || !Array.isArray(json.documents) || json.documents.some(d => !d || typeof d.id !== 'string')) {
+      throw new Error('자료 목록 파일(data/documents.json)이 손상되었거나 다른 내용으로 바뀌었습니다. 안전을 위해 불러오기를 멈췄습니다. 오른쪽 위 변경 기록에서 누가 바꿨는지 확인한 뒤, GitHub에서 이전 상태로 되돌려 주세요.');
+    }
+    return json.documents;
+  }
+
   // ---------- GitHub ----------
   async function loadGithubConfig() {
     const saved = await kvGet('github');
@@ -131,6 +141,14 @@
     if (cfg) await kvSet('github', Object.assign({}, cfg, { token: '' }));
     try { sessionStorage.removeItem('sas-github'); } catch (e) { /* 무시 */ }
     if (state.github) state.github.token = '';
+    emit();
+  }
+
+  /** 출입증은 그대로 두고 만료일만 고친다(null = 만료 없음) */
+  async function setExpiry(expiresAt) {
+    if (!state.github) return;
+    state.github.expiresAt = expiresAt || null;
+    await saveGithubConfig(state.github);
     emit();
   }
 
@@ -166,7 +184,7 @@
     const docs = [];
     let generatedAt = null;
     if (shas.has('data/documents.json')) {
-      const list = JSON.parse(await read('data/documents.json')).documents || [];
+      const list = parseDocList(await read('data/documents.json'));
       const paths = list.map(d => `data/documents/${d.id}.json`);
       const missing = paths.filter(p => !shas.has(p));
       if (missing.length) throw new Error(`자료 목록에는 있지만 파일이 없는 자료가 ${missing.length}건 있습니다: ${missing.slice(0, 3).join(', ')}`);
@@ -205,7 +223,9 @@
     const hasNoJekyll = latest.files.has('.nojekyll');
     if (!hasNoJekyll) files.push({ path: '.nojekyll', content: '' });
     if (!files.length && !deletions.length) return { written: 0, deleted: 0, unchanged: true };
-    const r = await c.commit({ files, deletions, message, parent: latest, onProgress });
+    const clientId = await getClientId();
+    const r = await c.commit({ files, deletions, message: message + `\n\nSas-Admin-Client: ${clientId}`, parent: latest, onProgress });
+    await rememberMyCommit(r.commitSha, latest.commitSha);
     // 반영 결과를 기준으로 지문 갱신
     for (const p of changed) {
       const text = outputs.files.get(p), sha = await GH.gitBlobSha(text);
@@ -221,6 +241,67 @@
     await clearDraft();
     emit();
     return { written: changed.length, deleted: deletions.length, commitSha: r.commitSha };
+  }
+
+  // ---------- 변경 감시 ----------
+  // 이 브라우저(관리자 도구)가 만든 커밋을 기억해 두고, 그 밖의 커밋이 생기면 알린다.
+  // 기준점(lastSeen): 관리자가 마지막으로 "확인"했거나, 이 도구가 마지막으로 반영한 커밋.
+  const watchKey = () => `watch:${state.github.owner}/${state.github.repo}`;
+  async function getClientId() {
+    let id = await kvGet('clientId');
+    if (!id) { id = Math.random().toString(36).slice(2, 10); await kvSet('clientId', id); }
+    return id;
+  }
+  async function getWatch() { return (await kvGet(watchKey())) || { lastSeen: null, mine: [] }; }
+  async function rememberMyCommit(sha, parentSha) {
+    const w = await getWatch();
+    w.mine = [sha, ...(w.mine || [])].slice(0, 300);
+    // 반영 직전까지 확인되지 않은 변경이 없었을 때만 기준점을 옮긴다(사이에 낀 다른 변경을 덮어 숨기지 않도록)
+    if (!w.lastSeen || w.lastSeen === parentSha) w.lastSeen = sha;
+    await kvSet(watchKey(), w);
+  }
+
+  /**
+   * 기준점 이후 이 PC의 관리자 도구가 만들지 않은 커밋을 찾는다.
+   * 반환 { first, items:[{sha,date,author,title,fromTool,files,moreFiles}], overflow, headSha }
+   */
+  async function checkActivity() {
+    const cfg = state.github;
+    if (!cfg || !cfg.token) return { items: [] };
+    const c = GH.client(cfg);
+    const w = await getWatch();
+    const commits = await c.listCommits(30);
+    const headSha = commits.length ? commits[0].sha : null;
+    if (!w.lastSeen) { w.lastSeen = headSha; await kvSet(watchKey(), w); return { first: true, items: [], headSha }; }
+    const mine = new Set(w.mine || []);
+    const newer = [];
+    let found = false;
+    for (const cm of commits) { if (cm.sha === w.lastSeen) { found = true; break; } newer.push(cm); }
+    const items = newer.filter(cm => !mine.has(cm.sha)).map(cm => ({
+      sha: cm.sha, date: cm.date, author: cm.author,
+      title: cm.message.split('\n')[0].slice(0, 120),
+      fromTool: /Sas-Admin-Client:/.test(cm.message)
+    }));
+    for (const it of items.slice(0, 8)) {
+      try { const f = await c.commitFiles(it.sha); it.files = f.slice(0, 12); it.moreFiles = Math.max(0, f.length - 12); it.program = f.some(x => !/^data\//.test(x.path)); }
+      catch (e) { it.files = []; }
+    }
+    if (!items.length && newer.length) { w.lastSeen = headSha; await kvSet(watchKey(), w); }
+    return { items, overflow: !found, headSha };
+  }
+  async function acknowledgeActivity(headSha) {
+    const w = await getWatch();
+    w.lastSeen = headSha; await kvSet(watchKey(), w);
+  }
+  /** 최근 변경 기록(최신순) + 누가 했는지 구분 */
+  async function recentActivity(n) {
+    const c = GH.client(state.github);
+    const w = await getWatch();
+    const mine = new Set(w.mine || []);
+    return (await c.listCommits(n || 20)).map(cm => ({
+      sha: cm.sha, date: cm.date, author: cm.author, title: cm.message.split('\n')[0].slice(0, 120),
+      who: mine.has(cm.sha) ? 'mine' : /Sas-Admin-Client:/.test(cm.message) ? 'tool' : 'other'
+    }));
   }
 
   // ---------- 저장소 폴더 (예비) ----------
@@ -244,7 +325,7 @@
     let generatedAt = null;
     if (existing.includes('data/documents.json')) {
       const listText = await readText(handle, 'data/documents.json');
-      const list = JSON.parse(listText).documents || [];
+      const list = parseDocList(listText);
       for (let i = 0; i < list.length; i++) {
         const p = `data/documents/${list[i].id}.json`;
         try { docs.push(JSON.parse(await readText(handle, p))); } catch (e) { throw new Error(`${p} 파일을 읽지 못했습니다.`); }
@@ -318,7 +399,7 @@
 
   root.SASStore = {
     STATUS, state, onChange, dataDigest, markChanged, getDoc, addDocs, replaceDoc, removeDoc, touch, allIds, diffOutputs,
-    kvGet, kvSet, loadGithubConfig, connectGithub, forgetToken, loadFromGithub, publishToGithub,
+    kvGet, kvSet, loadGithubConfig, connectGithub, setExpiry, forgetToken, checkActivity, acknowledgeActivity, recentActivity, loadFromGithub, publishToGithub,
     fsSupported, pickFolder, reopenLastFolder, saveToFolder, buildZip, markExported, markPublished, loadZip,
     getDraft, restoreDraft, discardDraft, lastFolderName, download
   };

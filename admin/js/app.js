@@ -118,6 +118,71 @@
     if (go) openTokenDialog();
   }
 
+  // ---------- 변경 감시 ----------
+  const fmtTime = d => d ? new Date(d).toLocaleString('ko-KR', { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+  const STATUS_KO = { added: '추가', modified: '수정', removed: '삭제', renamed: '이름 바뀜' };
+  const commitsUrl = () => `https://github.com/${S.state.github.owner}/${S.state.github.repo}/commits/${S.state.github.branch || 'main'}`;
+  let lastActivity = null;
+
+  function activityItem(it) {
+    return h('div', { class: 'act-item' },
+      h('div', {}, h('b', {}, fmtTime(it.date)), ' · ', it.author, ' ',
+        it.fromTool ? h('span', { class: 'tag warn' }, '관리자 도구(다른 PC 또는 출처 불명)') : h('span', { class: 'tag err' }, 'GitHub 웹 화면 등 다른 곳'),
+        it.program ? h('span', { class: 'tag err' }, '프로그램 파일 변경') : null),
+      h('div', { class: 'small' }, it.title),
+      it.files && it.files.length ? h('ul', { class: 'small muted' }, it.files.map(f => h('li', {}, `${STATUS_KO[f.status] || f.status}: ${f.path}`)), it.moreFiles ? h('li', {}, `외 ${it.moreFiles}개 파일`) : null) : null,
+      h('a', { class: 'small', href: `https://github.com/${S.state.github.owner}/${S.state.github.repo}/commit/${it.sha}`, target: '_blank', rel: 'noopener noreferrer' }, 'GitHub에서 자세히 보기 ↗'));
+  }
+
+  function renderActivityButton() {
+    const b = $('btnActivity');
+    const n = lastActivity && lastActivity.items ? lastActivity.items.length : 0;
+    b.classList.toggle('hidden', !n);
+    b.textContent = `⚠️ 확인 필요한 변경 ${n}건`;
+  }
+
+  async function showActivityDialog() {
+    const a = lastActivity; if (!a || !a.items.length) return;
+    const ok = await modal(h('div', {},
+      h('h2', {}, '⚠️ 관리자 도구가 하지 않은 변경이 있습니다'),
+      h('p', {}, `마지막으로 확인한 뒤 이 PC의 관리자 도구가 아닌 곳에서 ${a.items.length}건${a.overflow ? ' 이상' : ''}의 변경이 있었습니다.`),
+      h('div', { class: 'act-list' }, a.items.map(activityItem)),
+      a.overflow ? h('p', { class: 'small muted' }, '변경이 많아 최근 30건까지만 확인했습니다. 나머지는 GitHub 변경 기록에서 보세요.') : null,
+      h('div', { class: 'notice' },
+        h('b', {}, '선생님이 직접 한 변경이라면 '), '(프로그램 업데이트를 웹 화면으로 올렸거나, 다른 PC에서 반영한 경우) 「내가 한 변경이 맞음」을 누르세요.', h('br'),
+        h('b', {}, '모르는 변경이라면 '), '출입증이 새어 나갔을 수 있습니다. ① GitHub Settings → Developer settings → Fine-grained tokens에서 출입증을 Delete하고 ② 새 출입증을 발급해 연결한 뒤 ③ 변경 기록에서 바뀐 내용을 되돌리세요.'),
+      h('p', {}, h('a', { href: commitsUrl(), target: '_blank', rel: 'noopener noreferrer' }, '전체 변경 기록 열기 ↗'))),
+      [{ label: '나중에 확인', value: false }, { label: '내가 한 변경이 맞음', value: true, primary: true }]);
+    if (ok) {
+      await S.acknowledgeActivity(a.headSha);
+      lastActivity = { items: [] }; renderActivityButton();
+      toast('확인했습니다. 이후의 변경부터 다시 감시합니다.');
+    }
+  }
+
+  async function runActivityCheck() {
+    try {
+      lastActivity = await S.checkActivity();
+      renderActivityButton();
+      if (lastActivity.first) toast('변경 감시를 시작했습니다. 다음부터 관리자 도구가 하지 않은 변경을 알려 드립니다.', 5000);
+      if (lastActivity.items.length) await showActivityDialog();
+    } catch (e) { console.warn('변경 감시 실패', e); }
+  }
+  $('btnActivity').onclick = () => showActivityDialog();
+
+  $('btnHistory').onclick = async () => {
+    if (!S.state.github || !S.state.github.token) { toast('GitHub를 먼저 연결해 주세요.'); return; }
+    try {
+      const list = await S.recentActivity(20);
+      const label = { mine: ['이 PC의 관리자 도구', 'ok'], tool: ['관리자 도구(다른 PC 또는 출처 불명)', 'warn'], other: ['GitHub 웹 화면 등', 'gray'] };
+      await modal(h('div', {}, h('h2', {}, '최근 변경 기록'),
+        h('div', { class: 'act-list' }, list.map(c => h('div', { class: 'act-item' },
+          h('div', {}, h('b', {}, fmtTime(c.date)), ' · ', c.author, ' ', h('span', { class: 'tag ' + label[c.who][1] }, label[c.who][0])),
+          h('div', { class: 'small' }, c.title)))),
+        h('p', {}, h('a', { href: commitsUrl(), target: '_blank', rel: 'noopener noreferrer' }, 'GitHub에서 전체 기록 보기 ↗'))));
+    } catch (e) { toast(e.message, 5000); }
+  };
+
   // ---------- GitHub 연결 ----------
   const PERIODS = [['custom', 'GitHub에서 정한 만료일 입력'], ['30', '30일'], ['60', '60일'], ['90', '90일'], ['none', '만료 없음']];
   function tokenForm(opts) {
@@ -183,12 +248,15 @@
         S.addDocs(add); msg += ` 작업 자료 ${add.length}건을 합쳤습니다.`;
       }
       toast(msg, 5000);
-      await offerDraft();
       if (S.state.docs.length) showTab('manage');
-      maybeAlertExpiry();
+      await runActivityCheck();
+      await offerDraft();
+      await maybeAlertExpiry();
     } catch (e) {
-      toast(e.message, 7000);
-      if (e.kind === 'auth') { renderConnectBox(); openTokenDialog(); }
+      if (e.kind === 'auth') { toast(e.message, 7000); renderConnectBox(); openTokenDialog(); return; }
+      await modal(h('div', {}, h('h2', {}, '자료를 불러오지 못했습니다'), h('p', {}, e.message)));
+      // 불러오지 못했어도 무엇이 바뀌었는지는 확인할 수 있게 한다
+      await runActivityCheck();
     }
   }
 
@@ -202,6 +270,17 @@
         h('tr', {}, h('td', {}, '출입증'), h('td', {}, g.token ? '연결됨 (' + (g.remember ? '이 PC에 기억' : '창을 닫으면 지워짐') + ')' : '없음 — 다시 입력해 주세요')),
         h('tr', {}, h('td', {}, '만료일'), h('td', {}, info.date ? `${info.date} (${info.days < 0 ? '만료됨' : '남은 기간 ' + info.days + '일'})` : '만료 없음')),
         h('tr', {}, h('td', {}, '연결한 날'), h('td', {}, g.connectedAt ? new Date(g.connectedAt).toLocaleDateString('ko-KR') : '-')))));
+      // 만료일만 고치기: 출입증을 다시 붙여 넣지 않아도 된다
+      const expInput = h('input', { type: 'date', value: g.expiresAt || '', style: 'max-width:200px' });
+      body.append(h('h3', {}, '만료일 고치기'),
+        h('p', { class: 'small muted' }, 'GitHub의 Fine-grained tokens 목록에서 출입증 이름 옆에 표시된 만료일(Expires on …)과 같게 맞추세요. 출입증은 다시 넣지 않아도 됩니다.'),
+        h('div', { class: 'row', style: 'justify-content:flex-start' }, expInput,
+          h('button', { style: 'flex:0', onclick: async () => {
+            if (!expInput.value) { toast('날짜를 선택해 주세요.'); return; }
+            await S.setExpiry(expInput.value); await S.kvSet('expiryAlert:' + expInput.value, 'ok');
+            toast('만료일을 ' + expInput.value + '로 고쳤습니다. 캘린더 알림도 다시 추가해 주세요.', 5000); openTokenDialog();
+          } }, '만료일 저장'),
+          h('button', { class: 'ghost', style: 'flex:0', onclick: async () => { await S.setExpiry(null); toast('만료 없음으로 바꿨습니다.'); openTokenDialog(); } }, '만료 없음')));
       if (g.expiresAt) body.append(h('div', { class: 'actions' },
         h('button', { onclick: () => { S.download(new Blob([GH.calendarFile(g.expiresAt, `${g.owner}/${g.repo}`)], { type: 'text/calendar;charset=utf-8' }), `GitHub출입증_만료알림_${g.expiresAt}.ics`); toast('캘린더 파일을 받았습니다. 열어서 휴대폰·PC 캘린더에 추가하세요.', 6000); } }, '📅 캘린더에 알림 추가 (30일·7일·1일 전)'),
         g.token ? h('button', { class: 'danger', onclick: async () => { if (await confirmBox('이 PC에서 출입증을 지울까요? 다시 반영하려면 출입증을 새로 입력해야 합니다.', '지우기', true)) { await S.forgetToken(); $('modal').classList.add('hidden'); renderConnectBox(); toast('출입증을 지웠습니다.'); } } }, '이 PC에서 출입증 지우기') : null));
@@ -271,11 +350,15 @@
       toast('반영하지 않았던 작업을 이어서 합니다. 끝나면 「사이트에 반영」을 눌러 주세요.', 6000); showTab('manage');
     };
     const discard = async () => { await S.discardDraft(); box.classList.add('hidden'); $('modal').classList.add('hidden'); };
+    let done;
+    const finished = new Promise(r => { done = r; });
+    const wrap = fn => async () => { await fn(); if ($('modal').classList.contains('hidden')) done(); };
     const content = h('div', {}, h('h2', {}, '반영하지 않은 작업이 있습니다'),
       h('p', {}, `${new Date(draft.saved_at).toLocaleString('ko-KR')}에 저장된 작업 · 자료 ${draft.docs.length}건${draft.source ? ' · ' + draft.source : ''}`),
       sameBase ? null : h('p', { class: 'notice warn' }, '그 뒤 GitHub의 자료가 바뀌었습니다. 이어서 하면 다른 곳의 변경을 덮어쓸 수 있습니다.'),
-      h('div', { class: 'actions' }, h('button', { class: 'primary', onclick: restore }, '이어서 하기'), h('button', { onclick: discard }, '버리기')));
+      h('div', { class: 'actions' }, h('button', { class: 'primary', onclick: wrap(restore) }, '이어서 하기'), h('button', { onclick: wrap(discard) }, '버리기')));
     $('modalBody').replaceChildren(content); $('modal').classList.remove('hidden');
+    return finished;
   }
 
   async function initStart() {
@@ -756,6 +839,7 @@ ${groups.map(g => `<div class="card"><h2>${e(g.title)}</h2><table>${g.items.map(
   }
 
   $('btnPublish').onclick = async () => {
+    if (S.state.source !== 'github') { toast('GitHub에서 자료를 불러온 상태에서만 반영할 수 있습니다. 새로고침해 다시 불러와 주세요.', 5000); return; }
     const { outputs, chk, diff } = await runCheck();
     if (!chk.ok) { toast('오류를 먼저 고쳐 주세요.', 4000); return; }
     if (!diff.changed.length && !diff.deletions.length) { toast('바뀐 파일이 없습니다. 사이트와 내용이 같습니다.'); return; }
