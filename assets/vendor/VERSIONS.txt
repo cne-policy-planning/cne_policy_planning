@@ -1,0 +1,2 @@
+pdf.js 6.2.108 (Apache-2.0) — legacy build, 한글 CMap만 포함
+JSZip 3.10.1 (MIT)

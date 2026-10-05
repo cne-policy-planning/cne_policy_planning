@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>관리자 도구 · 교무행정 통합검색</title>
+<link rel="stylesheet" href="css/admin.css">
+<!-- PDF·HWPX·ZIP 도구는 assets/vendor에 내장되어 있습니다. 원본 파일은 외부로 전송되지 않습니다. -->
+<script src="../assets/vendor/jszip/jszip.min.js"></script>
+<script type="module">
+  import * as pdfjsLib from '../assets/vendor/pdfjs/pdf.min.mjs';
+  window.pdfjsLib = pdfjsLib;
+</script>
+</head>
+<body>
+<header class="top">
+  <div class="brand">📚 교무행정 통합검색 <span class="sub">/ 관리자 도구</span></div>
+  <div class="top-right">
+    <span id="folderName" class="folder" title="자료를 불러온 곳"></span>
+    <span id="statusPill" class="pill muted">자료 없음</span>
+    <button id="btnToken" class="small" title="GitHub 연결·출입증 관리">🔑 GitHub 연결</button>
+  </div>
+</header>
+
+<nav class="tabs" role="tablist">
+  <button class="tab active" data-tab="register" role="tab">① 자료 등록</button>
+  <button class="tab" data-tab="manage" role="tab">② 자료 관리 <span id="docCount" class="count">0</span></button>
+  <button class="tab" data-tab="save" role="tab">③ 점검·반영</button>
+</nav>
+
+<div id="tokenBanner" class="banner hidden" role="alert"></div>
+
+<main>
+  <!-- 시작 안내 -->
+  <section id="startCard" class="card start hidden">
+    <h2>시작하기</h2>
+    <div id="connectBox"></div>
+    <div id="draftBox" class="notice hidden"></div>
+    <details class="more">
+      <summary>다른 방법으로 불러오기 (예비)</summary>
+      <p class="muted small">GitHub 연결이 안 될 때만 쓰세요. 저장소 폴더(GitHub Desktop)나 데이터 ZIP으로 작업할 수 있습니다.</p>
+      <div class="actions">
+        <button id="btnOpenFolder">저장소 폴더 열기</button>
+        <button id="btnReopen" class="hidden">지난 폴더 다시 열기</button>
+        <label class="btn">ZIP에서 불러오기<input id="zipInput" type="file" accept=".zip" hidden></label>
+        <label class="btn">v1 JSON 가져오기<input id="v1Input" type="file" accept=".json,application/json" hidden></label>
+      </div>
+      <p id="fsNotice" class="notice hidden">이 브라우저는 폴더 저장을 지원하지 않습니다.</p>
+    </details>
+  </section>
+
+  <!-- ① 자료 등록 -->
+  <section id="tab-register" class="tabpane">
+    <div class="card">
+      <h2>공통 정보 <span class="muted small">이번에 등록하는 파일 모두에 적용됩니다. 등록 후 자료별로 고칠 수 있습니다.</span></h2>
+      <div class="grid2">
+        <div>
+          <label>학교급 <span class="req">필수 · 복수 선택</span></label>
+          <div id="regLevels" class="checks"></div>
+        </div>
+        <div>
+          <label for="regCategory">업무 분류</label>
+          <input id="regCategory" type="text" list="categoryList" placeholder="예: 교무학사실무">
+        </div>
+        <div>
+          <label for="regYear">연도</label>
+          <input id="regYear" type="number" min="2000" max="2100" placeholder="예: 2026">
+        </div>
+        <div>
+          <label for="regOriginSite">원 출처</label>
+          <div class="row">
+            <select id="regOriginSite"></select>
+            <input id="regOriginUrl" type="url" placeholder="게시글 주소(선택)">
+          </div>
+        </div>
+      </div>
+      <datalist id="categoryList"></datalist>
+    </div>
+
+    <div class="card">
+      <h2>파일 선택</h2>
+      <div id="drop" class="drop" tabindex="0" role="button">
+        <div class="drop-icon">📂</div>
+        <strong>파일을 끌어다 놓거나 눌러서 선택하세요</strong>
+        <span class="muted small">PDF·HWPX는 본문을 추출해 업무별로 나눕니다. HWP·엑셀 등은 자료명·검색어로만 검색되는 링크형 자료로 등록됩니다.</span>
+        <input id="fileInput" type="file" multiple hidden>
+      </div>
+      <div id="queueWrap" class="hidden">
+        <table class="table" id="queueTable">
+          <thead><tr><th>파일</th><th>자료명</th><th>웍스 링크</th><th>분석 결과</th><th></th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <div class="actions">
+          <button id="btnAnalyze" class="primary">분석 시작</button>
+          <button id="btnAddDocs" disabled>목록에 추가</button>
+          <button id="btnClearQueue" class="ghost">비우기</button>
+          <span id="queueMsg" class="muted small"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ② 자료 관리 -->
+  <section id="tab-manage" class="tabpane hidden">
+    <div class="manage">
+      <aside class="card list-pane">
+        <input id="fQuery" type="search" placeholder="자료명·분류 검색">
+        <div class="row small-gap">
+          <select id="fLevel"><option value="">모든 학교급</option></select>
+          <select id="fCategory"><option value="">모든 분류</option></select>
+        </div>
+        <label class="inline"><input id="fNoWorks" type="checkbox"> 웍스 링크 없는 자료만</label>
+        <label class="inline"><input id="fWarn" type="checkbox"> 확인 필요 자료만</label>
+        <div id="docList" class="doc-list"></div>
+      </aside>
+      <div id="editor" class="editor">
+        <div class="card empty-editor muted">왼쪽 목록에서 자료를 선택하세요.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ③ 점검·저장 -->
+  <section id="tab-save" class="tabpane hidden">
+    <div class="card">
+      <h2>점검</h2>
+      <p class="muted small">저장 전에 자료 목록·학교급별 색인·자료별 파일이 서로 맞는지 검사합니다.</p>
+      <div class="actions"><button id="btnCheck" class="primary">점검 실행</button></div>
+      <div id="checkResult"></div>
+    </div>
+    <div class="card">
+      <h2>사이트에 반영</h2>
+      <div id="saveStatus" class="notice"></div>
+      <label for="commitMsg" style="margin-top:12px">변경 내용 메모 <span class="req">GitHub 기록에 남습니다(비워 두면 자동 작성)</span></label>
+      <input id="commitMsg" type="text" placeholder="예: 유치원 자료 3건 등록">
+      <div class="actions">
+        <button id="btnPublish" class="primary">사이트에 반영</button>
+        <span id="saveMsg" class="muted small"></span>
+      </div>
+      <p class="muted small">점검을 통과하면 바뀐 파일만 GitHub에 올립니다. 1~2분 뒤 공개 사이트에서 검색됩니다.</p>
+    </div>
+    <details class="card more">
+      <summary>예비 방법: 저장소 폴더 저장 · ZIP 내보내기</summary>
+      <p class="muted small">GitHub 연결이 안 될 때 씁니다. 폴더에 저장하거나 ZIP으로 받은 뒤, GitHub Desktop 또는 GitHub 웹 화면으로 직접 올려야 합니다.</p>
+      <div class="actions">
+        <button id="btnSaveFolder">저장소 폴더에 저장</button>
+        <button id="btnZipChanged">바뀐 파일만 ZIP</button>
+        <button id="btnZipAll" class="ghost">전체 ZIP</button>
+        <button id="btnPublished" class="ghost">직접 반영 완료로 표시</button>
+      </div>
+    </details>
+    <p class="muted small">※ 공개 사이트의 데이터 파일은 누구나 내려받을 수 있습니다. 보호가 필요한 자료는 올리지 마세요. 출입증은 이 PC의 브라우저에만 보관되며 사이트 파일에는 들어가지 않습니다.</p>
+  </section>
+</main>
+
+<div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+<div id="modal" class="modal hidden" role="dialog" aria-modal="true"><div class="modal-box"><div id="modalBody"></div></div></div>
+
+<script src="../assets/js/core/normalize.js"></script>
+<script src="../assets/js/core/textlayout.js"></script>
+<script src="../assets/js/core/sectionizer.js"></script>
+<script src="../assets/js/core/schema.js"></script>
+<script src="../assets/js/core/indexer.js"></script>
+<script src="js/extract.js"></script>
+<script src="js/github.js"></script>
+<script src="js/store.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
