@@ -74,8 +74,6 @@
     $('folderName').textContent = S.state.sourceLabel || '자료를 아직 불러오지 않음';
     $('docCount').textContent = S.state.docs.length;
     $('startCard').classList.toggle('hidden', !!S.state.source || S.state.docs.length > 0);
-    const cats = [...new Set(S.state.docs.map(d => d.category).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'ko'));
-    $('categoryList').replaceChildren(...cats.map(c => h('option', { value: c })));
     renderTokenState();
   }
   S.onChange(() => { renderHeader(); if (currentTab === 'manage') renderList(); if (currentTab === 'save') renderSaveStatus(); });
@@ -379,9 +377,18 @@
     }
   }
 
+  // 업무 분류 드롭다운: 고정 목록(SAS.CATEGORIES). 목록에 없는 기존 값은 지우지 않고 따로 보여 준다.
+  function categoryOptions(current) {
+    const opts = [h('option', { value: '', selected: !current }, '분류 선택')];
+    if (current && !SAS.CATEGORIES.includes(current)) opts.push(h('option', { value: current, selected: true }, `${current} (목록에 없음)`));
+    SAS.CATEGORIES.forEach(c => opts.push(h('option', { value: c, selected: c === current }, c)));
+    return opts;
+  }
+
   // ---------- ① 자료 등록 ----------
   levelChecks($('regLevels'), []);
   $('regOriginSite').replaceChildren(h('option', { value: '' }, '원 출처 선택(선택)'), ...SAS.ORIGIN_SITES.map(s => h('option', { value: s }, s)), h('option', { value: '기타' }, '기타'));
+  $('regCategory').replaceChildren(...categoryOptions(''));
   $('regYear').value = new Date().getFullYear();
 
   let queue = [];
@@ -588,7 +595,7 @@
       h('div', { class: 'grid2' },
         field('자료명', h('input', { type: 'text', value: doc.title, onchange: e => { doc.title = e.target.value.trim(); changed(doc, true); renderList(); } })),
         field('학교급', lv),
-        field('업무 분류', h('input', { type: 'text', list: 'categoryList', value: doc.category, onchange: e => { doc.category = e.target.value.trim(); changed(doc); renderList(); } })),
+        field('업무 분류', h('select', { onchange: e => { doc.category = e.target.value; changed(doc); renderList(); } }, ...categoryOptions(doc.category))),
         field('연도', h('input', { type: 'number', value: doc.year || '', onchange: e => { doc.year = e.target.value ? Number(e.target.value) : null; changed(doc); } })),
         field('웍스 링크 (원본 내려받기)', h('div', { class: 'row' }, worksInput, doc.works_url ? h('a', { class: 'btn small', href: doc.works_url, target: '_blank', rel: 'noopener noreferrer', style: 'flex:0' }, '열기 ↗') : null)),
         field('원 출처', h('div', { class: 'row' }, originSel, h('input', { type: 'url', value: doc.origin.url, placeholder: '게시글 주소', onchange: e => { doc.origin.url = e.target.value.trim(); changed(doc); } })), '개정판 확인용 기록입니다. 사용자 화면의 내려받기는 웍스 링크로 연결됩니다.')),

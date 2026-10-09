@@ -4,18 +4,55 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>교무행정 통합검색</title>
-<style>
-  :root { font-family: system-ui, -apple-system, "Malgun Gothic", sans-serif; color: #1d2939; background: #f5f7fa; }
-  body { margin: 0; display: grid; place-items: center; min-height: 100vh; padding: 20px; box-sizing: border-box; }
-  .card { background: #fff; border: 1px solid #e1e6ed; border-radius: 14px; padding: 28px; max-width: 520px; line-height: 1.7; }
-  h1 { font-size: 20px; margin: 0 0 8px; }
-  p { color: #677489; margin: 0; font-size: 14px; }
-</style>
+<meta name="description" content="유아·초등·중등·특수 교무행정 매뉴얼·지침·서식을 한곳에서 찾고 내려받습니다.">
+<link rel="stylesheet" href="assets/css/site.css">
 </head>
 <body>
-  <div class="card">
-    <h1>📚 교무행정 통합검색</h1>
-    <p>사용자 검색 화면을 준비하고 있습니다. (개발 2단계: 학교급 선택 → 통합검색 → 미리보기 · 내려받기)</p>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#/">📚 교무행정 통합검색</a>
+    <nav id="levelNav" class="level-nav hidden" aria-label="학교급"></nav>
   </div>
+</header>
+
+<main class="wrap">
+  <!-- 첫 화면: 학교급 선택 -->
+  <section id="home" class="hidden">
+    <div class="hero">
+      <h1>어느 학교급 자료를 찾으세요?</h1>
+      <p>업무 매뉴얼·지침·서식을 업무 이름이나 낱말로 찾아 바로 내려받을 수 있습니다.</p>
+    </div>
+    <div id="levelCards" class="level-cards"></div>
+    <p class="home-note">자료는 도교육청 자료실 등에 게시된 공개 자료를 모은 것입니다.<br>원본과 서식은 네이버 웍스에서 내려받습니다.</p>
+  </section>
+
+  <!-- 학교급 화면: 검색 · 업무별 보기 -->
+  <section id="level" class="hidden">
+    <div class="level-head">
+      <h1 id="levelTitle"></h1>
+      <form id="searchForm" class="search-box" role="search">
+        <input id="q" type="search" autocomplete="off" placeholder="업무 이름이나 낱말 (예: 현장체험학습, 소풍, 보결)" aria-label="검색어">
+        <button class="primary" type="submit">검색</button>
+      </form>
+      <div id="hints" class="hints"></div>
+      <div id="catChips" class="chips" aria-label="업무 분류"></div>
+    </div>
+    <div id="summary" class="summary" aria-live="polite"></div>
+    <div id="results"></div>
+  </section>
+
+  <div id="status"></div>
+</main>
+
+<footer class="site">
+  <div class="wrap" id="footer">교무행정 통합검색 · 원본 자료의 저작권은 각 발행 기관에 있습니다.</div>
+</footer>
+
+<script src="assets/js/core/normalize.js"></script>
+<script src="assets/js/core/sectionizer.js"></script>
+<script src="assets/js/core/schema.js"></script>
+<script src="assets/js/core/indexer.js"></script>
+<script src="assets/js/site/search.js"></script>
+<script src="assets/js/site/app.js"></script>
 </body>
 </html>

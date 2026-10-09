@@ -19,6 +19,9 @@
   ];
   const TEXT_FORMATS = ['pdf', 'hwpx'];
   const ORIGIN_SITES = ['학교업무자료실', '부서별자료실', '학교업무최적화자료실'];
+  // 업무 분류(고정 목록). 관리자 도구의 드롭다운과 사용자 화면에서 이 순서대로 씁니다.
+  // 바꿀 때는 이 목록만 고치면 됩니다. 이미 등록된 자료의 분류가 목록에 없으면 "목록에 없음"으로 표시됩니다.
+  const CATEGORIES = ['교무학사실무'];
 
   function levelSlug(name) { const l = LEVELS.find(x => x.name === name); return l ? l.slug : null; }
   function levelName(slug) { const l = LEVELS.find(x => x.slug === slug); return l ? l.name : null; }
@@ -258,5 +261,5 @@
     return { errors, warnings };
   }
 
-  return { SCHEMA_VERSION, LEVELS, TEXT_FORMATS, ORIGIN_SITES, levelSlug, levelName, formatOf, kindOf, newDocId, titleFromFilename, createDocument, finalizeDocument, carryKeywords, carryForms, numberForms, formList, matchBundle, migrateV1, validateDocument };
+  return { SCHEMA_VERSION, LEVELS, TEXT_FORMATS, ORIGIN_SITES, CATEGORIES, levelSlug, levelName, formatOf, kindOf, newDocId, titleFromFilename, createDocument, finalizeDocument, carryKeywords, carryForms, numberForms, formList, matchBundle, migrateV1, validateDocument };
 });
