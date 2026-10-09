@@ -1,0 +1,28 @@
+{
+ "schema_version": "2.0",
+ "generated_at": "2026-10-09T04:08:22.210Z",
+ "shard_count": 128,
+ "document_count": 1,
+ "levels": {
+  "kindergarten": {
+   "name": "유아",
+   "documents": 1,
+   "sections": 17
+  },
+  "elementary": {
+   "name": "초등",
+   "documents": 0,
+   "sections": 0
+  },
+  "middle": {
+   "name": "중등",
+   "documents": 0,
+   "sections": 0
+  },
+  "special": {
+   "name": "특수",
+   "documents": 0,
+   "sections": 0
+  }
+ }
+}

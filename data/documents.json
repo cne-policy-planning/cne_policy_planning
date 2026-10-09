@@ -1,0 +1,38 @@
+{
+ "schema_version": "2.0",
+ "generated_at": "2026-10-09T04:08:22.210Z",
+ "count": 1,
+ "documents": [
+  {
+   "id": "doc-2026-ie5uf6",
+   "title": "1-1.교무학사 도움자료 유치원",
+   "school_levels": [
+    "유아"
+   ],
+   "category": "교무학사실무",
+   "year": 2026,
+   "format": "hwpx",
+   "kind": "text",
+   "works_url": "https://works.do/xjip3jl",
+   "origin": {
+    "site": "학교업무자료실",
+    "url": "",
+    "note": ""
+   },
+   "search_keywords": [
+    "교육과정",
+    "설명회",
+    "입학식",
+    "졸업",
+    "생활기록부",
+    "장학",
+    "보결수업",
+    "보호자 상담"
+   ],
+   "forms_bundle_url": "",
+   "section_count": 17,
+   "form_count": 0,
+   "updated_at": "2026-10-09T04:07:57.064Z"
+  }
+ ]
+}
