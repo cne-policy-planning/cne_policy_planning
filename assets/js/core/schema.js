@@ -98,17 +98,47 @@
   /**
    * 서식 번호 매기기: 내려받기 서식(file 링크)에 업무 순서대로 1번부터 번호를 준다.
    * 같은 주소의 서식은 한 번만 번호를 받는다(서식 모음에 한 번만 들어가므로).
+   * 관리자가 직접 추가한 서식(manual)은 자동으로 찾은 서식 뒤에 추가한 순서대로 번호를 받는다.
+   * 그래서 직접 추가해도 기존 번호가 바뀌지 않고, 서식 모음 파일 끝에 이어 붙이면 된다.
    */
   function numberForms(doc) {
-    const byUrl = new Map();
+    const byKey = new Map();
     let no = 0;
-    (doc.links || []).forEach(l => {
+    const links = doc.links || [];
+    [...links.filter(l => !l.manual), ...links.filter(l => l.manual)].forEach(l => {
       if (l.kind !== 'file') { l.form_no = null; return; }
-      if (!byUrl.has(l.url)) byUrl.set(l.url, ++no);
-      l.form_no = byUrl.get(l.url);
+      const key = l.url ? l.url : 'manual:' + l.id;
+      if (!byKey.has(key)) byKey.set(key, ++no);
+      l.form_no = byKey.get(key);
       if (l.bundle_page === undefined) l.bundle_page = null;
     });
     return no;
+  }
+
+  /** 서식 직접 추가: names(여러 개 가능)를 업무 secId에 붙인다. 추가된 링크 목록을 반환 */
+  function addManualForms(doc, secId, names, url) {
+    const sec = (doc.sections || []).find(s => s.id === secId);
+    if (!sec) throw new Error('업무를 선택해 주세요.');
+    doc.links = doc.links || [];
+    const used = new Set(doc.links.map(l => l.id));
+    let n = 1;
+    const added = N.splitList(names).map(text => {
+      while (used.has('man-' + String(n).padStart(4, '0'))) n++;
+      const id = 'man-' + String(n).padStart(4, '0'); used.add(id);
+      const l = { id, text, url: (url || '').trim(), kind: 'file', block: sec.block_start, section_id: secId, manual: true, form_no: null, bundle_page: null };
+      doc.links.push(l);
+      return l;
+    });
+    numberForms(doc);
+    return added;
+  }
+
+  /** 직접 추가한 서식 삭제(자동으로 찾은 서식은 지우지 않는다) */
+  function removeManualForm(doc, linkId) {
+    const before = (doc.links || []).length;
+    doc.links = (doc.links || []).filter(l => !(l.manual && l.id === linkId));
+    numberForms(doc);
+    return before !== doc.links.length;
   }
 
   /** 서식 목록(번호순, 중복 제거) */
@@ -147,12 +177,22 @@
     return { found, total: forms.length, missing, hasPages };
   }
 
-  /** 자료 교체 시 서식 모음 정보와 쪽수를 주소 기준으로 옮긴다 */
+  /** 자료 교체 시 서식 모음 정보와 쪽수를 주소 기준으로 옮긴다. 직접 추가한 서식은 같은 이름의 업무로 옮긴다 */
   function carryForms(oldDoc, newDoc) {
     newDoc.forms_bundle = Object.assign({}, oldDoc.forms_bundle || {});
-    const byUrl = new Map((oldDoc.links || []).filter(l => l.form_no != null).map(l => [l.url, l]));
+    const byUrl = new Map((oldDoc.links || []).filter(l => l.form_no != null && !l.manual).map(l => [l.url, l]));
     let kept = 0;
     (newDoc.links || []).forEach(l => { const o = byUrl.get(l.url); if (o && o.bundle_page != null) { l.bundle_page = o.bundle_page; kept++; } });
+    const secByName = new Map((newDoc.sections || []).map(s => [N.norm(s.heading), s]));
+    (oldDoc.links || []).filter(l => l.manual).forEach(l => {
+      const os = (oldDoc.sections || []).find(s => s.id === l.section_id);
+      const ns = os ? secByName.get(N.norm(os.heading)) : null;
+      if (!ns) return;
+      newDoc.links = newDoc.links || [];
+      newDoc.links.push(Object.assign({}, l, { section_id: ns.id, block: ns.block_start }));
+      if (l.bundle_page != null) kept++;
+    });
+    numberForms(newDoc);
     return kept;
   }
 
@@ -261,5 +301,5 @@
     return { errors, warnings };
   }
 
-  return { SCHEMA_VERSION, LEVELS, TEXT_FORMATS, ORIGIN_SITES, CATEGORIES, levelSlug, levelName, formatOf, kindOf, newDocId, titleFromFilename, createDocument, finalizeDocument, carryKeywords, carryForms, numberForms, formList, matchBundle, migrateV1, validateDocument };
+  return { SCHEMA_VERSION, LEVELS, TEXT_FORMATS, ORIGIN_SITES, CATEGORIES, levelSlug, levelName, formatOf, kindOf, newDocId, titleFromFilename, createDocument, finalizeDocument, carryKeywords, carryForms, numberForms, addManualForms, removeManualForm, formList, matchBundle, migrateV1, validateDocument };
 });

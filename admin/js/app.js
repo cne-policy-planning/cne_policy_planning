@@ -544,6 +544,8 @@
 
   function reassignLinks(doc) {
     (doc.links || []).forEach(l => {
+      // 직접 추가한 서식은 그 업무가 남아 있으면 그대로 둔다
+      if (l.manual && (doc.sections || []).some(s => s.id === l.section_id)) return;
       const owners = (doc.sections || []).filter(s => l.block >= s.block_start && l.block <= s.block_end);
       l.section_id = owners.length ? owners[owners.length - 1].id : null;
     });
@@ -631,8 +633,8 @@
         rows.push(h('tr', { class: 'open' }, h('td', { colspan: 7 },
           h('div', { class: 'small muted', style: 'margin-bottom:6px' }, `${pageLabel(doc, s.block_start)} ~ ${pageLabel(doc, s.block_end)} · 미리보기 시작 문장: ${SAS.sectionLead(doc, s, 90)}`),
           h('div', { class: 'preview' }, SAS.sectionText(doc, s)),
-          secForms.length ? h('div', { style: 'margin-top:10px' }, h('b', { class: 'small' }, `이 업무의 서식 ${secForms.length}개`),
-            ...secForms.map(l => h('div', { class: 'form-row' }, h('span', { class: 'no' }, l.form_no + '번'), h('span', {}, l.text), h('span', { class: 'small muted' }, l.bundle_page ? `모음 ${l.bundle_page}쪽` : ''))) ) : null)));
+          h('div', { style: 'margin-top:10px' }, h('b', { class: 'small' }, `이 업무의 서식 ${secForms.length}개 `), h('button', { class: 'small', onclick: () => addFormsDialog(doc, s.id) }, '+ 서식 직접 추가'),
+            ...secForms.map(l => h('div', { class: 'form-row' }, h('span', { class: 'no' }, l.form_no + '번'), h('span', {}, l.text, l.manual ? h('span', { class: 'tag gray' }, '직접 추가') : null), h('span', { class: 'small muted' }, l.bundle_page ? `모음 ${l.bundle_page}쪽` : '')))))));
       }
     });
     return h('div', { class: 'card' },
@@ -641,6 +643,7 @@
           h('button', { class: 'small', onclick: () => addSection(doc) }, '+ 업무 추가'),
           h('button', { class: 'small ghost', onclick: () => resplit(doc) }, '자동 분할 다시'))),
       h('p', { class: 'muted small' }, (doc.extraction.toc_found ? '목차를 인식해 자동으로 나눴습니다. ' : '목차를 찾지 못해 본문 제목으로 나눴습니다. ') + `쪽 번호는 ${isPdf ? 'PDF 쪽(파일상 순서)' : '문단 번호'}입니다. 업무별 검색어는 사용자가 쓰는 말(예: 소풍)을 넣으면 해당 업무가 2순위로 검색됩니다.`),
+      doc.sections.some(s => SAS.isUntitled(doc, s)) ? h('div', { class: 'notice warn' }, `목차가 없어 쪽·길이 기준으로 나눈 구간 ${doc.sections.filter(s => SAS.isUntitled(doc, s)).length}개는 사용자 화면의 「업무 목록」에 나오지 않고 업무명으로도 검색되지 않습니다(본문·검색어 검색은 됩니다). 업무명을 직접 고친 구간은 진짜 업무로 보고 목록에 나옵니다.`) : null,
       h('div', { style: 'overflow:auto' }, h('table', { class: 'table' },
         h('thead', {}, h('tr', {}, ...['#', '상위 분류', '업무명', isPdf ? 'PDF 쪽' : '문단', '업무 검색어', '서식', ''].map(t => h('th', {}, t)))),
         h('tbody', {}, rows))),
@@ -690,11 +693,17 @@
 
   function formsCard(doc, forms) {
     const fb = doc.forms_bundle || (doc.forms_bundle = { works_url: '', filename: '', page_count: null, matched_at: null });
-    const card = h('div', { class: 'card' }, h('h2', {}, `서식 (${forms.length})`));
-    if (!forms.length) { card.append(h('p', { class: 'muted small' }, '이 자료에서 내려받기 서식 링크를 찾지 못했습니다.')); return card; }
+    const manualCount = forms.filter(f => f.manual).length;
+    const card = h('div', { class: 'card' },
+      h('div', { class: 'editor-head' }, h('h2', {}, `서식 (${forms.length})`),
+        h('div', { class: 'actions', style: 'margin:0' }, h('button', { class: 'small', onclick: () => addFormsDialog(doc) }, '+ 서식 직접 추가'))));
+    if (!forms.length) {
+      card.append(h('p', { class: 'muted small' }, '이 자료에서 내려받기 서식 링크를 찾지 못했습니다(HWPX·스캔 자료 등). 관련 서식이 있으면 「+ 서식 직접 추가」로 업무별로 넣어 주세요. 사용자 화면에 "이 업무의 서식 N번"으로 안내됩니다.'));
+      return card;
+    }
     const found = forms.filter(f => f.bundle_page != null).length;
     card.append(
-      h('p', { class: 'muted small' }, 'PDF 안의 서식 링크를 업무 순서대로 번호 매긴 목록입니다. 이 순서대로 한글에서 서식을 이어 붙여 "서식 모음" 파일 하나를 만들고, 웍스에 올린 링크를 아래에 넣으세요. 사용자에게는 "서식 모음 내려받기 → N번 서식 · 몇 쪽"으로 안내됩니다.'),
+      h('p', { class: 'muted small' }, '자료 안의 서식 링크를 업무 순서대로 번호 매긴 목록입니다. 링크로 찾지 못한 서식은 「+ 서식 직접 추가」로 넣을 수 있으며, 기존 번호 뒤에 이어서 번호가 붙습니다. 이 번호 순서대로 한글에서 서식을 이어 붙여 "서식 모음" 파일 하나를 만들고, 웍스에 올린 링크를 아래에 넣으세요. 사용자에게는 "서식 모음 내려받기 → N번 서식 · 몇 쪽"으로 안내됩니다.'),
       h('div', { class: 'grid2' },
         field('서식 모음 웍스 링크', h('input', { type: 'url', value: fb.works_url, placeholder: 'https://works…', onchange: e => { fb.works_url = e.target.value.trim(); changed(doc, true); renderList(); } })),
         field('서식 모음 파일명 (안내용)', h('input', { type: 'text', value: fb.filename, placeholder: `예: ${doc.title}_서식모음.hwp`, onchange: e => { fb.filename = e.target.value.trim(); changed(doc); } }))),
@@ -702,13 +711,20 @@
         h('button', { onclick: () => downloadFormList(doc) }, '① 서식 내려받기 목록 만들기'),
         h('button', { onclick: () => matchBundleFile(doc) }, '② 서식 모음에서 쪽 찾기 (PDF·HWPX)'),
         h('span', { class: 'small muted' }, fb.matched_at ? `쪽 확인 ${found}/${forms.length}개 · ${new Date(fb.matched_at).toLocaleDateString('ko-KR')}` : '아직 쪽 정보가 없습니다(번호만 안내됨)')),
-      h('details', {}, h('summary', {}, '서식 번호·쪽 목록 보기 / 직접 고치기'),
+      h('details', { open: manualCount > 0 && forms.length <= 30 ? true : null }, h('summary', {}, '서식 번호·쪽 목록 보기 / 직접 고치기'),
         h('div', { class: 'form-row small muted' }, h('span', {}, '번호'), h('span', {}, '서식명 (업무)'), h('span', {}, '모음 쪽')),
         ...forms.map(f => {
           const sec = doc.sections.find(s => s.id === f.section_id);
           return h('div', { class: 'form-row' },
             h('span', { class: 'no' }, f.form_no + '번'),
-            h('span', {}, f.text, ' ', h('span', { class: 'small muted' }, sec ? `· ${sec.heading}` : ''), ' ', h('a', { class: 'small', href: f.url, target: '_blank', rel: 'noopener noreferrer' }, '원문↗'), f.bundle_found === false ? h('span', { class: 'tag warn' }, '못 찾음') : null),
+            h('span', {}, f.text, ' ', h('span', { class: 'small muted' }, sec ? `· ${sec.heading}` : '· 업무 없음'), ' ',
+              f.url ? h('a', { class: 'small', href: f.url, target: '_blank', rel: 'noopener noreferrer' }, '원문↗') : null,
+              f.manual ? h('span', { class: 'tag gray' }, '직접 추가') : null,
+              f.bundle_found === false ? h('span', { class: 'tag warn' }, '못 찾음') : null,
+              f.manual ? h('button', { class: 'small ghost', title: '직접 추가한 서식 삭제', onclick: async () => {
+                if (!(await confirmBox(`「${SAS.esc(f.text)}」 서식을 지울까요? 뒤에 직접 추가한 서식의 번호가 하나씩 당겨집니다.`, '삭제', true))) return;
+                SAS.removeManualForm(doc, f.id); changed(doc, true);
+              } }, '✕') : null),
             h('input', { type: 'number', min: 1, value: f.bundle_page == null ? '' : f.bundle_page, onchange: e => {
               const v = e.target.value ? Number(e.target.value) : null;
               doc.links.filter(l => l.form_no === f.form_no).forEach(l => { l.bundle_page = v; l.bundle_found = v != null; });
@@ -716,6 +732,30 @@
             } }));
         })));
     return card;
+  }
+
+  /** 서식 직접 추가 창: 업무를 고르고 서식 이름을 한 줄에 하나씩 */
+  async function addFormsDialog(doc, secId) {
+    if (!doc.sections.length) { toast('먼저 업무 구간이 있어야 서식을 붙일 수 있습니다.'); return; }
+    const sel = h('select', {}, ...doc.sections.map((s, i) => h('option', { value: s.id, selected: s.id === secId }, `${i + 1}. ${s.parent_heading ? s.parent_heading + ' › ' : ''}${s.heading}`)));
+    const names = h('textarea', { rows: 5, placeholder: '예:\n현장체험학습 계획서(예시)\n학부모 동의서' });
+    const url = h('input', { type: 'url', placeholder: '원래 내려받기 주소(선택)' });
+    const page = h('input', { type: 'number', min: 1, placeholder: '서식 모음 쪽(선택)' });
+    const ok = await modal(h('div', {}, h('h2', {}, '서식 직접 추가'),
+      h('p', { class: 'muted small' }, '자료에서 링크로 찾지 못한 서식을 업무에 붙입니다. 번호는 기존 서식 뒤에 이어서 붙으니, 서식 모음 파일에도 같은 순서로 끝에 이어 붙여 주세요.'),
+      field('업무', sel), h('div', { style: 'margin-top:10px' }, field('서식 이름 (한 줄에 하나씩, 여러 개 가능)', names)),
+      h('div', { class: 'grid2', style: 'margin-top:10px' }, field('원래 주소', url, '출처 기록용입니다. 사용자 화면에는 나오지 않습니다.'), field('서식 모음 쪽', page, '서식을 1개만 넣을 때 쓸 수 있습니다.'))),
+      [{ label: '취소', value: false }, { label: '추가', value: true, primary: true }]);
+    if (!ok) return;
+    const list = SAS.splitList(names.value);
+    if (!list.length) { toast('서식 이름을 입력해 주세요.'); return; }
+    if (url.value.trim() && !/^https?:\/\//i.test(url.value.trim())) { toast('주소는 http(s)로 시작해야 합니다.'); return; }
+    try {
+      const added = SAS.addManualForms(doc, sel.value, list, list.length === 1 ? url.value : '');
+      if (list.length === 1 && page.value) added[0].bundle_page = Number(page.value);
+      changed(doc, true); renderList();
+      toast(`서식 ${added.length}개를 추가했습니다(${added[0].form_no}번${added.length > 1 ? `~${added[added.length - 1].form_no}번` : ''}).`);
+    } catch (e) { toast(e.message); }
   }
 
   function safeName(s) { return String(s).replace(/[\\/:*?"<>|]/g, '').replace(/\s+/g, ' ').trim().slice(0, 60); }
@@ -740,7 +780,7 @@
 <li>완성한 파일을 웍스에 올리고, 관리자 도구의 「서식 모음 웍스 링크」에 공유 링크를 넣습니다.</li>
 <li>같은 파일을 <b>PDF로도 저장</b>해 관리자 도구의 「서식 모음에서 쪽 찾기」에 넣으면 각 서식의 쪽 번호가 자동으로 채워집니다.</li></ol>
 <p style="font-size:12px;color:#677489">PDF·한글이 아닌 큰 자료(길라잡이 등)는 모음에 넣기 어려우면 빼도 됩니다. 뺀 서식은 관리자 도구에서 쪽 칸을 비워 두세요.</p></div>
-${groups.map(g => `<div class="card"><h2>${e(g.title)}</h2><table>${g.items.map(f => `<tr><td class="n">${f.form_no}번</td><td>${e(f.text)}<br><code>${e(pad3(f.form_no) + '_' + safeName(f.text))}</code></td><td style="width:90px"><a href="${e(f.url)}" target="_blank" rel="noopener noreferrer" onclick="this.closest('tr').classList.add('done')">내려받기</a></td></tr>`).join('')}</table></div>`).join('\n')}
+${groups.map(g => `<div class="card"><h2>${e(g.title)}</h2><table>${g.items.map(f => `<tr><td class="n">${f.form_no}번</td><td>${e(f.text)}<br><code>${e(pad3(f.form_no) + '_' + safeName(f.text))}</code></td><td style="width:90px">${f.url ? `<a href="${e(f.url)}" target="_blank" rel="noopener noreferrer" onclick="this.closest('tr').classList.add('done')">내려받기</a>` : '<span style="color:#677489;font-size:12px">직접 추가<br>(파일 직접 준비)</span>'}</td></tr>`).join('')}</table></div>`).join('\n')}
 </main></body></html>`;
     S.download(new Blob([html], { type: 'text/html;charset=utf-8' }), `서식목록_${safeName(doc.title)}.html`);
     toast('서식 내려받기 목록을 저장했습니다. 브라우저로 열어 순서대로 내려받으세요.', 5000);

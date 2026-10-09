@@ -52,7 +52,9 @@
       (d.sections || []).forEach((s, si) => {
         if (si >= SEC_BASE) throw new Error(`${d.title}: 업무가 ${SEC_BASE}개를 넘습니다.`);
         const files = (d.links || []).filter(l => l.section_id === s.id && l.kind === 'file').length;
-        index.sections.push({ d: di, s: si, id: s.id, h: s.heading, p: s.parent_heading || '', pg: s.pdf_pages || [], pp: s.printed_pages || [], k: s.keywords || [], l: N.sectionLead(d, s, 90), n: files });
+        const sec = { d: di, s: si, id: s.id, h: s.heading, p: s.parent_heading || '', pg: s.pdf_pages || [], pp: s.printed_pages || [], k: s.keywords || [], l: N.sectionLead(d, s, 90), n: files };
+        if (N.isUntitled(d, s)) sec.u = 1; // 목차 없이 나눈 구간: 업무 목록에 안 보이고 업무명으로 검색되지 않음
+        index.sections.push(sec);
         const ref = di * SEC_BASE + si;
         for (const g of N.bigrams(N.norm(N.sectionText(d, s)))) {
           if (g.length < 2) continue;

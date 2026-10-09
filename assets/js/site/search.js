@@ -60,9 +60,10 @@
       const doc = index.docs[s.d];
       if (!docOk(doc)) continue;
       let tier = 0;
-      if (s._h === q.nq) tier = TIER.EXACT;
-      else if (s._h.includes(q.nq) || allTerms([s._h], q)) tier = TIER.TITLE;
-      else if (fieldHit(s._k, q) || (allTerms([s._h, ...s._k], q) && s._k.length)) tier = TIER.KEYWORD;
+      const hh = s.u ? '' : s._h; // 목차 없이 나눈 구간의 이름은 제목이 아니므로 업무명 검색에서 뺀다
+      if (hh && hh === q.nq) tier = TIER.EXACT;
+      else if (hh && (hh.includes(q.nq) || allTerms([hh], q))) tier = TIER.TITLE;
+      else if (fieldHit(s._k, q) || (allTerms([hh, ...s._k], q) && s._k.length)) tier = TIER.KEYWORD;
       if (tier) { sections.push({ tier, sec: s, doc }); seen.add(s._ref); }
     }
     sections.sort((a, b) => a.tier - b.tier || a.sec.d - b.sec.d || a.sec.s - b.sec.s);

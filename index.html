@@ -4,13 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>교무행정 통합검색</title>
-<meta name="description" content="유아·초등·중등·특수 교무행정 매뉴얼·지침·서식을 한곳에서 찾고 내려받습니다.">
+<meta name="description" content="업무 매뉴얼, 지침, 서식을 키워드로 찾아 바로 내려받을 수 있습니다.">
 <link rel="stylesheet" href="assets/css/site.css">
 </head>
 <body>
+<div class="page-bg" aria-hidden="true"></div>
 <header class="top">
   <div class="wrap">
-    <a class="brand" href="#/">📚 교무행정 통합검색</a>
+    <a class="brand" href="#/">교무행정 통합검색</a>
     <nav id="levelNav" class="level-nav hidden" aria-label="학교급"></nav>
   </div>
 </header>
@@ -18,12 +19,16 @@
 <main class="wrap">
   <!-- 첫 화면: 학교급 선택 -->
   <section id="home" class="hidden">
+    <div class="dots" aria-hidden="true"></div>
     <div class="hero">
-      <h1>어느 학교급 자료를 찾으세요?</h1>
-      <p>업무 매뉴얼·지침·서식을 업무 이름이나 낱말로 찾아 바로 내려받을 수 있습니다.</p>
+      <div class="eyebrow">학교의 모든 교무행정 자료를 한 곳에서</div>
+      <h1>어느 <em>학교급 자료</em>를 찾으세요?</h1>
+      <p>업무 매뉴얼, 지침, 서식을 키워드로 찾아 바로 내려받을 수 있습니다.</p>
     </div>
     <div id="levelCards" class="level-cards"></div>
     <p class="home-note">자료는 도교육청 자료실 등에 게시된 공개 자료를 모은 것입니다.<br>원본과 서식은 네이버 웍스에서 내려받습니다.</p>
+    <img class="deco left" src="assets/img/deco-left.png" alt="" aria-hidden="true">
+    <img class="deco right" src="assets/img/deco-right.png" alt="" aria-hidden="true">
   </section>
 
   <!-- 학교급 화면: 검색 · 업무별 보기 -->
@@ -31,7 +36,7 @@
     <div class="level-head">
       <h1 id="levelTitle"></h1>
       <form id="searchForm" class="search-box" role="search">
-        <input id="q" type="search" autocomplete="off" placeholder="업무 이름이나 낱말 (예: 현장체험학습, 소풍, 보결)" aria-label="검색어">
+        <input id="q" type="search" autocomplete="off" placeholder="업무 관련 키워드 (예: 현장체험학습, 소풍, 보결)" aria-label="검색어">
         <button class="primary" type="submit">검색</button>
       </form>
       <div id="hints" class="hints"></div>
@@ -45,7 +50,10 @@
 </main>
 
 <footer class="site">
-  <div class="wrap" id="footer">교무행정 통합검색 · 원본 자료의 저작권은 각 발행 기관에 있습니다.</div>
+  <div class="wrap" id="footer">
+    <span>교무행정 통합검색 · 원본 자료의 저작권은 각 발행 기관에 있습니다.</span>
+    <span class="org"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 6.5C10 5 7 4.5 3 4.8v13.4c4-.3 7 .2 9 1.8 2-1.6 5-2.1 9-1.8V4.8c-4-.3-7 .2-9 1.7z"/><path d="M12 6.5V20"/></svg>충청남도교육청 정책기획과</span>
+  </div>
 </footer>
 
 <script src="assets/js/core/normalize.js"></script>

@@ -4,7 +4,6 @@
   const SAS = window.SAS, SS = window.SASSearch;
   const $ = id => document.getElementById(id);
   const BODY_PAGE = 20;        // 본문 결과를 한 번에 확인·표시하는 개수
-  const ICONS = { kindergarten: '🧸', elementary: '🎒', middle: '📘', special: '🤝' };
 
   function h(tag, props, ...kids) {
     const el = document.createElement(tag);
@@ -73,10 +72,10 @@
     $('home').classList.remove('hidden'); $('level').classList.add('hidden'); $('levelNav').classList.add('hidden');
     $('levelCards').replaceChildren(...SAS.LEVELS.map(l => {
       const info = (manifest && manifest.levels && manifest.levels[l.slug]) || { documents: 0, sections: 0 };
-      return h('a', { class: 'level-card' + (info.documents ? '' : ' empty'), href: `#/${l.slug}` },
-        h('span', { class: 'icon', 'aria-hidden': 'true' }, ICONS[l.slug] || '📁'),
+      return h('a', { class: `level-card ${l.slug}` + (info.documents ? '' : ' no-docs'), href: `#/${l.slug}` },
+        h('img', { src: `assets/img/level-${l.slug}.png`, alt: '', width: 104, height: 104 }),
         h('span', { class: 'name' }, l.name),
-        h('span', { class: 'count' }, info.documents ? `자료 ${info.documents}건 · 업무 ${info.sections}개` : '자료 준비 중'));
+        h('span', { class: 'count' }, info.documents ? `자료 ${info.documents}건` : '자료 준비 중'));
     }));
   }
 
@@ -186,17 +185,20 @@
       return finish();
     }
     let pos = 0, headed = false;
+    const untitledShown = new Set();
     async function more() {
       moreRow.replaceChildren(spinner('본문 확인 중…'));
       let shown = 0;
       while (pos < cands.length && shown < BODY_PAGE) {
         const s = cands[pos++];
         const doc = index.docs[s.d];
+        if (s.u && untitledShown.has(s.d)) continue; // 목차 없는 자료는 자료당 한 번만
         let detail;
         try { detail = await loader.doc(doc.id); } catch (e) { continue; }
         if (token !== searchToken) return;
         const v = SS.verifySection(detail, s.id, q);
         if (!v) continue;
+        if (s.u) untitledShown.add(s.d);
         if (!headed && (meta.sections.length || meta.docs.length)) { bodyBox.append(h('div', { class: 'group-title' }, '본문에서 찾은 업무')); headed = true; }
         bodyBox.append(sectionCard(index, { tier: SS.TIER.BODY, sec: s, doc }, q, v));
         shown++; bodyCount++;
@@ -225,7 +227,8 @@
   /** 업무 결과 카드 */
   function sectionCard(index, x, q, v) {
     const s = x.sec, d = x.doc;
-    const path = [d.c, d.t, s.p].filter(Boolean).join(' › ');
+    const path = [d.c, s.u ? '' : d.t, s.p].filter(Boolean).join(' › ');
+    const title = s.u ? d.t : s.h; // 목차 없는 자료는 구간 이름 대신 자료명을 제목으로
     const pg = SS.pageLabel(s.pg, s.pp);
     const info = [];
     if (pg) info.push(h('span', {}, pg));
@@ -237,7 +240,7 @@
     toggle.addEventListener('click', () => toggleDetail(toggle, detail, d, s, q));
     return h('article', { class: 'result' },
       h('div', { class: 'meta-row' }, h('span', { class: 'tag' + (x.tier === SS.TIER.BODY ? ' body' : '') }, SS.TIER_LABEL[x.tier]), h('span', { class: 'path' }, path)),
-      h('h3', { html: SS.highlightTerms(s.h, q.rawTerms) }),
+      h('h3', { html: SS.highlightTerms(title, q.rawTerms) }),
       info.length ? h('div', { class: 'pages' }, ...info) : null,
       snippetHtml ? h('p', { class: 'snippet', html: snippetHtml }) : null,
       h('div', { class: 'card-actions' }, toggle,
@@ -287,7 +290,8 @@
 
   /** 자료 카드(자료명·검색어 결과, 업무별 보기) */
   function docCard(index, d, r, o) {
-    const secs = index.sections.filter(s => s.d === d._i);
+    const allSecs = index.sections.filter(s => s.d === d._i);
+    const secs = allSecs.filter(s => !s.u); // 목차 없이 나눈 구간은 업무 목록에 보이지 않는다
     const fmt = (d.f || '').toUpperCase();
     const meta = [d.c, d.y ? `${d.y}년` : '', fmt, d.o ? `출처: ${d.o}` : ''].filter(Boolean).join(' · ');
     const rawTerms = o.q ? o.q.rawTerms : [];
@@ -300,7 +304,7 @@
       toggle.textContent = open ? `업무 목록 접기 ▴` : `업무 목록 ${secs.length}개 ▾`;
       if (open && !list.childElementCount) list.append(...secGroups(secs, r));
     });
-    const formCount = secs.reduce((a, s) => a + (s.n || 0), 0);
+    const formCount = allSecs.reduce((a, s) => a + (s.n || 0), 0);
     return h('article', { class: 'doc-card' },
       h('div', { class: 'meta-row' }, o.tier ? h('span', { class: 'tag' }, SS.TIER_LABEL[o.tier]) : h('span', { class: 'tag gray' }, d.f === 'pdf' || d.f === 'hwpx' ? '자료' : '내려받기 자료'), h('span', {}, meta)),
       h('h3', { html: SS.highlightTerms(d.t, rawTerms) }),

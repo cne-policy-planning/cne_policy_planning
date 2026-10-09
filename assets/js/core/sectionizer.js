@@ -158,7 +158,7 @@
       // 제목을 전혀 찾지 못하면 페이지(또는 일정 길이)별로 나눈다
       return { sections: blocks.map((b, bi) => ({ bi, b })).filter(x => !isEmptyBlock(x.b)).map((x, i) => ({
         id: 'sec-' + pad(i + 1), heading: x.b.pdf_page ? `${docTitle} ${x.b.pdf_page}쪽` : `${docTitle} 구간 ${i + 1}`,
-        parent_heading: stripPart(x.b.footer_label), block_start: x.bi, block_end: x.bi, keywords: [], auto: true })),
+        parent_heading: stripPart(x.b.footer_label), block_start: x.bi, block_end: x.bi, keywords: [], auto: true, untitled: true })),
         warnings: ['목차와 업무 제목을 찾지 못해 페이지 단위로 나눴습니다. 관리 화면에서 업무명을 보정해 주세요.'] };
     }
     if (starts[0].bi > 0 && blocks.slice(0, starts[0].bi).some(b => !isEmptyBlock(b))) {
@@ -197,7 +197,7 @@
     const sections = []; let cur = null, len = 0;
     blocks.forEach((b, i) => {
       if (!cur || len > 1800) {
-        cur = { id: 'sec-' + pad(sections.length + 1), heading: (b.text.split('\n')[0] || '').slice(0, 40) || `${docTitle} 구간 ${sections.length + 1}`, parent_heading: '', block_start: i, block_end: i, keywords: [], auto: true };
+        cur = { id: 'sec-' + pad(sections.length + 1), heading: (b.text.split('\n')[0] || '').slice(0, 40) || `${docTitle} 구간 ${sections.length + 1}`, parent_heading: '', block_start: i, block_end: i, keywords: [], auto: true, untitled: true };
         sections.push(cur); len = 0;
       }
       cur.block_end = i; len += b.text.length;
@@ -248,6 +248,18 @@
     return 'site';
   }
 
+  /**
+   * 업무명이 진짜 제목이 아닌 구간인지(목차 없이 쪽·길이로 나눈 구간).
+   * 관리자가 업무명을 고치면(auto=false) 제목으로 본다. 예전 자료는 형식으로 추정한다.
+   */
+  function isUntitled(doc, s) {
+    if (s.auto === false) return false;
+    if (s.untitled) return true;
+    if (doc.extraction && doc.extraction.toc_found) return false;
+    if (doc.format === 'hwpx') return true;
+    return /\s\d+쪽$|\s구간 \d+$/.test(s.heading || '');
+  }
+
   /** 블록별 링크를 섹션에 배정하고 중복을 정리한다 */
   function attachLinks(doc) {
     const out = [];
@@ -269,5 +281,5 @@
     return out.map((o, i) => ({ id: 'lnk-' + String(i + 1).padStart(4, '0'), text: o.text.replace(/^[「『」』\s]+|[「『」』\s,]+$/g, ''), url: o.url, kind: o.kind, block: o.block, section_id: o.section_id }));
   }
 
-  return { parseToc, sectionize, sectionText, sectionLead, sectionPages, attachLinks, linkKind, cleanTitle };
+  return { parseToc, isUntitled, sectionize, sectionText, sectionLead, sectionPages, attachLinks, linkKind, cleanTitle };
 });
