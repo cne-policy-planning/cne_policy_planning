@@ -13,19 +13,30 @@
 
   const ROMAN = 'ⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ';
   const LEADER = /(?:[·・‧.…]\s*){4,}|…{2,}/;
-  const TOC_LINE = /^(\d(?: ?\d)?)\s*[.．]\s*(.+?)\s*(?:[·・‧.…]\s*){3,}\s*(\d(?: ?\d){0,3})\s*$/;
+  // 항목 번호: 1. / 가. 가) / ① (가나다는 점이나 괄호가 꼭 있어야 낱말과 헷갈리지 않는다)
+  const HANGUL_NUM = '가나다라마바사아자차카타파하';
+  const CIRCLED = '①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳';
+  const MARK = '(\\d(?: ?\\d)?\\s*[.．]|[' + HANGUL_NUM + ']\\s*[.．)]|[' + CIRCLED + ']\\s*[.．)]?)';
+  const MARK_LOOSE = '(\\d{1,2}\\s*[.．)]?|[' + HANGUL_NUM + ']\\s*[.．)]|[' + CIRCLED + ']\\s*[.．)]?)';
+  const TOC_LINE = new RegExp('^' + MARK + '\\s*(.+?)\\s*(?:[·・‧.…]\\s*){3,}\\s*(\\d(?: ?\\d){0,3})\\s*$');
   const PART_LINE = new RegExp('^\\s*([' + ROMAN + ']|[IVX]{1,4})\\s*[.．]?\\s*([^·・.…\\d][^·・…]{0,30})$');
-  const HEADING_LINE = /^(\d(?: ?\d)?)\s*[.．]\s*([^\d\s].{0,60})$/;
+  const HEADING_LINE = new RegExp('^' + MARK + '\\s*([^\\d\\s].{0,60})$');
+  const MARK_START = new RegExp('^' + MARK_LOOSE);
   const ROMAN_ONLY = new RegExp('^\\s*([' + ROMAN + ']|[IVX]{1,4})\\s*[.．]?\\s*$');
-  const num = s => Number(String(s).replace(/\s/g, ''));
+  /** 번호 → 순서 수: "12." → 12, "다)" → 3, "③" → 3 */
+  const num = s => {
+    const t = String(s).replace(/[\s.．)]/g, '');
+    const h = HANGUL_NUM.indexOf(t), c = CIRCLED.indexOf(t);
+    return h >= 0 ? h + 1 : c >= 0 ? c + 1 : Number(t);
+  };
 
   function pad(n) { return String(n).padStart(3, '0'); }
 
   const TOC_WORD = /^\s*(목\s*차|차\s*례|contents)\s*$/i;
-  const LOOSE_ROW = /^(\d{1,2})\s*[.．)]?\s+([^\d\s].*?[가-힣A-Za-z)\]」』])\s+(\d{1,3})$/;
-  const NUM_ONLY = /^(\d{1,2})\s*[.．)]?$/;
+  const LOOSE_ROW = new RegExp('^' + MARK_LOOSE + '\\s*([^\\d\\s' + CIRCLED + '].*?[가-힣A-Za-z)\\]」』])\\s+(\\d{1,3})$');
+  const NUM_ONLY = new RegExp('^(\\d{1,2}\\s*[.．)]?|[' + HANGUL_NUM + ']\\s*[.．)]|[' + CIRCLED + ']\\s*[.．)]?)$');
   const PAGE_ONLY = /^\d{1,3}$/;
-  const NUM_TITLE = /^(\d{1,2})\s*[.．)]\s*([^\d\s].{0,60}?)(?:\s*(?:[·・‧.…]\s*)*\s+(\d{1,3}))?$/;
+  const NUM_TITLE = new RegExp('^(\\d{1,2}\\s*[.．)]|[' + HANGUL_NUM + ']\\s*[.．)]|[' + CIRCLED + ']\\s*[.．)]?)\\s*([^\\d\\s].{0,60}?)(?:\\s*(?:[·・‧.…]\\s*)*\\s+(\\d{1,3}))?$');
 
   /** 점선 없는 목차 줄 묶음 → entries 또는 null */
   function looseTocLines(lines) {
@@ -35,7 +46,14 @@
       const l = lines[i];
       const m = l.match(LOOSE_ROW);
       if (m && /[가-힣]/.test(m[2])) { rows.push({ num: num(m[1]), title: cleanTitle(m[2]), printed: num(m[3]), parent }); continue; }
-      if (ROMAN_ONLY.test(l) && lines[i + 1] && !/^\d/.test(lines[i + 1])) { parent = cleanTitle(lines[++i]); continue; }
+      if (ROMAN_ONLY.test(l)) {
+        // "Ⅰ" / "교무·연구 업무" 또는 (도형 글자 순서 때문에) "교무·연구 업무" / "Ⅰ"
+        const prev = lines[i - 1], next = lines[i + 1];
+        const nameLike = t => t && t.length <= 30 && /[가-힣]/.test(t) && !/^\d/.test(t) && !NUM_TITLE.test(t) && !NUM_ONLY.test(t) && !LOOSE_ROW.test(t) && !TOC_WORD.test(t);
+        if (nameLike(next)) { parent = cleanTitle(next); i++; }
+        else if (nameLike(prev)) parent = cleanTitle(prev);
+        continue;
+      }
       const p = l.match(PART_LINE);
       if (p) parent = cleanTitle(p[2]);
     }
@@ -64,7 +82,7 @@
       if (pm && !LEADER.test(t)) { parent = cleanTitle(pm[2]); continue; }
       let e = null, k = j;
       const nm = t.match(NUM_ONLY);
-      if (nm && next && /[가-힣]/.test(next) && !/^\d/.test(next) && next.length <= 60) { e = { num: num(nm[1]), title: cleanTitle(next) }; k = j + 1; }
+      if (nm && next && /[가-힣]/.test(next) && !MARK_START.test(next) && !PAGE_ONLY.test(next) && next.length <= 60) { e = { num: num(nm[1]), title: cleanTitle(next) }; k = j + 1; }
       else {
         const m = t.match(NUM_TITLE);
         if (m && /[가-힣]/.test(m[2])) { e = { num: num(m[1]), title: cleanTitle(m[2]), printed: m[3] ? num(m[3]) : null }; }
@@ -112,9 +130,9 @@
       const joined = [];
       for (const l of lines) {
         const prev = joined[joined.length - 1];
-        if (prev && /^\d{1,2}\s*[.．]?\s*$/.test(prev)) { joined[joined.length - 1] = prev + ' ' + l; continue; }
+        if (prev && NUM_ONLY.test(prev.trim())) { joined[joined.length - 1] = prev + ' ' + l; continue; }
         if (prev && ROMAN_ONLY.test(prev)) { joined[joined.length - 1] = prev.trim() + ' ' + l; continue; }
-        if (prev && !TOC_LINE.test(prev) && /^\d{1,2}\s*[.．]/.test(prev) && /^(?:[·・‧.…]\s*){3,}\d+$/.test(l.replace(/\s/g, ''))) { joined[joined.length - 1] = prev + ' ' + l; continue; }
+        if (prev && !TOC_LINE.test(prev) && MARK_START.test(prev) && /^(?:[·・‧.…]\s*){3,}\d+$/.test(l.replace(/\s/g, ''))) { joined[joined.length - 1] = prev + ' ' + l; continue; }
         joined.push(l);
       }
       for (const l of joined) {
@@ -227,9 +245,10 @@
       let title = null;
       if (b.lines && median) {
         const big = b.lines.slice(0, 4).find(l => l.size >= median * 1.3 && l.text.length <= 60 && !N.isSectionMarker(l.text));
-        if (big) title = cleanTitle(big.text.replace(/^\d{1,2}\s*[.．]\s*/, ''));
+        if (big) title = cleanTitle(big.text.replace(MARK_START, '').trim());
       }
-      if (!title) { const h = headingIn(b, 3); if (h) title = h.title; }
+      // 목차가 없을 때는 숫자 제목(1. 2.)만 업무로 본다. 가./①은 업무 안의 작은 항목인 경우가 많다
+      if (!title) { const h = headingIn(b, 3); if (h && /^\d/.test(String(b.text).trim().split('\n').find(l => HEADING_LINE.test(l.trim())) || '')) title = h.title; }
       if (title) starts.push({ bi, heading: title });
     });
     if (!starts.length) {
@@ -267,7 +286,7 @@
       for (const e of toc.entries) {
         for (let i = from; i < blocks.length; i++) {
           const t = blocks[i].text.trim();
-          if (t.length > 70 || LEADER.test(t)) continue;
+          if (t.length > 70 || LEADER.test(t) || LOOSE_ROW.test(t)) continue; // 목차 줄(끝에 쪽 번호)은 본문 제목이 아님
           const m = t.match(HEADING_LINE);
           if (m && similar(m[2], e.title)) { starts.push({ bi: i, heading: cleanTitle(m[2]), parent: e.parent }); from = i + 1; break; }
           // 제목 칸이 번호와 이름으로 나뉜 경우("1" / "업무명") 또는 번호 없이 이름만 있는 제목

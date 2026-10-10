@@ -1,4 +1,4 @@
-/* 교무행정 통합검색 · 사용자 화면 */
+/* 교무업무 통합검색 · 사용자 화면 */
 (function () {
   'use strict';
   const SAS = window.SAS, SS = window.SASSearch;
@@ -68,7 +68,7 @@
   // ---------- 첫 화면 ----------
   function renderHome() {
     current = { slug: null, q: '', c: '' };
-    document.title = '교무행정 통합검색';
+    document.title = '교무업무 통합검색';
     $('home').classList.remove('hidden'); $('level').classList.add('hidden'); $('levelNav').classList.add('hidden');
     $('levelCards').replaceChildren(...SAS.LEVELS.map(l => {
       const info = (manifest && manifest.levels && manifest.levels[l.slug]) || { documents: 0, sections: 0 };
@@ -91,7 +91,7 @@
     $('home').classList.add('hidden'); $('level').classList.remove('hidden');
     renderNav(r.slug);
     $('levelTitle').textContent = `${name} 자료 검색`;
-    document.title = (r.q ? `${r.q} - ` : '') + `${name} · 교무행정 통합검색`;
+    document.title = (r.q ? `${r.q} - ` : '') + `${name} · 교무업무 통합검색`;
     const levelChanged = current.slug !== r.slug;
     current = r;
     const input = $('q');

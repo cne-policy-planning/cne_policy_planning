@@ -46,22 +46,42 @@
 
   function localName(node) { return (node.localName || String(node.nodeName).split(':').pop()).toLowerCase(); }
 
-  /** 문단 하나의 글자. 안쪽 표·문단은 따로 처리되므로 건너뛴다 */
+  /** 한글 하이퍼링크 필드의 주소(http/https만) */
+  function hyperlinkUrl(field) {
+    let path = '', cmd = '';
+    for (const el of field.getElementsByTagName('*')) {
+      if (localName(el) !== 'stringparam') continue;
+      const n = el.getAttribute('name');
+      if (n === 'Path') path = el.textContent;
+      else if (n === 'Command') cmd = el.textContent;
+    }
+    let url = (path || cmd.replace(/\\(.)/g, '$1').split(';')[0] || '').trim();
+    return /^https?:\/\//i.test(url) ? url : '';
+  }
+
+  /** 문단 하나의 글자와 링크. 안쪽 표·문단은 따로 처리되므로 건너뛴다 */
   function paragraphText(p) {
     let s = '';
+    const links = [], open = new Map();
     const walk = node => {
       for (const child of node.childNodes) {
         if (child.nodeType === 3) { if (localName(node) === 't') s += child.nodeValue; continue; }
         if (child.nodeType !== 1) continue;
         const n = localName(child);
-        if (n === 'tbl' || n === 'p' || n === 'subList' || n === 'sublist') continue;
+        if (n === 'tbl' || n === 'p' || n === 'sublist') continue;
         if (n === 'linebreak' || n === 'br') s += '\n';
         else if (n === 'tab') s += ' ';
-        else walk(child);
+        else if (n === 'fieldbegin') {
+          if ((child.getAttribute('type') || '').toUpperCase() === 'HYPERLINK') { const url = hyperlinkUrl(child); if (url) open.set(child.getAttribute('id'), { url, start: s.length }); }
+        } else if (n === 'fieldend') {
+          const o = open.get(child.getAttribute('beginIDRef'));
+          if (o) { links.push({ url: o.url, text: s.slice(o.start) }); open.delete(child.getAttribute('beginIDRef')); }
+        } else walk(child);
       }
     };
     walk(p);
-    return s;
+    open.forEach(o => links.push({ url: o.url, text: s.slice(o.start) })); // 문단 끝까지 이어진 링크
+    return { text: s, links };
   }
 
   async function extractHwpx(file, onProgress) {
@@ -77,8 +97,10 @@
       if (doc.getElementsByTagName('parsererror').length) throw new Error('HWPX XML 형식 오류: ' + names[i]);
       for (const el of doc.getElementsByTagName('*')) {
         if (localName(el) !== 'p') continue;
-        const t = SAS.clean(paragraphText(el));
-        if (t) blocks.push({ pdf_page: null, printed_page: null, footer_label: '', text: t, links: [] });
+        const r = paragraphText(el);
+        const t = SAS.clean(r.text);
+        const links = r.links.map(l => ({ url: l.url, text: SAS.clean(l.text).replace(/\s+/g, ' ') })).filter(l => l.text);
+        if (t) blocks.push({ pdf_page: null, printed_page: null, footer_label: '', text: t, links });
       }
       if (onProgress) onProgress(i + 1, names.length);
     }
