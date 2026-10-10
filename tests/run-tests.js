@@ -112,6 +112,29 @@ test('목차 없는 HWPX: 길이로 나눈 구간은 색인에 u 표시, 업무�
   ok(!JSON.parse(out.files.get('data/indexes/kindergarten.json')).sections.some(s => s.u), '목차 있는 PDF는 표시 없음');
 });
 
+test('표 안 목차(HWPX, 칸마다 문단 분리·점선 없음) → 업무 분할', () => {
+  const P = t => ({ text: t });
+  const toc = [P('목 차'), P('Ⅰ'), P('교무·연구 업무'), P('1'), P('교육과정 편성·운영'), P('1'), P('2'), P('유아모집·입학설명회'), P('3'), P('3'), P('입학식'), P('5'),
+    P('Ⅱ'), P('유아교육지원'), P('1'), P('현장체험학습 운영'), P('7')];
+  const body = [P('1. 교육과정 편성·운영'), P('업무개요'), P('유치원 교육과정을 편성한다.'), P('2'), P('유아모집·입학설명회'), P('모집 안내'), P('입학식'), P('입학식 운영'), P('1. 현장체험학습 운영'), P('소풍 계획')];
+  const d = SAS.createDocument({ title: 't', school_levels: ['유아'], filename: 'a.hwpx', format: 'hwpx' }, toc.concat(body), []);
+  ok(d.extraction.toc_found, d.extraction.warnings.join());
+  eq(d.sections.map(x => [x.heading, x.parent_heading, x.block_start]), [['교육과정 편성·운영', '교무·연구 업무', 17], ['유아모집·입학설명회', '교무·연구 업무', 20], ['입학식', '교무·연구 업무', 23], ['현장체험학습 운영', '유아교육지원', 25]]);
+  ok(!d.sections.some(x => x.untitled));
+});
+test('표 안 목차(HWPX, 한 칸에 "1. 업무명")', () => {
+  const P = t => ({ text: t });
+  const d = SAS.createDocument({ title: 't', school_levels: ['유아'], filename: 'a.hwpx', format: 'hwpx' },
+    [P('1. 가나 업무'), P('3'), P('2. 다라 업무'), P('5'), P('3. 마바 업무'), P('8'), P('1. 가나 업무'), P('본문 가'), P('2. 다라 업무'), P('본문 나'), P('3. 마바 업무'), P('본문 다')], []);
+  eq(d.sections.map(x => [x.heading, x.block_start]), [['가나 업무', 6], ['다라 업무', 8], ['마바 업무', 10]]);
+});
+test('표 안 목차(PDF, 점선 없는 "1. 업무명 12" 줄)', () => {
+  const pages = ['목차\n1. 교육과정 편성 3\n2. 유아 모집 4\n3. 입학식 5', '표지', '1. 교육과정 편성\n내용', '2. 유아 모집\n내용', '3. 입학식\n내용'];
+  const blocks = pages.map((t, i) => ({ pdf_page: i + 1, printed_page: i + 1, text: t }));
+  const d = SAS.createDocument({ title: 't', school_levels: ['유아'], filename: 'a.pdf' }, blocks, []);
+  ok(d.extraction.toc_found); eq(d.sections.map(x => [x.heading, x.pdf_pages]), [['교육과정 편성', [3]], ['유아 모집', [4]], ['입학식', [5]]]);
+});
+
 console.log('\n[7] 텍스트 도구');
 test('정규화: 공백·가운뎃점·대소문자 무시', () => eq(SAS.norm('유·초 이음  PPT'), SAS.norm('유초이음ppt')));
 test('강조: 띄어쓰기가 달라도 찾음', () => ok(SAS.highlight('현장 체험학습 운영', '현장체험학습').includes('<mark>현장 체험학습</mark>')));

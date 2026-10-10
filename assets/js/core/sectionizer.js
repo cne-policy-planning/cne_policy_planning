@@ -21,13 +21,91 @@
 
   function pad(n) { return String(n).padStart(3, '0'); }
 
+  const TOC_WORD = /^\s*(목\s*차|차\s*례|contents)\s*$/i;
+  const LOOSE_ROW = /^(\d{1,2})\s*[.．)]?\s+([^\d\s].*?[가-힣A-Za-z)\]」』])\s+(\d{1,3})$/;
+  const NUM_ONLY = /^(\d{1,2})\s*[.．)]?$/;
+  const PAGE_ONLY = /^\d{1,3}$/;
+  const NUM_TITLE = /^(\d{1,2})\s*[.．)]\s*([^\d\s].{0,60}?)(?:\s*(?:[·・‧.…]\s*)*\s+(\d{1,3}))?$/;
+
+  /** 점선 없는 목차 줄 묶음 → entries 또는 null */
+  function looseTocLines(lines) {
+    const rows = [], hasWord = lines.some(l => TOC_WORD.test(l));
+    let parent = '';
+    for (let i = 0; i < lines.length; i++) {
+      const l = lines[i];
+      const m = l.match(LOOSE_ROW);
+      if (m && /[가-힣]/.test(m[2])) { rows.push({ num: num(m[1]), title: cleanTitle(m[2]), printed: num(m[3]), parent }); continue; }
+      if (ROMAN_ONLY.test(l) && lines[i + 1] && !/^\d/.test(lines[i + 1])) { parent = cleanTitle(lines[++i]); continue; }
+      const p = l.match(PART_LINE);
+      if (p) parent = cleanTitle(p[2]);
+    }
+    if (rows.length < (hasWord ? 3 : 5)) return null;
+    let up = 0;
+    for (let i = 1; i < rows.length; i++) if (rows[i].printed >= rows[i - 1].printed) up++;
+    return up >= (rows.length - 1) * 0.8 ? rows : null;
+  }
+
+  /**
+   * HWPX 표 안 목차: 칸마다 문단이 나뉘어 "1" / "업무명" / "12"처럼 들어온다.
+   * 앞부분에서 번호가 붙은 짧은 항목이 촘촘히 이어지는 묶음을 찾는다.
+   * 반환 { entries, tocEnd } 또는 null
+   */
+  function parseTocParagraphs(blocks) {
+    const limit = Math.min(blocks.length, Math.max(80, Math.floor(blocks.length * 0.4)));
+    const lines = [];
+    for (let bi = 0; bi < limit; bi++) String(blocks[bi].text || '').split('\n').map(t => t.trim()).filter(Boolean).forEach(t => lines.push({ bi, t }));
+    const found = [];
+    let parent = '';
+    for (let j = 0; j < lines.length; j++) {
+      const t = lines[j].t, next = lines[j + 1] ? lines[j + 1].t : '';
+      if (t.length > 90) continue;
+      if (ROMAN_ONLY.test(t) && next && !/^\d/.test(next) && next.length <= 40) { parent = cleanTitle(next); j++; continue; }
+      const pm = t.match(PART_LINE);
+      if (pm && !LEADER.test(t)) { parent = cleanTitle(pm[2]); continue; }
+      let e = null, k = j;
+      const nm = t.match(NUM_ONLY);
+      if (nm && next && /[가-힣]/.test(next) && !/^\d/.test(next) && next.length <= 60) { e = { num: num(nm[1]), title: cleanTitle(next) }; k = j + 1; }
+      else {
+        const m = t.match(NUM_TITLE);
+        if (m && /[가-힣]/.test(m[2])) { e = { num: num(m[1]), title: cleanTitle(m[2]), printed: m[3] ? num(m[3]) : null }; }
+      }
+      if (!e || !e.title) continue;
+      if (e.printed == null && lines[k + 1] && PAGE_ONLY.test(lines[k + 1].t)) { e.printed = num(lines[k + 1].t); k++; }
+      found.push(Object.assign(e, { parent, line: j, bi: lines[k].bi }));
+      j = k;
+    }
+    // 촘촘한 묶음(항목 사이 6줄 이내)으로 나눈 뒤, 1번부터 시작하고 번호가 차례로 늘어나는 첫 묶음
+    const groups = [];
+    // 같은 제목이 다시 나오면 본문이 시작된 것이므로 묶음을 끊는다
+    found.forEach(e => {
+      const g = groups[groups.length - 1];
+      const dup = g && g.some(x => N.norm(x.title) === N.norm(e.title));
+      if (g && !dup && e.line - g[g.length - 1].line <= 6) g.push(e); else groups.push([e]);
+    });
+    for (const g of groups) {
+      if (g.length < 3 || g[0].num !== 1) continue;
+      let ok = 0;
+      for (let i = 1; i < g.length; i++) if (g[i].num === g[i - 1].num + 1 || g[i].num === 1) ok++;
+      if (ok < (g.length - 1) * 0.8) continue;
+      return { entries: g.map(e => ({ num: e.num, title: e.title, printed: e.printed, parent: e.parent })), tocEnd: g[g.length - 1].bi };
+    }
+    return null;
+  }
+
   /** 목차 페이지를 찾아 [{num,title,printed,parent}] 반환 */
   function parseToc(blocks) {
     const entries = [], tocBlocks = [];
     blocks.forEach((b, bi) => {
       const lines = String(b.text || '').split('\n').map(s => s.trim()).filter(Boolean);
       const leaderLines = lines.filter(l => LEADER.test(l) && /\d\s*$/.test(l));
-      if (leaderLines.length < 3) return;
+      if (leaderLines.length < 3) {
+        // 점선 없는 목차(표 안 목차): "1. 업무명   12" 줄이 여러 개이고 쪽수가 커지는 순서
+        const loose = looseTocLines(lines);
+        if (!loose) return;
+        tocBlocks.push(bi);
+        loose.forEach(e => entries.push(e));
+        return;
+      }
       tocBlocks.push(bi);
       let parent = '';
       // 줄이 잘려 다음 줄로 넘어간 항목("7." / "···· 9")을 이어 붙인다
@@ -176,17 +254,26 @@
 
   /** HWPX(문단 블록): 목차 제목과 같은 문단을 찾고, 없으면 길이 기준으로 묶는다 */
   function sectionsForParagraphs(blocks, docTitle) {
-    const toc = parseToc([{ text: blocks.map(b => b.text).join('\n') }]);
+    let toc = parseToc([{ text: blocks.map(b => b.text).join('\n') }]);
+    let from0 = 0;
+    if (toc.entries.length < 3) {
+      // 표 안 목차(점선 없음, 칸마다 문단이 나뉨)
+      const t2 = parseTocParagraphs(blocks);
+      if (t2) { toc = t2; from0 = t2.tocEnd + 1; }
+    }
     const starts = [];
     if (toc.entries.length >= 3) {
-      let from = 0;
+      let from = from0;
       for (const e of toc.entries) {
         for (let i = from; i < blocks.length; i++) {
           const t = blocks[i].text.trim();
-          if (t.length <= 70 && !LEADER.test(t)) {
-            const m = t.match(HEADING_LINE);
-            if (m && similar(m[2], e.title)) { starts.push({ bi: i, heading: cleanTitle(m[2]), parent: e.parent }); from = i + 1; break; }
-          }
+          if (t.length > 70 || LEADER.test(t)) continue;
+          const m = t.match(HEADING_LINE);
+          if (m && similar(m[2], e.title)) { starts.push({ bi: i, heading: cleanTitle(m[2]), parent: e.parent }); from = i + 1; break; }
+          // 제목 칸이 번호와 이름으로 나뉜 경우("1" / "업무명") 또는 번호 없이 이름만 있는 제목
+          const nm = t.match(NUM_ONLY);
+          if (nm && num(nm[1]) === e.num && blocks[i + 1] && N.norm(blocks[i + 1].text) === N.norm(e.title)) { starts.push({ bi: i, heading: cleanTitle(blocks[i + 1].text), parent: e.parent }); from = i + 2; break; }
+          if (from0 && N.norm(t) === N.norm(e.title)) { starts.push({ bi: i, heading: cleanTitle(t), parent: e.parent }); from = i + 1; break; }
         }
       }
     }
