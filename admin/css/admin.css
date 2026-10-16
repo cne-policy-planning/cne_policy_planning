@@ -153,3 +153,20 @@ details.more > summary { font-size: 13px; }
 .act-item:last-child { border-bottom: 0; }
 .act-item ul { margin: 4px 0; padding-left: 18px; }
 button.danger.small { background: var(--err-soft); }
+
+/* 번호 목차 · 링크 점검 */
+.outline-list { max-height: 480px; overflow: auto; border: 1px solid var(--line2); border-radius: 10px; padding: 6px 8px; font-size: 13px; }
+.ol-row { display: flex; gap: 6px; align-items: baseline; padding: 2px 0; }
+.ol-code { font-family: ui-monospace, Consolas, monospace; font-size: 11.5px; color: var(--muted); white-space: nowrap; }
+.ol-row.k-ch .ol-t, .ol-row.k-task .ol-t { font-weight: 700; }
+.ol-row.k-part .ol-t { color: var(--muted); font-weight: 600; }
+.ol-row.k-group .ol-t { color: var(--blue-text); font-weight: 600; }
+.ol-row.k-bullet .ol-t { color: #475467; }
+.ltag { font-size: 11px; font-weight: 700; color: #fff; border-radius: 4px; padding: 0 5px; white-space: nowrap; }
+.ltag.t-서식 { background: #2e7a57; } .ltag.t-참고 { background: #a86a12; } .ltag.t-법령 { background: #2a5ba6; } .ltag.t-사이트 { background: #6650b0; }
+.seg { display: inline-flex; gap: 4px; }
+.seg button.on { background: var(--blue-soft); border-color: #b9d0f5; color: var(--blue-text); }
+.links-table td { vertical-align: top; }
+.links-table input[type=url] { font-size: 12px; }
+.links-table select { width: auto; }
+.mono { font-family: ui-monospace, Consolas, monospace; font-size: 11px; word-break: break-all; }

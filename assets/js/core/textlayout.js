@@ -85,8 +85,8 @@
       // 같은 주소라도 다른 칸(가로로 떨어진 곳)이면 별개의 서식명이다
       if (prev && prev.url === p.url && prev.lastTop - p.top < 30 && prev.lastTop >= p.top && Math.abs((prev.L + prev.R) / 2 - (box.L + box.R) / 2) < 60) {
         if (p.text && !prev.text.endsWith(p.text)) prev.text = (prev.text + ' ' + p.text).trim();
-        prev.lastTop = p.top; prev.L = Math.min(prev.L, box.L); prev.R = Math.max(prev.R, box.R); prev.B = Math.min(prev.B, box.B);
-      } else merged.push({ url: p.url, text: p.text, lastTop: p.top, L: box.L, R: box.R, B: box.B });
+        prev.lastTop = p.top; prev.top = Math.max(prev.top, p.top); prev.L = Math.min(prev.L, box.L); prev.R = Math.max(prev.R, box.R); prev.B = Math.min(prev.B, box.B);
+      } else merged.push({ url: p.url, text: p.text, lastTop: p.top, top: p.top, L: box.L, R: box.R, B: box.B });
     });
     // 링크 영역이 서식명의 마지막 줄을 덮지 않은 경우: 바로 아래, 같은 열의 줄을 이어 붙인다
     const lines = buildLines(page);
@@ -109,7 +109,9 @@
         bottom = next.y;
       }
     }
-    return merged.map(m => ({ url: m.url, text: m.text.replace(/\s+/g, ' ').replace(/[,，]\s*$/, '').trim() }));
+    // box: 링크 영역(PDF 좌표, 왼쪽 아래 원점) [왼, 아래, 오른, 위] — 쪽 보기에서 누를 자리와 목차 위치에 쓴다
+    const r1 = v => Math.round(v * 10) / 10;
+    return merged.map(m => ({ url: m.url, text: m.text.replace(/\s+/g, ' ').replace(/[,，]\s*$/, '').trim(), box: [r1(m.L), r1(m.B), r1(m.R), r1(m.top)] }));
   }
 
   /**
@@ -179,7 +181,9 @@
       footer_label: r.footer_label,
       running_header: r.running_header,
       text: N.clean(r.lines.map(l => l.text).join('\n')),
-      lines: r.lines.map(l => ({ text: l.text, size: Math.round(l.size * 10) / 10 })),
+      // 줄 위치(PDF 좌표)는 목차 트리를 만들 때만 쓰고 저장 전에 지운다(schema.finalizeDocument)
+      lines: r.lines.map(l => ({ text: l.text, size: Math.round(l.size * 10) / 10, x: Math.round(l.x * 10) / 10, xe: Math.round(l.xe * 10) / 10, y: Math.round(l.y * 10) / 10 })),
+      w: Math.round((pages[i].width || 595) * 10) / 10, h: Math.round((pages[i].height || 842) * 10) / 10,
       links: linkTexts(pages[i])
     }));
   }

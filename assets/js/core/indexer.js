@@ -25,7 +25,8 @@
       id: d.id, title: d.title, school_levels: d.school_levels, category: d.category, year: d.year,
       format: d.format, kind: d.kind, works_url: d.works_url, origin: d.origin,
       search_keywords: d.search_keywords, forms_bundle_url: (d.forms_bundle && d.forms_bundle.works_url) || '', section_count: (d.sections || []).length,
-      form_count: N.formList(d).length, updated_at: d.updated_at
+      form_count: N.formList(d).length, updated_at: d.updated_at,
+      pdf: d.pdf ? d.pdf.path : '', pages: (d.blocks || []).length, outline_count: d.outline && d.outline.nodes ? d.outline.nodes.length : 0
     };
   }
 
@@ -48,7 +49,7 @@
     const index = { schema_version: N.SCHEMA_VERSION, level: level.name, slug: level.slug, generated_at: generatedAt, shard_count: shardCount, sec_base: SEC_BASE, docs: [], sections: [] };
     const shards = Array.from({ length: shardCount }, () => new Map());
     list.forEach((d, di) => {
-      index.docs.push({ id: d.id, t: d.title, c: d.category, y: d.year, f: d.format, w: d.works_url || '', fb: (d.forms_bundle && d.forms_bundle.works_url) || '', o: (d.origin && d.origin.site) || '', k: d.search_keywords || [] });
+      index.docs.push({ id: d.id, t: d.title, c: d.category, y: d.year, f: d.format, w: d.works_url || '', fb: (d.forms_bundle && d.forms_bundle.works_url) || '', o: (d.origin && d.origin.site) || '', k: d.search_keywords || [], p: d.pdf ? d.pdf.path : '', n: (d.blocks || []).length });
       (d.sections || []).forEach((s, si) => {
         if (si >= SEC_BASE) throw new Error(`${d.title}: 업무가 ${SEC_BASE}개를 넘습니다.`);
         const files = (d.links || []).filter(l => l.section_id === s.id && l.kind === 'file').length;

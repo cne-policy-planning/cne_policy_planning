@@ -37,6 +37,7 @@
     });
   }
   const confirmBox = (html, okLabel, danger) => modal(html, [{ label: '취소', value: false }, { label: okLabel || '확인', value: true, primary: !danger, danger }]);
+  const PDF_WARN = 15 * 1024 * 1024, PDF_MAX = 95 * 1024 * 1024;
   const fmtBytes = n => n > 1048576 ? (n / 1048576).toFixed(1) + 'MB' : Math.max(1, Math.round(n / 1024)) + 'KB';
   const pad3 = n => String(n).padStart(3, '0');
   const today = () => { const d = new Date(); return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`; };
@@ -422,7 +423,7 @@
       return h('tr', {},
         h('td', {}, h('div', { class: 'fname' }, q.file.name), h('div', { class: 'small muted' }, fmt.toUpperCase() + ' · ' + fmtBytes(q.file.size))),
         h('td', {}, h('input', { type: 'text', value: q.title, oninput: e => { q.title = e.target.value; if (q.doc) q.doc.title = q.title; } })),
-        h('td', {}, h('input', { type: 'url', value: q.works, placeholder: 'https://works…', oninput: e => { q.works = e.target.value.trim(); if (q.doc) q.doc.works_url = q.works; } })),
+        h('td', {}, h('input', { type: 'url', value: q.works, placeholder: '비우면 사이트의 PDF', oninput: e => { q.works = e.target.value.trim(); if (q.doc) q.doc.works_url = q.works; } })),
         statusCell,
         h('td', {}, h('button', { class: 'small ghost', title: '목록에서 빼기', onclick: () => { queue = queue.filter(x => x !== q); renderQueue(); } }, '✕')));
     }));
@@ -439,7 +440,11 @@
       h('span', { class: 'tag ok' }, `${doc.blocks.length}${doc.format === 'pdf' ? '쪽' : '문단'}`),
       h('span', { class: doc.extraction.toc_found ? 'tag ok' : 'tag warn' }, `업무 ${doc.sections.length}개${doc.extraction.toc_found ? ' · 목차 인식' : ''}`)
     ];
-    if (forms) out.push(h('span', { class: 'tag' }, `서식 ${forms}개`));
+    if (doc.outline) {
+      const suspect = (doc.links || []).filter(l => SAS.isSuspectUrl(l.url)).length;
+      out.push(h('span', { class: 'tag ok' }, `번호 목차 ${doc.outline.nodes.length}개`), h('span', { class: 'tag' }, `링크 ${(doc.links || []).length}개`));
+      if (suspect) out.push(h('span', { class: 'tag warn' }, `잘린 주소 ${suspect}개`));
+    } else if (forms) out.push(h('span', { class: 'tag' }, `서식 ${forms}개`));
     if (doc.extraction.warnings.length) out.push(h('details', {}, h('summary', {}, `확인 ${doc.extraction.warnings.length}건`), h('ul', { class: 'small' }, doc.extraction.warnings.map(w => h('li', {}, w)))));
     return out;
   }
@@ -465,6 +470,12 @@
         q.doc = SAS.createDocument(Object.assign({}, meta, { title: q.title, filename: q.file.name, format: r.format, works_url: q.works }), r.blocks, ids.concat(queue.map(x => x.doc && x.doc.id).filter(Boolean)));
         const same = S.state.docs.find(d => SAS.norm(d.title) === SAS.norm(q.doc.title) && (d.year || '') === (q.doc.year || ''));
         q.message = same ? '같은 이름의 자료가 이미 있습니다. 새 판이면 「자료 관리 → 파일 교체」를 이용하세요.' : '';
+        if (r.format === 'pdf') {
+          // 원본 PDF도 사이트에 올려 쪽 보기에 쓴다(GitHub는 파일 하나 100MB까지)
+          if (q.file.size > PDF_MAX) throw new Error(`PDF가 ${fmtBytes(q.file.size)}입니다. 사이트에 올릴 수 있는 크기(약 95MB)를 넘습니다. 한글에서 그림 품질을 낮춰 다시 PDF로 저장해 주세요.`);
+          q.doc.pdf = { path: S.pdfPath(q.doc.id), bytes: q.file.size };
+          if (q.file.size > PDF_WARN) q.message += (q.message ? ' ' : '') + `PDF가 ${fmtBytes(q.file.size)}입니다. 15MB 이하로 줄이면 사용자 화면이 더 빨리 열립니다.`;
+        }
         q.status = 'done';
       } catch (e) { q.status = 'error'; q.message = e.message; console.error(e); }
       renderQueue();
@@ -488,6 +499,7 @@
       q.doc.title = q.title.trim() || q.doc.title; q.doc.works_url = q.works;
     });
     S.addDocs(ready.map(q => q.doc));
+    for (const q of ready) if (q.doc.pdf) await S.setPendingPdf(q.doc.id, q.file);
     queue = queue.filter(q => q.status !== 'done');
     renderQueue();
     toast(`${ready.length}건을 추가했습니다. 「③ 점검·반영」에서 반영해야 사이트에 나타납니다.`, 5000);
@@ -511,7 +523,7 @@
       (!q || SAS.norm(d.title + d.category).includes(q)) &&
       (!fLevel.value || d.school_levels.includes(fLevel.value)) &&
       (!fCat.value || d.category === fCat.value) &&
-      (!$('fNoWorks').checked || !d.works_url) &&
+      (!$('fNoWorks').checked || !d.pdf) &&
       (!$('fWarn').checked || needsCheck(d)))
       .sort((a, b) => (b.updated_at || '').localeCompare(a.updated_at || ''));
     const box = $('docList');
@@ -552,6 +564,7 @@
   }
 
   function changed(doc, rerender) {
+    SAS.syncOutline(doc);
     SAS.finalizeDocument(doc);
     S.touch(doc);
     if (rerender) renderEditor();
@@ -599,14 +612,129 @@
         field('학교급', lv),
         field('업무 분류', h('select', { onchange: e => { doc.category = e.target.value; changed(doc); renderList(); } }, ...categoryOptions(doc.category))),
         field('연도', h('input', { type: 'number', value: doc.year || '', onchange: e => { doc.year = e.target.value ? Number(e.target.value) : null; changed(doc); } })),
-        field('웍스 링크 (원본 내려받기)', h('div', { class: 'row' }, worksInput, doc.works_url ? h('a', { class: 'btn small', href: doc.works_url, target: '_blank', rel: 'noopener noreferrer', style: 'flex:0' }, '열기 ↗') : null)),
+        field('원본 내려받기 링크 (선택)', h('div', { class: 'row' }, worksInput, doc.works_url ? h('a', { class: 'btn small', href: doc.works_url, target: '_blank', rel: 'noopener noreferrer', style: 'flex:0' }, '열기 ↗') : null), doc.pdf ? '비워 두면 사이트에 올린 PDF를 내려받습니다. HWP 원본 등을 따로 주고 싶을 때만 넣으세요.' : null),
         field('원 출처', h('div', { class: 'row' }, originSel, h('input', { type: 'url', value: doc.origin.url, placeholder: '게시글 주소', onchange: e => { doc.origin.url = e.target.value.trim(); changed(doc); } })), '개정판 확인용 기록입니다. 사용자 화면의 내려받기는 웍스 링크로 연결됩니다.')),
       h('div', { style: 'margin-top:14px' }, field('문서 전체 검색어 (쉼표로 구분)', h('textarea', { value: doc.search_keywords.join(', '), placeholder: '예: 유치원 업무, 교무학사, 매뉴얼', onchange: e => { doc.search_keywords = SAS.splitList(e.target.value); changed(doc); } }), '이 자료 전체를 대표하는 말입니다. 업무별 검색어는 아래 업무 목록에서 넣습니다.')));
 
     const parts = [head, meta];
-    if (doc.kind === 'text') parts.push(sectionCard(doc), formsCard(doc, forms));
+    if (doc.kind === 'text') {
+      parts.push(pdfCard(doc));
+      if (doc.outline) parts.push(outlineCard(doc), linksCard(doc));
+      parts.push(sectionCard(doc));
+      // 예전 방식(서식 모음 웍스 링크)을 이미 쓰고 있는 자료만 서식 모음 칸을 보여 준다
+      if (!doc.outline || (doc.forms_bundle && doc.forms_bundle.works_url)) parts.push(formsCard(doc, forms));
+    }
     parts.push(dangerCard(doc));
     box.replaceChildren(...parts.filter(Boolean));
+  }
+
+  // ---------- 원본 PDF · 번호 목차 · 링크 점검 ----------
+  function siteUrl(doc) {
+    const slug = SAS.levelSlug((doc.school_levels || [])[0]) || 'kindergarten';
+    return `../#/${slug}/${doc.id}`;
+  }
+
+  function pdfCard(doc) {
+    const pending = S.pendingPdfIds().includes(doc.id);
+    let state;
+    if (doc.format !== 'pdf') state = h('p', { class: 'muted small' }, `${doc.format.toUpperCase()} 자료는 쪽 보기를 할 수 없어 사용자 화면에 본문 글자로 보여 줍니다. PDF로 저장해 「파일 교체」하면 쪽 보기와 번호 목차가 생깁니다.`);
+    else if (!doc.pdf) state = h('div', { class: 'notice warn' }, '원본 PDF가 사이트에 없습니다. 아래 「자료 교체·삭제 → 파일 교체」로 같은 PDF를 다시 넣으면 번호 목차와 쪽 보기가 만들어집니다.');
+    else state = h('div', { class: 'kv' },
+      h('span', {}, pending ? h('span', { class: 'tag warn' }, '반영 대기') : h('span', { class: 'tag ok' }, '사이트에 있음')),
+      h('span', {}, doc.pdf.path), doc.pdf.bytes ? h('span', {}, fmtBytes(doc.pdf.bytes)) : null,
+      doc.pdf.bytes > PDF_WARN ? h('span', { class: 'tag warn' }, '15MB 넘음 — 열리는 데 오래 걸릴 수 있음') : null);
+    return h('div', { class: 'card' },
+      h('div', { class: 'editor-head' }, h('h2', {}, '원본 PDF · 쪽 보기'),
+        doc.pdf && !pending ? h('a', { class: 'btn small', href: siteUrl(doc), target: '_blank', rel: 'noopener noreferrer' }, '사용자 화면에서 보기 ↗') : null),
+      state,
+      pending ? h('p', { class: 'small muted' }, '「③ 점검·반영」에서 반영하면 PDF가 사이트에 올라갑니다.') : null);
+  }
+
+  const KIND_LABEL = { ch: '단원', task: '업무', part: '부분', group: '묶음', item: '항목', bullet: '세부', link: '링크' };
+  function outlineCard(doc) {
+    const nodes = doc.outline.nodes;
+    const links = new Map((doc.links || []).map(l => [l.id, l]));
+    const count = k => nodes.filter(n => n.k === k).length;
+    const filter = h('input', { type: 'search', placeholder: '목차에서 찾기 (예: 사전답사)', style: 'max-width:280px' });
+    const list = h('div', { class: 'outline-list' });
+    const render = () => {
+      const q = SAS.norm(filter.value);
+      const shown = nodes.filter(n => !q || SAS.norm(n.t).includes(q)).slice(0, q ? 300 : 2000);
+      list.replaceChildren(...shown.map(n => {
+        const l = n.l ? links.get(n.l) : null;
+        const depth = n.c.split('.').length - 1;
+        return h('div', { class: 'ol-row k-' + n.k, style: `padding-left:${depth * 14}px` },
+          h('span', { class: 'ol-code' }, n.c),
+          l ? h('span', { class: 'ltag t-' + l.type }, l.type) : null,
+          h('span', { class: 'ol-t' }, l ? l.text : n.t),
+          l && SAS.isSuspectUrl(l.url) ? h('span', { class: 'tag warn' }, '잘린 주소') : null,
+          h('span', { class: 'small muted' }, ` ${doc.blocks[n.b] ? doc.blocks[n.b].pdf_page + '쪽' : ''}`));
+      }));
+    };
+    filter.addEventListener('input', render);
+    const det = h('details', {}, h('summary', {}, `번호 목차 펼쳐 보기 (${nodes.length}개 항목)`), h('div', { style: 'margin:8px 0' }, filter), list);
+    det.addEventListener('toggle', () => { if (det.open && !list.childElementCount) render(); });
+    return h('div', { class: 'card' },
+      h('h2', {}, '번호 목차'),
+      h('div', { class: 'kv' }, ...['ch', 'task', 'item', 'bullet', 'link'].map(k => h('span', {}, `${KIND_LABEL[k]} ${count(k)}`)),
+        h('span', { class: 'muted' }, `세부 목차가 있는 업무 ${doc.outline.stats ? doc.outline.stats.detailed : '-'}/${doc.sections.length}`)),
+      h('p', { class: 'muted small' }, 'PDF의 목차·「업무개요 / 업무의 내용 및 방법 / 관련 자료 및 서식」·◆·번호·▸ 표시를 읽어 자동으로 만든 목차입니다. 업무명은 아래 「업무 목록」에서 고치면 목차에도 반영되고, 링크 이름·주소·종류는 「링크 점검」에서 고칩니다.'),
+      det);
+  }
+
+  const LINK_TYPES = ['서식', '참고', '법령', '사이트'];
+  let linkFilter = 'all';
+  function linksCard(doc) {
+    const links = doc.links || [];
+    const codeOf = new Map((doc.outline ? doc.outline.nodes : []).filter(n => n.l).map(n => [n.l, n.c]));
+    const suspect = links.filter(l => SAS.isSuspectUrl(l.url));
+    const edited = links.filter(l => l.url_orig || l.text_orig || l.type_set);
+    const sample = (links.find(l => /cne\.go\.kr\/boardCnts\/fileDown\.do\?.*[?&]m=/.test(l.url)) || {}).url;
+    const byType = t => links.filter(l => l.type === t).length;
+    const q = h('input', { type: 'search', placeholder: '링크 이름으로 찾기', style: 'max-width:240px' });
+    const seg = h('div', { class: 'seg' }, ...[['all', `전체 ${links.length}`], ['suspect', `잘린 주소 ${suspect.length}`], ['edited', `고친 것 ${edited.length}`]].map(([v, label]) =>
+      h('button', { class: 'small' + (linkFilter === v ? ' on' : ''), onclick: () => { linkFilter = v; renderEditor(); } }, label)));
+    const body = h('tbody');
+    const render = () => {
+      const qq = SAS.norm(q.value);
+      const list = links.filter(l => (linkFilter === 'all' || (linkFilter === 'suspect' ? SAS.isSuspectUrl(l.url) : (l.url_orig || l.text_orig || l.type_set))) && (!qq || SAS.norm(l.text).includes(qq)));
+      body.replaceChildren(...list.slice(0, 500).map(l => {
+        const typeSel = h('select', { onchange: e => { SAS.setLinkInfo(doc, l.id, { type: e.target.value }); changed(doc); } }, ...LINK_TYPES.map(t => h('option', { value: t, selected: t === l.type }, t)));
+        const name = h('input', { type: 'text', value: l.text, onchange: e => { SAS.setLinkInfo(doc, l.id, { text: e.target.value }); changed(doc); } });
+        const url = h('input', { type: 'url', value: l.url, onchange: e => {
+          const v = e.target.value.trim();
+          if (v && !/^https?:\/\//i.test(v)) { toast('주소는 http:// 또는 https://로 시작해야 합니다.'); e.target.value = l.url; return; }
+          SAS.setLinkUrl(doc, l.id, v); changed(doc, true);
+        } });
+        const sug = SAS.isSuspectUrl(l.url) ? SAS.suggestUrl(l.url, sample) : '';
+        return h('tr', {},
+          h('td', { class: 'muted small', style: 'white-space:nowrap' }, codeOf.get(l.id) || ''),
+          h('td', {}, typeSel),
+          h('td', {}, name),
+          h('td', {}, h('div', { class: 'row' }, url, h('a', { class: 'btn small', href: l.url, target: '_blank', rel: 'noopener noreferrer', style: 'flex:0', title: '새 탭에서 열어 확인' }, '열기 ↗')),
+            sug ? h('div', { class: 'small' }, h('span', { class: 'tag warn' }, '잘린 주소'), ' ', h('a', { href: sug, target: '_blank', rel: 'noopener noreferrer' }, '보충한 주소로 열어 보기 ↗'), ' ',
+              h('button', { class: 'small ghost', onclick: () => { SAS.setLinkUrl(doc, l.id, sug); changed(doc, true); toast('보충한 주소로 바꿨습니다.'); } }, '이 주소로 바꾸기')) : null,
+            l.url_orig ? h('div', { class: 'small muted' }, '처음 주소: ', h('span', { class: 'mono' }, l.url_orig), ' ',
+              h('button', { class: 'small ghost', onclick: () => { SAS.setLinkUrl(doc, l.id, ''); changed(doc, true); } }, '되돌리기')) : null));
+      }));
+      if (!list.length) body.append(h('tr', {}, h('td', { colspan: 4, class: 'muted small' }, '해당하는 링크가 없습니다.')));
+    };
+    q.addEventListener('input', render);
+    render();
+    return h('div', { class: 'card' },
+      h('div', { class: 'editor-head' }, h('h2', {}, `링크 점검 (${links.length})`),
+        h('div', { class: 'kv' }, ...LINK_TYPES.map(t => h('span', {}, `${t} ${byType(t)}`)))),
+      h('p', { class: 'muted small' }, '사용자 화면의 「받기」·「법령」 단추와 쪽 보기에서 누르는 자리는 여기 주소로 연결됩니다. 원본 PDF의 링크는 바꾸지 않습니다. 「열기」로 확인해 찾을 수 없다고 나오면 주소를 고쳐 주세요. 종류(서식·참고)는 이름으로 자동 추정한 것이라 틀리면 고르면 됩니다.'),
+      suspect.length ? h('div', { class: 'notice warn' },
+        h('b', {}, `주소가 잘린 것으로 보이는 링크 ${suspect.length}개`), ' — 교육청 내려받기 주소에 게시판 정보(m=…&s=…)가 빠져 있습니다. 하나를 「보충한 주소로 열어 보기」로 확인해 보고, 열리면 한꺼번에 바꾸세요.',
+        h('div', { class: 'actions', style: 'margin:8px 0 0' }, h('button', { class: 'small', onclick: async () => {
+          if (!(await confirmBox(`잘린 주소 ${suspect.length}개에 게시판 정보를 채워 넣을까요? 처음 주소는 남아 있어 언제든 되돌릴 수 있습니다.`, '모두 바꾸기'))) return;
+          suspect.forEach(l => SAS.setLinkUrl(doc, l.id, SAS.suggestUrl(l.url, sample)));
+          changed(doc, true); toast(`${suspect.length}개 주소를 바꿨습니다. 몇 개를 열어 확인해 주세요.`, 5000);
+        } }, `잘린 주소 ${suspect.length}개 모두 보충하기`))) : null,
+      h('div', { class: 'row', style: 'justify-content:flex-start;gap:10px;flex-wrap:wrap;margin:8px 0' }, seg, q),
+      h('div', { style: 'overflow:auto;max-height:520px' }, h('table', { class: 'table links-table' },
+        h('thead', {}, h('tr', {}, ...['번호', '종류', '이름', '주소'].map(t => h('th', {}, t)))), body)));
   }
 
   function sectionCard(doc) {
@@ -817,13 +945,20 @@ ${groups.map(g => `<div class="card"><h2>${e(g.title)}</h2><table>${g.items.map(
       works_url: doc.works_url, origin: doc.origin, search_keywords: doc.search_keywords, created_at: doc.created_at, forms_bundle: doc.forms_bundle }, r.blocks, []);
     const kept = SAS.carryKeywords(doc, nd);
     const keptForms = SAS.carryForms(doc, nd);
+    const keptLinks = SAS.carryLinkEdits(doc, nd);
+    if (r.format === 'pdf') {
+      if (file.size > PDF_MAX) { toast(`PDF가 ${fmtBytes(file.size)}로 너무 큽니다(약 95MB까지). 기존 자료를 유지합니다.`, 6000); return; }
+      nd.pdf = { path: S.pdfPath(doc.id), bytes: file.size };
+    }
     const ok = await confirmBox(`<h2>파일 교체</h2><p><b>${SAS.esc(file.name)}</b></p><ul>
       <li>업무: ${doc.sections.length}개 → <b>${nd.sections.length}개</b>${nd.extraction.toc_found ? ' (목차 인식)' : ''}</li>
-      <li>업무 검색어 유지: ${kept}개 업무</li><li>서식: ${SAS.formList(doc).length}개 → <b>${SAS.formList(nd).length}개</b> (쪽 정보 유지 ${keptForms}개)</li>
+      <li>업무 검색어 유지: ${kept}개 업무</li><li>링크: ${(doc.links || []).length}개 → <b>${(nd.links || []).length}개</b> (고친 주소·이름 유지 ${keptLinks}개)</li>
+      ${nd.outline ? `<li>번호 목차: <b>${nd.outline.nodes.length}개 항목</b></li>` : ''}${nd.pdf ? `<li>원본 PDF도 새 파일로 바꿉니다 (${fmtBytes(file.size)})</li>` : ''}
       ${nd.extraction.warnings.length ? `<li>참고: ${nd.extraction.warnings.map(SAS.esc).join(' / ')}</li>` : ''}</ul>
-      <p class="small muted">웍스의 원본 파일도 새 판으로 바꿔 올리고, 링크가 바뀌었으면 웍스 링크를 고쳐 주세요. 서식이 바뀌었으면 서식 모음도 다시 만들어야 합니다.</p>`, '교체 적용');
+      <p class="small muted">따로 넣은 원본 내려받기 링크가 있다면 새 판으로 바꿔 주세요.</p>`, '교체 적용');
     if (!ok) return;
     S.replaceDoc(doc.id, nd);
+    if (nd.pdf && r.format === 'pdf') await S.setPendingPdf(doc.id, file);
     renderEditor(); renderList();
     toast('교체했습니다. 「③ 점검·반영」에서 반영해 주세요.');
   }
@@ -853,7 +988,7 @@ ${groups.map(g => `<div class="card"><h2>${e(g.title)}</h2><table>${g.items.map(
     $('checkResult').replaceChildren(
       h('div', { class: 'stat' }, h('div', {}, h('b', {}, S.state.docs.length + '건'), h('span', {}, '전체 자료')), ...lvStats,
         h('div', {}, h('b', {}, fmtBytes(st.totalBytes)), h('span', {}, `데이터 ${st.fileCount}개 파일`)),
-        h('div', {}, h('b', {}, diff.changed.length + diff.deletions.length + '개'), h('span', {}, `반영 시 바뀌는 파일${diff.deletions.length ? ` (삭제 ${diff.deletions.length})` : ''}`))),
+        h('div', {}, h('b', {}, diff.changed.length + diff.deletions.length + S.pendingPdfIds().length + '개'), h('span', {}, `반영 시 바뀌는 파일${S.pendingPdfIds().length ? ` (PDF ${S.pendingPdfIds().length})` : ''}${diff.deletions.length ? ` (삭제 ${diff.deletions.length})` : ''}`))),
       chk.errors.length ? h('div', { class: 'notice err' }, h('b', {}, `오류 ${chk.errors.length}건 — 고친 뒤 반영할 수 있습니다.`), h('ul', {}, chk.errors.slice(0, 50).map(e => h('li', {}, e)))) : h('div', { class: 'notice ok' }, '오류 없음. 반영할 수 있습니다.'),
       chk.warnings.length ? h('details', {}, h('summary', {}, `확인 권장 ${chk.warnings.length}건 (반영은 가능)`), h('ul', { class: 'small' }, chk.warnings.slice(0, 200).map(w => h('li', {}, w)))) : '');
     return { outputs, chk, diff };
@@ -889,14 +1024,15 @@ ${groups.map(g => `<div class="card"><h2>${e(g.title)}</h2><table>${g.items.map(
     if (S.state.source !== 'github') { toast('GitHub에서 자료를 불러온 상태에서만 반영할 수 있습니다. 새로고침해 다시 불러와 주세요.', 5000); return; }
     const { outputs, chk, diff } = await runCheck();
     if (!chk.ok) { toast('오류를 먼저 고쳐 주세요.', 4000); return; }
-    if (!diff.changed.length && !diff.deletions.length) { toast('바뀐 파일이 없습니다. 사이트와 내용이 같습니다.'); return; }
+    const nPdf = S.pendingPdfIds().length;
+    if (!diff.changed.length && !diff.deletions.length && !nPdf) { toast('바뀐 파일이 없습니다. 사이트와 내용이 같습니다.'); return; }
     const info = GH.expiryInfo(S.state.github && S.state.github.expiresAt);
     if (info.level === 'expired') { toast('출입증이 만료되었습니다. 새 출입증으로 바꿔 주세요.', 5000); openTokenDialog(); return; }
     const message = ($('commitMsg').value.trim() || autoMessage(diff)) + `\n\n관리자 도구에서 반영 · 바뀐 파일 ${diff.changed.length}개, 삭제 ${diff.deletions.length}개`;
     try {
-      const r = await withProgress(`사이트에 반영하는 중… (파일 ${diff.changed.length + diff.deletions.length}개)`, p => S.publishToGithub(outputs, message, p));
+      const r = await withProgress(`사이트에 반영하는 중… (파일 ${diff.changed.length + diff.deletions.length}개${nPdf ? ` · PDF ${nPdf}개` : ''})`, p => S.publishToGithub(outputs, message, p));
       $('commitMsg').value = '';
-      $('saveMsg').textContent = `${new Date().toLocaleTimeString('ko-KR')} 반영 완료: 파일 ${r.written}개 올림, ${r.deleted}개 삭제. 1~2분 뒤 사이트에서 확인하세요.`;
+      $('saveMsg').textContent = `${new Date().toLocaleTimeString('ko-KR')} 반영 완료: 파일 ${r.written}개 올림${r.pdfs ? `(PDF ${r.pdfs}개 포함)` : ''}, ${r.deleted}개 삭제. 1~2분 뒤 사이트에서 확인하세요.`;
       toast('사이트에 반영했습니다.', 4000);
       renderSaveStatus(); runCheck();
     } catch (e) {
@@ -908,7 +1044,7 @@ ${groups.map(g => `<div class="card"><h2>${e(g.title)}</h2><table>${g.items.map(
   $('btnSaveFolder').onclick = async () => {
     const { outputs, chk, diff } = await runCheck();
     if (!chk.ok) { toast('오류를 먼저 고쳐 주세요.', 4000); return; }
-    if (!diff.changed.length && !diff.deletions.length) { toast('바뀐 파일이 없습니다.'); return; }
+    if (!diff.changed.length && !diff.deletions.length && !S.pendingPdfIds().length) { toast('바뀐 파일이 없습니다.'); return; }
     try {
       const r = await withProgress(`저장 중… (${diff.changed.length + diff.deletions.length}개 파일)`, p => S.saveToFolder(outputs, p));
       $('saveMsg').textContent = `${new Date().toLocaleTimeString('ko-KR')} 저장 완료: 파일 ${r.written}개 기록, ${r.deleted}개 삭제. GitHub Desktop에서 커밋·푸시하세요.`;

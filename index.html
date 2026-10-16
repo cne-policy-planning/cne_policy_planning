@@ -6,6 +6,13 @@
 <title>교무업무 통합검색</title>
 <meta name="description" content="업무 매뉴얼, 지침, 서식을 키워드로 찾아 바로 내려받을 수 있습니다.">
 <link rel="stylesheet" href="assets/css/site.css">
+<script type="module">
+  // 쪽 보기용 PDF 도구(내장, 외부 CDN 미사용). 불러오지 못해도 목차·검색은 동작한다
+  import * as pdfjsLib from './assets/vendor/pdfjs/pdf.min.mjs';
+  pdfjsLib.GlobalWorkerOptions.workerSrc = new URL('./assets/vendor/pdfjs/pdf.worker.min.mjs', location.href).href;
+  window.pdfjsLib = pdfjsLib;
+  window.dispatchEvent(new Event('pdfjs-ready'));
+</script>
 </head>
 <body>
 <div class="page-bg" aria-hidden="true"></div>
@@ -23,28 +30,63 @@
     <div class="hero">
       <div class="eyebrow">학교의 모든 교무업무 자료를 한 곳에서</div>
       <h1>어느 <em>학교급 자료</em>를 찾으세요?</h1>
-      <p>업무 매뉴얼, 지침, 서식을 키워드로 찾아 바로 내려받을 수 있습니다.</p>
+      <p>업무 매뉴얼·지침을 목차로 찾아 원문을 바로 보고, 서식을 바로 내려받습니다.</p>
     </div>
     <div id="levelCards" class="level-cards"></div>
-    <p class="home-note">자료는 도교육청 자료실 등에 게시된 공개 자료를 모은 것입니다.<br>원본과 서식은 네이버 웍스에서 내려받습니다.</p>
+    <p class="home-note">자료는 도교육청 자료실 등에 게시된 공개 자료를 모은 것입니다.<br>목차를 누르면 원문 쪽이 바로 열리고, 서식은 원 게시처에서 바로 내려받습니다.</p>
     <img class="deco left" src="assets/img/deco-left.png" alt="" aria-hidden="true">
     <img class="deco right" src="assets/img/deco-right.png" alt="" aria-hidden="true">
   </section>
 
-  <!-- 학교급 화면: 검색 · 업무별 보기 -->
-  <section id="level" class="hidden">
-    <div class="level-head">
-      <h1 id="levelTitle"></h1>
+  <!-- 학교급 화면: 왼쪽 자료 · 가운데 번호 목차 · 오른쪽 쪽 보기 -->
+  <section id="level" class="hidden" aria-label="자료 보기">
+    <div class="v-top">
       <form id="searchForm" class="search-box" role="search">
-        <input id="q" type="search" autocomplete="off" placeholder="업무 관련 키워드 (예: 현장체험학습, 소풍, 보결)" aria-label="검색어">
+        <input id="q" type="search" autocomplete="off" placeholder="업무·서식·법령 검색 (예: 현장체험학습, 서] 기안문, 법] 유아교육법)" aria-label="검색어">
         <button class="primary" type="submit">검색</button>
       </form>
-      <div id="hints" class="hints"></div>
-      <div id="catChips" class="chips" aria-label="업무 분류"></div>
+      <div id="typeChips" class="chips" role="group" aria-label="자료 종류"></div>
     </div>
-    <div id="summary" class="summary" aria-live="polite"></div>
-    <div id="results"></div>
+    <div class="v-tabs" role="tablist">
+      <button id="tabToc" type="button" role="tab" aria-selected="true">목차</button>
+      <button id="tabDoc" type="button" role="tab" aria-selected="false">본문</button>
+    </div>
+    <div id="cols" class="v-cols" data-show="toc">
+      <nav class="v-pane v-docs" aria-label="자료 목록">
+        <div class="v-label" id="docsLabel">자료</div>
+        <div id="docList" class="v-doclist"></div>
+        <div class="v-label">이 자료</div>
+        <div id="docStats" class="v-stats"></div>
+      </nav>
+      <section class="v-pane v-toc" aria-label="목차">
+        <div class="v-head">
+          <div id="docTitle" class="v-title"></div>
+          <div class="v-btns">
+            <button id="btnFold" type="button" class="small">목차 접기</button>
+            <button id="btnHere" type="button" class="small accent">◉ 현재위치</button>
+            <button id="btnShare" type="button" class="small">현재 위치 공유</button>
+          </div>
+        </div>
+        <div id="tocScroll" class="v-scroll"><div id="tree" class="v-tree"></div></div>
+      </section>
+      <section class="v-pane v-view" aria-label="본문">
+        <div class="v-head v-head-row">
+          <div id="crumb" class="v-crumb"></div>
+          <div class="v-pager">
+            <button id="pPrev" type="button" class="ib" aria-label="이전 쪽">‹</button>
+            <input id="pNum" inputmode="numeric" aria-label="쪽 번호">
+            <span id="pTotal"></span>
+            <button id="pNext" type="button" class="ib" aria-label="다음 쪽">›</button>
+            <button id="zOut" type="button" class="ib" aria-label="작게 보기">−</button>
+            <button id="zIn" type="button" class="ib" aria-label="크게 보기">+</button>
+            <a id="btnDown" class="btn small hidden" target="_blank" rel="noopener">원본 내려받기</a>
+          </div>
+        </div>
+        <div id="viewer" class="v-scroll v-viewer"><div id="pages" class="v-pages"></div></div>
+      </section>
+    </div>
   </section>
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
 
   <div id="status"></div>
 </main>

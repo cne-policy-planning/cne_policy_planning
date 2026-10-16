@@ -381,10 +381,19 @@
           return;
         }
         seen.add(key);
-        out.push({ key, text: l.text || l.url, url: l.url, kind: linkKind(l.url), block: bi, section_id: sec ? sec.id : null });
+        // 링크 영역: 쪽 위에서부터 잰 [왼, 위, 오른, 아래](pt). 쪽 보기에서 누를 자리로 쓴다
+        const H = b.h || 842;
+        const box = Array.isArray(l.box) ? [l.box[0], Math.round((H - l.box[3]) * 10) / 10, l.box[2], Math.round((H - l.box[1]) * 10) / 10] : null;
+        out.push({ key, text: l.text || l.url, url: l.url, kind: linkKind(l.url), block: bi, section_id: sec ? sec.id : null, box });
       });
     });
-    return out.map((o, i) => ({ id: 'lnk-' + String(i + 1).padStart(4, '0'), text: o.text.replace(/^[「『」』\s]+|[「『」』\s,]+$/g, ''), url: o.url, kind: o.kind, block: o.block, section_id: o.section_id }));
+    return out.map((o, i) => {
+      // 낫표는 링크가 이름 일부만 덮어 짝이 맞지 않는 경우가 많아 모두 뺀다
+      const text = o.text.replace(/[「『」』]/g, '').replace(/^[\s,，.·]+|[\s,，]+$/g, '').replace(/\s+/g, ' ');
+      const r = { id: 'lnk-' + String(i + 1).padStart(4, '0'), text: text || o.url, url: o.url, kind: o.kind, block: o.block, section_id: o.section_id };
+      if (o.box) r.box = o.box;
+      return r;
+    });
   }
 
   return { parseToc, isUntitled, sectionize, sectionText, sectionLead, sectionPages, attachLinks, linkKind, cleanTitle };

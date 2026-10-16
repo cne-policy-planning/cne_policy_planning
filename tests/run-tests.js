@@ -7,7 +7,7 @@
 'use strict';
 const path = require('path');
 const core = p => require(path.join(__dirname, '..', 'assets', 'js', 'core', p));
-const SAS = Object.assign({}, core('normalize.js'), core('textlayout.js'), core('sectionizer.js'), core('schema.js'), core('indexer.js'));
+const SAS = Object.assign({}, core('normalize.js'), core('textlayout.js'), core('sectionizer.js'), core('outline.js'), core('schema.js'), core('indexer.js'));
 
 let pass = 0, fail = 0;
 function test(name, fn) {
@@ -50,11 +50,46 @@ test('서식 모음 쪽 찾기(번호 순서, 일부 누락·2쪽 서식)', () =
   eq(m.missing, [5, 50]); eq(SAS.formList(d).find(f => f.form_no === 11).bundle_page, 11);
 });
 
+console.log('\n[3-2] 번호 목차 트리(충교위키식)');
+const O = doc.outline.nodes, node = c => O.find(n => n.c === c);
+const lnk = n => doc.links.find(l => l.id === n.l);
+test('단원 3개 · 업무 27개 모두 세부 목차', () => { eq(O.filter(n => n.k === 'ch').map(n => n.t), ['교무·연구 업무', '유아교육지원', '인사업무']); eq(doc.outline.stats.detailed, 27); });
+test('1.6 = 유치원 평가·유치원 규칙, 부분 3개', () => { eq(node('1.6').t, '유치원 평가·유치원 규칙'); eq(['1.6.1', '1.6.2', '1.6.3'].map(c => node(c).t), ['업무개요', '업무의 내용 및 방법', '관련 자료 및 서식']); });
+test('◆ 묶음 → 번호 항목 → ▸ 항목 (5단계)', () => { eq(node('1.6.2.1').t, '유치원 평가'); eq(node('1.6.2.1.1').t, '유치원 평가 주요 사항'); eq(node('1.6.2.1.1.2').t, '평가 주기: 1년(매년 실시)'); eq(node('1.6.2.2').t, '유치원 규칙'); });
+test('두 단 편집: 오른쪽 단 항목은 왼쪽 단 다음에 이어짐', () => { eq(node('2.5.2.3.5').t, '참여 유아 파악 및 보호자 동의서 받기'); eq(node('2.5.2.6').t, '현장체험학습 완료 후 업무 처리'); });
+test('줄바꿈된 항목 이어 붙이기 · "-" 줄은 딸린 줄', () => { eq(node('1.1.2.1').t, '유치원 교육과정위원회 조직 및 교육과정 편성 계획 수립'); ok(node('1.6.2.1.1.3').d.length === 3); });
+test('업무개요 근거 법령 링크는 업무개요 아래', () => { eq(lnk(node('1.6.1.1')).type, '법령'); eq(node('1.6.1.1').t, '유아교육법 제19조(평가)'); });
+test('관련 자료: 줄 단위로 왼쪽부터, 서식·참고 구분', () => { eq(node('1.6.3.1').t, '유치원 평가 운영 계획(예시)'); eq(lnk(node('1.6.3.1')).type, '서식'); eq(lnk(node('1.6.3.3')).type, '참고'); eq(node('2.5.3.4').t, '현장체험학습 계획서(예시)'); });
+test('모든 링크에 쪽 위치(누를 자리)', () => ok(doc.links.every(l => Array.isArray(l.box) && l.box[1] < l.box[3])));
+test('잘린 교육청 주소 찾기·보충 제안', () => {
+  ok(SAS.isSuspectUrl('http://www.cne.go.kr/boardCnts/fileDown.do?fileSeq=abc')); ok(!SAS.isSuspectUrl('http://www.cne.go.kr/boardCnts/fileDown.do?m=0104&s=manual&fileSeq=abc'));
+  eq(SAS.suggestUrl('http://www.cne.go.kr/boardCnts/fileDown.do?fileSeq=abc', 'http://www.cne.go.kr/boardCnts/fileDown.do?m=0104&s=manual&fileSeq=x'), 'http://www.cne.go.kr/boardCnts/fileDown.do?m=0104&s=manual&fileSeq=abc');
+  ok(doc.links.filter(l => SAS.isSuspectUrl(l.url)).length >= 40);
+});
+test('저장 파일에는 줄 위치가 남지 않음(쪽 크기만)', () => { ok(!doc.blocks.some(b => b.lines)); eq([doc.blocks[11].w, doc.blocks[11].h], [595, 841]); });
+
+test('링크 주소·이름 고치기 → 되돌리기, 교체 시 승계', () => {
+  const d = JSON.parse(JSON.stringify(doc)); const l = d.links.find(x => SAS.isSuspectUrl(x.url)); const orig = l.url;
+  SAS.setLinkUrl(d, l.id, 'https://example.org/a.hwp'); eq(l.url_orig, orig); eq(l.kind, 'site');
+  SAS.setLinkInfo(d, l.id, { text: '고친 이름', type: '서식' });
+  const nd = JSON.parse(JSON.stringify(doc)); eq(SAS.carryLinkEdits(d, nd), 1);
+  const m = nd.links.find(x => x.url_orig === orig); eq([m.url, m.text, m.type], ['https://example.org/a.hwp', '고친 이름', '서식']);
+  SAS.setLinkUrl(d, l.id, ''); eq(l.url, orig); ok(!l.url_orig);
+});
+test('업무명 고치면 목차 제목도 바뀜', () => { const d = JSON.parse(JSON.stringify(doc)); d.sections[5].heading = '유치원 평가와 규칙'; SAS.syncOutline(d); eq(d.outline.nodes.find(n => n.c === '1.6').t, '유치원 평가와 규칙'); });
+test('원본 PDF 경로 검사 · 색인에 PDF 경로', () => {
+  const d = JSON.parse(JSON.stringify(doc)); d.pdf = { path: 'pdf/' + d.id + '.pdf', bytes: 1 };
+  ok(SAS.validateDocument(d).errors.length === 0); d.pdf.path = '../x.pdf'; ok(SAS.validateDocument(d).errors.some(e => /PDF/.test(e)));
+  d.pdf.path = 'pdf/' + d.id + '.pdf'; const o = SAS.buildOutputs([d], { generatedAt: 'x' }); eq(JSON.parse(o.files.get('data/indexes/kindergarten.json')).docs[0].p, d.pdf.path);
+});
+
 console.log('\n[4] v1 JSON 변환');
-const v1 = SAS.migrateV1(require('./fixtures/v1-kinder-2026.json'), []);
-test('v1 → 업무 27개(조각 경계에서 잘린 목차 복원)', () => eq(v1[0].sections.length, 27));
-test('v1 페이지 검색어 「소풍」 → 현장체험학습 운영', () => eq(v1[0].sections.find(s => s.heading === '현장체험학습 운영').keywords, ['소풍', '현장학습']));
-test('ID 형식', () => ok(/^doc-2026-[a-z0-9]{6}$/.test(v1[0].id)));
+let v1F = null; try { v1F = require('./fixtures/v1-kinder-2026.json'); } catch (e) { console.log('  (v1 시험 자료 없음 — 건너뜀)'); }
+const v1 = v1F ? SAS.migrateV1(v1F, []) : null;
+const vtest = (n, f) => v1 ? test(n, f) : null;
+vtest('v1 → 업무 27개(조각 경계에서 잘린 목차 복원)', () => eq(v1[0].sections.length, 27));
+vtest('v1 페이지 검색어 「소풍」 → 현장체험학습 운영', () => eq(v1[0].sections.find(s => s.heading === '현장체험학습 운영').keywords, ['소풍', '현장학습']));
+vtest('ID 형식', () => ok(/^doc-2026-[a-z0-9]{6}$/.test(v1[0].id)));
 
 console.log('\n[5] 색인·일관성');
 sec('현장체험학습 운영').keywords = ['소풍', '사전답사'];

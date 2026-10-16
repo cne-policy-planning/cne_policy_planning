@@ -3,7 +3,7 @@
  */
 (function (root, factory) {
   const deps = root.SAS || (typeof require === 'function'
-    ? Object.assign({}, require('./normalize.js'), require('./textlayout.js'), require('./sectionizer.js')) : {});
+    ? Object.assign({}, require('./normalize.js'), require('./textlayout.js'), require('./sectionizer.js'), require('./outline.js')) : {});
   const api = factory(deps);
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.SAS = Object.assign(root.SAS || {}, api);
@@ -76,18 +76,26 @@
         footer_label: b.footer_label || '',
         text: b.text || '',
         lines: b.lines,
+        w: b.w, h: b.h,
         links: b.links || []
       })),
       sections: [],
       links: [],
       forms_bundle: Object.assign({ works_url: '', filename: '', page_count: null, matched_at: null }, meta.forms_bundle || {}),
+      // 원본 PDF(사이트에 함께 올려 쪽 보기에 쓴다): { path: 'pdf/<id>.pdf', bytes, sha }
+      pdf: meta.pdf || null,
+      outline: null,
+      outline_edits: {},
       extraction: { toc_found: false, warnings: [], extracted_at: now }
     };
     if (doc.kind === 'text') {
       const r = N.sectionize(doc);
       doc.sections = r.sections;
       doc.links = N.attachLinks(doc);
+      doc.links.forEach(l => { l.type = N.linkType(l.text, l.url); });
       numberForms(doc);
+      const o = N.buildOutline(doc);
+      doc.outline = { nodes: o.nodes, built_at: now, stats: o.stats };
       doc.extraction.toc_found = !!r.toc_found;
       doc.extraction.warnings = r.warnings || [];
       if (!doc.blocks.some(b => N.norm(b.text).length > 20)) doc.extraction.warnings.unshift('추출된 글자가 거의 없습니다. 스캔 PDF(이미지)일 수 있으며 OCR은 지원하지 않습니다.');
@@ -198,7 +206,11 @@
 
   /** 저장 전 정리: 작업용 필드 제거, 섹션 쪽수 계산 */
   function finalizeDocument(doc) {
-    doc.blocks = (doc.blocks || []).map(b => ({ n: b.n, pdf_page: b.pdf_page, printed_page: b.printed_page, footer_label: b.footer_label || '', text: b.text }));
+    doc.blocks = (doc.blocks || []).map(b => {
+      const o = { n: b.n, pdf_page: b.pdf_page, printed_page: b.printed_page, footer_label: b.footer_label || '', text: b.text };
+      if (b.w) { o.w = b.w; o.h = b.h; }
+      return o;
+    });
     doc.sections = (doc.sections || []).map(s => Object.assign({}, s, N.sectionPages(doc, s), { keywords: N.splitList(s.keywords) }));
     return doc;
   }
@@ -285,8 +297,13 @@
     if (!doc.id || !/^doc-[a-z0-9-]+$/.test(doc.id)) errors.push('문서 ID 형식 오류');
     if (!doc.title) errors.push('자료명이 비어 있습니다');
     if (!doc.school_levels || !doc.school_levels.length) errors.push('학교급이 선택되지 않았습니다');
-    if (!doc.works_url) warnings.push('웍스 링크가 없습니다(내려받기 버튼이 비활성화됩니다)');
-    else if (!/^https?:\/\//i.test(doc.works_url)) errors.push('웍스 링크가 http(s)로 시작하지 않습니다');
+    if (doc.works_url && !/^https?:\/\//i.test(doc.works_url)) errors.push('원본 내려받기 링크가 http(s)로 시작하지 않습니다');
+    if (doc.format === 'pdf' && !doc.pdf) warnings.push('원본 PDF가 사이트에 없습니다. 「파일 교체」로 PDF를 다시 넣으면 쪽 보기가 됩니다');
+    if (doc.pdf && !/^pdf\/[a-z0-9-]+\.pdf$/.test(doc.pdf.path || '')) errors.push('원본 PDF 경로 형식 오류');
+    if (doc.kind === 'text' && doc.format === 'pdf' && !doc.outline) warnings.push('번호 목차가 없습니다. 「파일 교체」로 PDF를 다시 분석해 주세요');
+    const suspect = (doc.links || []).filter(l => N.isSuspectUrl(l.url)).length;
+    if (suspect) warnings.push(`주소가 잘린 것으로 보이는 링크 ${suspect}개(누르면 찾을 수 없다고 나올 수 있음) — 「링크 점검」에서 고칠 수 있습니다`);
+    (doc.links || []).forEach(l => { if (l.url && !/^https?:\/\//i.test(l.url)) errors.push(`링크 주소 형식 오류: ${l.text}`); });
     const nb = (doc.blocks || []).length;
     (doc.sections || []).forEach(s => {
       if (!s.heading) errors.push(`${s.id}: 업무명이 비어 있습니다`);
@@ -295,11 +312,51 @@
     const sids = new Set((doc.sections || []).map(s => s.id));
     if (sids.size !== (doc.sections || []).length) errors.push('업무 ID가 중복됩니다');
     if (doc.kind === 'text' && !(doc.sections || []).length) warnings.push('업무 구간이 없습니다(본문 검색 불가)');
-    const forms = (doc.links || []).filter(l => l.form_no != null);
-    if (forms.length && !(doc.forms_bundle && doc.forms_bundle.works_url)) warnings.push(`서식 ${formList(doc).length}개가 있지만 서식 모음 웍스 링크가 없습니다`);
-    else if (doc.forms_bundle && doc.forms_bundle.works_url && !/^https?:\/\//i.test(doc.forms_bundle.works_url)) errors.push('서식 모음 링크가 http(s)로 시작하지 않습니다');
+    if (doc.forms_bundle && doc.forms_bundle.works_url && !/^https?:\/\//i.test(doc.forms_bundle.works_url)) errors.push('서식 모음 링크가 http(s)로 시작하지 않습니다');
     return { errors, warnings };
   }
 
-  return { SCHEMA_VERSION, LEVELS, TEXT_FORMATS, ORIGIN_SITES, CATEGORIES, levelSlug, levelName, formatOf, kindOf, newDocId, titleFromFilename, createDocument, finalizeDocument, carryKeywords, carryForms, numberForms, addManualForms, removeManualForm, formList, matchBundle, migrateV1, validateDocument };
+  /** 링크 주소 고치기: 처음 주소는 url_orig에 남긴다(빈 값이면 처음 주소로 되돌림) */
+  function setLinkUrl(doc, id, url) {
+    const l = (doc.links || []).find(x => x.id === id);
+    if (!l) return null;
+    const v = String(url || '').trim();
+    if (!l.url_orig) l.url_orig = l.url;
+    l.url = v || l.url_orig;
+    if (l.url === l.url_orig) delete l.url_orig;
+    l.kind = N.linkKind(l.url);
+    return l;
+  }
+  /** 링크 이름·종류 고치기 */
+  function setLinkInfo(doc, id, info) {
+    const l = (doc.links || []).find(x => x.id === id);
+    if (!l) return null;
+    if (info.text != null && String(info.text).trim()) { if (!l.text_orig) l.text_orig = l.text; l.text = String(info.text).trim(); }
+    if (info.type) { l.type = info.type; l.type_set = true; }
+    return l;
+  }
+  /** 자료 교체 시 관리자가 고친 링크(주소·이름·종류)를 처음 주소가 같은 링크로 옮긴다 */
+  function carryLinkEdits(oldDoc, newDoc) {
+    const byOrig = new Map();
+    (oldDoc.links || []).forEach(l => { if (l.url_orig || l.text_orig || l.type_set) byOrig.set(l.url_orig || l.url, l); });
+    let n = 0;
+    (newDoc.links || []).forEach(l => {
+      const o = byOrig.get(l.url);
+      if (!o) return;
+      if (o.url_orig) { l.url_orig = l.url; l.url = o.url; l.kind = N.linkKind(l.url); }
+      if (o.text_orig) { l.text_orig = l.text; l.text = o.text; }
+      if (o.type_set) { l.type = o.type; l.type_set = true; }
+      n++;
+    });
+    if (oldDoc.pdf && !newDoc.pdf) newDoc.pdf = oldDoc.pdf;
+    return n;
+  }
+  /** 업무명을 고치면 목차의 업무 제목도 같이 */
+  function syncOutline(doc) {
+    if (!doc.outline || !doc.outline.nodes) return;
+    const byId = new Map((doc.sections || []).map(s => [s.id, s]));
+    doc.outline.nodes.forEach(n => { if (n.k === 'task' && n.s && byId.has(n.s)) n.t = byId.get(n.s).heading; });
+  }
+
+  return { setLinkUrl, setLinkInfo, carryLinkEdits, syncOutline, SCHEMA_VERSION, LEVELS, TEXT_FORMATS, ORIGIN_SITES, CATEGORIES, levelSlug, levelName, formatOf, kindOf, newDocId, titleFromFilename, createDocument, finalizeDocument, carryKeywords, carryForms, numberForms, addManualForms, removeManualForm, formList, matchBundle, migrateV1, validateDocument };
 });

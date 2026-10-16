@@ -85,6 +85,22 @@
   }
   async function clearDraft() { clearTimeout(draftTimer); await kvDel('draft'); }
 
+  // ---------- 원본 PDF(아직 사이트에 올리지 않은 것) ----------
+  // 자료 ID → File/Blob. 창을 닫아도 이어서 반영할 수 있게 IndexedDB에도 넣어 둔다.
+  const pendingPdfs = new Map();
+  async function setPendingPdf(id, blob) { pendingPdfs.set(id, blob); await kvSet('pdf:' + id, blob); markChanged(id); }
+  async function dropPendingPdf(id) { pendingPdfs.delete(id); await kvDel('pdf:' + id); }
+  function pendingPdfIds() { return [...pendingPdfs.keys()].filter(id => getDoc(id)); }
+  async function restorePendingPdfs() {
+    for (const k of await kvKeys('pdf:')) { const id = k.slice(4); const b = await kvGet(k); if (b && getDoc(id)) pendingPdfs.set(id, b); else await kvDel(k); }
+  }
+  function pdfPath(id) { return `pdf/${id}.pdf`; }
+  /** 저장소의 PDF 중 어느 자료에서도 쓰지 않는 것(자료를 지운 경우) */
+  function orphanPdfs(paths) {
+    const used = new Set(state.docs.filter(d => d.pdf).map(d => d.pdf.path));
+    return [...paths].filter(p => /^pdf\/[^/]+\.pdf$/.test(p) && !used.has(p));
+  }
+
   function getDoc(id) { return state.docs.find(d => d.id === id); }
   function addDocs(list) { list.forEach(d => { state.docs.push(d); state.changedIds.add(d.id); }); markChanged(); }
   function replaceDoc(id, doc) { const i = state.docs.findIndex(d => d.id === id); if (i >= 0) state.docs[i] = doc; markChanged(id); }
@@ -219,6 +235,21 @@
     clearTimeout(draftTimer);
     const { changed, deletions } = await diffOutputs(outputs);
     const files = changed.map(p => ({ path: p, content: outputs.files.get(p) }));
+    // 원본 PDF: 새로 넣은 것은 조각으로 올리고, 지운 자료의 PDF는 함께 지운다
+    const pdfIds = pendingPdfIds();
+    for (let i = 0; i < pdfIds.length; i++) {
+      const id = pdfIds[i], doc = getDoc(id);
+      if (!doc || !doc.pdf) continue;
+      const bytes = new Uint8Array(await pendingPdfs.get(id).arrayBuffer());
+      const sha = await GH.gitBlobSha(bytes);
+      if (latest.files.get(doc.pdf.path) !== sha) {
+        if (onProgress) onProgress(i, pdfIds.length + 1);
+        const got = await c.createBlob(bytes);
+        files.push({ path: doc.pdf.path, sha: got || sha });
+      }
+    }
+    const pdfDeletions = orphanPdfs(latest.files.keys());
+    deletions.push(...pdfDeletions);
     // GitHub Pages가 data 폴더를 그대로 내보내도록(.nojekyll) 처음 한 번 만든다
     const hasNoJekyll = latest.files.has('.nojekyll');
     if (!hasNoJekyll) files.push({ path: '.nojekyll', content: '' });
@@ -234,13 +265,14 @@
       if (/^data\/documents(\/|\.json$)|^data\/manifest\.json$/.test(p)) await kvSet('blob:' + sha, text);
     }
     deletions.forEach(p => state.savedShas.delete(p));
+    for (const id of pdfIds) await dropPendingPdf(id);
     state.head = { commitSha: r.commitSha, treeSha: r.treeSha };
     state.generatedAt = outputs.manifest.generated_at;
     state.changedIds = new Set();
     state.status = 'published';
     await clearDraft();
     emit();
-    return { written: changed.length, deleted: deletions.length, commitSha: r.commitSha };
+    return { written: files.length, deleted: deletions.length, pdfs: pdfIds.length, commitSha: r.commitSha };
   }
 
   // ---------- 변경 감시 ----------
@@ -353,6 +385,12 @@
     let done = 0;
     for (const p of changed) { const t = outputs.files.get(p); await writeText(state.folder, p, t); state.savedShas.set(p, await GH.gitBlobSha(t)); if (onProgress) onProgress(++done, changed.length + deletions.length); }
     for (const p of deletions) { await removePath(state.folder, p); state.savedShas.delete(p); if (onProgress) onProgress(++done, changed.length + deletions.length); }
+    for (const id of pendingPdfIds()) {
+      const doc = getDoc(id); if (!doc || !doc.pdf) continue;
+      const parts = doc.pdf.path.split('/'); const name = parts.pop(); const d = await dirAt(state.folder, parts, true);
+      const w = await (await d.getFileHandle(name, { create: true })).createWritable(); await w.write(pendingPdfs.get(id)); await w.close();
+      await dropPendingPdf(id);
+    }
     state.generatedAt = outputs.manifest.generated_at;
     state.changedIds = new Set(); state.status = 'exported';
     await clearDraft(); emit();
@@ -366,6 +404,7 @@
     let paths = [...outputs.files.keys()], deletions = [];
     if (changedOnly) { const d = await diffOutputs(outputs); paths = d.changed; deletions = d.deletions; }
     paths.forEach(p => zip.file(p, outputs.files.get(p)));
+    for (const id of pendingPdfIds()) { const doc = getDoc(id); if (doc && doc.pdf) { zip.file(doc.pdf.path, pendingPdfs.get(id)); paths.push(doc.pdf.path); } }
     if (deletions.length) zip.file('삭제할_파일_목록.txt', '저장소에서 아래 파일을 직접 삭제해 주세요.\n\n' + deletions.join('\n'));
     return { blob: await zip.generateAsync({ type: 'blob', compression: 'DEFLATE' }), count: paths.length, deletions: deletions.length };
   }
@@ -384,8 +423,8 @@
 
   // ---------- 임시 보관 ----------
   async function getDraft() { return kvGet('draft'); }
-  async function restoreDraft(draft) { state.docs = draft.docs || []; state.status = 'unsaved'; draft.docs.forEach(d => state.changedIds.add(d.id)); emit(); }
-  async function discardDraft() { await clearDraft(); }
+  async function restoreDraft(draft) { state.docs = draft.docs || []; state.status = 'unsaved'; draft.docs.forEach(d => state.changedIds.add(d.id)); await restorePendingPdfs(); emit(); }
+  async function discardDraft() { await clearDraft(); for (const k of await kvKeys('pdf:')) await kvDel(k); pendingPdfs.clear(); }
   async function lastFolderName() { const h = await kvGet('folder'); return h ? h.name : ''; }
   async function reopenLastFolder(onProgress) { const h = await kvGet('folder'); if (!h) throw new Error('지난번에 연 폴더 기록이 없습니다.'); return loadFolder(h, onProgress); }
 
@@ -398,6 +437,7 @@
   }
 
   root.SASStore = {
+    setPendingPdf, dropPendingPdf, pendingPdfIds, pdfPath, orphanPdfs,
     STATUS, state, onChange, dataDigest, markChanged, getDoc, addDocs, replaceDoc, removeDoc, touch, allIds, diffOutputs,
     kvGet, kvSet, loadGithubConfig, connectGithub, setExpiry, forgetToken, checkActivity, acknowledgeActivity, recentActivity, loadFromGithub, publishToGithub,
     fsSupported, pickFolder, reopenLastFolder, saveToFolder, buildZip, markExported, markPublished, loadZip,

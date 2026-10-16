@@ -1,9 +1,19 @@
-/* 교무업무 통합검색 · 사용자 화면 */
+/*
+ * 교무업무 통합검색 · 사용자 화면
+ *  - 첫 화면: 학교급 카드
+ *  - 학교급 화면(충교위키식 3단): 왼쪽 자료 목록 · 가운데 번호 목차(또는 검색 결과) · 오른쪽 원문 쪽 보기
+ *  - 주소: #/학교급  ·  #/학교급/자료ID  ·  #/학교급/자료ID/목차번호  ·  #/학교급?q=검색어&t=서식
+ */
 (function () {
   'use strict';
   const SAS = window.SAS, SS = window.SASSearch;
   const $ = id => document.getElementById(id);
-  const BODY_PAGE = 20;        // 본문 결과를 한 번에 확인·표시하는 개수
+  const TYPES = ['서식', '참고', '법령', '사이트'];
+  const TYPE_SHORT = { 서식: '서', 참고: '참', 법령: '법', 사이트: '누리' };
+  const TYPE_PREFIX = { 서: '서식', 참: '참고', 법: '법령', 사: '사이트' };
+  const VENDOR = 'assets/vendor/pdfjs/';
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isNarrow = () => matchMedia('(max-width: 900px)').matches;
 
   function h(tag, props, ...kids) {
     const el = document.createElement(tag);
@@ -17,44 +27,37 @@
     for (const c of kids.flat()) if (c != null && c !== false) el.append(c.nodeType ? c : document.createTextNode(String(c)));
     return el;
   }
+  const esc = s => SAS.esc(String(s == null ? '' : s));
+  let toastTimer;
+  function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.remove('hidden'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.add('hidden'), 3600); }
 
   const loader = SS.createLoader(window.fetch.bind(window), '');
   let manifest = null;
-  let current = { slug: null, q: '', c: '' };
-  let searchToken = 0;
 
-  // ---------- 주소(#/학교급?q=검색어&c=분류) ----------
+  // ---------- 주소 ----------
   function parseHash() {
-    const m = location.hash.replace(/^#\/?/, '').split('?');
-    const slug = SAS.levelName(m[0]) ? m[0] : null;
-    const p = new URLSearchParams(m[1] || '');
-    return { slug, q: p.get('q') || '', c: p.get('c') || '' };
+    const [path, query] = location.hash.replace(/^#\/?/, '').split('?');
+    const parts = path.split('/').filter(Boolean).map(decodeURIComponent);
+    const slug = SAS.levelName(parts[0]) ? parts[0] : null;
+    const p = new URLSearchParams(query || '');
+    return { slug, doc: parts[1] || '', code: parts[2] || '', q: p.get('q') || '', t: TYPES.includes(p.get('t')) ? p.get('t') : '' };
   }
-  function hashFor(slug, q, c) {
+  function hashFor(r) {
+    let s = `#/${r.slug}`;
+    if (r.doc) s += '/' + encodeURIComponent(r.doc) + (r.code ? '/' + r.code : '');
     const p = new URLSearchParams();
-    if (q) p.set('q', q);
-    if (c) p.set('c', c);
-    const s = p.toString();
-    return `#/${slug}${s ? '?' + s : ''}`;
+    if (r.q) p.set('q', r.q);
+    if (r.t) p.set('t', r.t);
+    const qs = p.toString();
+    return s + (qs ? '?' + qs : '');
   }
-  function go(slug, q, c) { const nh = hashFor(slug, q, c); if (location.hash !== nh) location.hash = nh; else route(); }
-
-  // ---------- 상태 표시 ----------
-  function showStatus(node) { $('status').replaceChildren(...(node ? [node] : [])); }
-  function spinner(text) { return h('span', {}, h('span', { class: 'spinner' }), ' ', text); }
+  /** 주소만 바꾸고 다시 그리지 않는다(스크롤에 따른 현재위치 표시용) */
+  function quietHash(r) { const nh = hashFor(r); if (location.hash !== nh) history.replaceState(null, '', nh); }
 
   // ---------- 시작 ----------
   async function init() {
-    showStatus(h('div', { class: 'empty' }, spinner('자료 목록을 불러오는 중…')));
-    try {
-      manifest = await loader.manifest();
-      showStatus(null);
-    } catch (e) {
-      manifest = { levels: {} };
-      showStatus(e.status === 404
-        ? h('div', { class: 'empty' }, '아직 등록된 자료가 없습니다. 관리자가 자료를 올리면 여기서 검색할 수 있습니다.')
-        : h('div', { class: 'notice err' }, '자료 목록을 불러오지 못했습니다. 인터넷 연결을 확인하고 새로고침해 주세요.', h('br'), h('span', { class: 'small' }, String(e.message))));
-    }
+    try { manifest = await loader.manifest(); }
+    catch (e) { manifest = { levels: {} }; }
     window.addEventListener('hashchange', route);
     route();
   }
@@ -62,275 +65,448 @@
   function route() {
     const r = parseHash();
     if (!r.slug) return renderHome();
-    renderLevel(r);
+    openLevel(r);
   }
 
   // ---------- 첫 화면 ----------
   function renderHome() {
-    current = { slug: null, q: '', c: '' };
     document.title = '교무업무 통합검색';
+    document.body.classList.remove('viewing');
     $('home').classList.remove('hidden'); $('level').classList.add('hidden'); $('levelNav').classList.add('hidden');
     $('levelCards').replaceChildren(...SAS.LEVELS.map(l => {
-      const info = (manifest && manifest.levels && manifest.levels[l.slug]) || { documents: 0, sections: 0 };
+      const info = (manifest && manifest.levels && manifest.levels[l.slug]) || { documents: 0 };
       return h('a', { class: `level-card ${l.slug}` + (info.documents ? '' : ' no-docs'), href: `#/${l.slug}` },
         h('img', { src: `assets/img/level-${l.slug}.png`, alt: '', width: 104, height: 104 }),
         h('span', { class: 'name' }, l.name),
         h('span', { class: 'count' }, info.documents ? `자료 ${info.documents}건` : '자료 준비 중'));
     }));
   }
-
   function renderNav(slug) {
     const nav = $('levelNav');
     nav.replaceChildren(...SAS.LEVELS.map(l => h('a', { href: `#/${l.slug}`, class: l.slug === slug ? 'active' : null, 'aria-current': l.slug === slug ? 'page' : null }, l.name)));
     nav.classList.remove('hidden');
   }
 
-  // ---------- 학교급 화면 ----------
-  async function renderLevel(r) {
+  // ---------- 학교급 화면 상태 ----------
+  const V = {
+    slug: null, index: null, docs: new Map(),   // 자료ID → 목차가 준비된 상세
+    doc: null, nodes: [], by: {}, kids: {}, open: new Set(), cur: null,
+    q: '', t: '', zoom: 1, pdf: null, pdfTask: null, renderToken: 0, observer: null
+  };
+  try { V.zoom = Number(localStorage.getItem('sas-zoom')) || 1; } catch (e) { /* 무시 */ }
+
+  async function openLevel(r) {
     const name = SAS.levelName(r.slug);
+    document.body.classList.add('viewing');
     $('home').classList.add('hidden'); $('level').classList.remove('hidden');
     renderNav(r.slug);
-    $('levelTitle').textContent = `${name} 자료 검색`;
-    document.title = (r.q ? `${r.q} - ` : '') + `${name} · 교무업무 통합검색`;
-    const levelChanged = current.slug !== r.slug;
-    current = r;
-    const input = $('q');
-    if (input.value !== r.q) input.value = r.q;
-    if (levelChanged && !r.q && matchMedia('(min-width: 760px)').matches) input.focus();
+    if (V.slug !== r.slug) {
+      V.slug = r.slug; V.index = null; V.doc = null;
+      $('docList').replaceChildren(h('div', { class: 'v-empty' }, h('span', { class: 'spinner' }), ' 자료 목록을 불러오는 중…'));
+      $('tree').replaceChildren(); $('pages').replaceChildren(); $('crumb').replaceChildren(); $('docTitle').textContent = ''; $('docStats').replaceChildren();
+      try { V.index = await loader.level(r.slug); }
+      catch (e) {
+        V.index = { docs: [], sections: [] };
+        const msg = e.status === 404 ? `${name} 자료는 아직 준비 중입니다.` : '자료 목록을 불러오지 못했습니다. 새로고침해 주세요.';
+        $('docList').replaceChildren(h('div', { class: 'v-empty' }, msg));
+        $('tree').replaceChildren(h('div', { class: 'v-empty' }, msg));
+        return;
+      }
+      if (parseHash().slug !== r.slug) return;
+    }
+    const docs = V.index.docs || [];
+    $('docsLabel').textContent = `${name} 자료 ${docs.length}건`;
+    if (!docs.length) {
+      $('docList').replaceChildren(h('div', { class: 'v-empty' }, `${name} 자료는 아직 준비 중입니다.`));
+      $('tree').replaceChildren(h('div', { class: 'v-empty' }, `${name} 자료는 아직 준비 중입니다. 다른 학교급을 골라 보세요.`));
+      $('docTitle').textContent = ''; $('pages').replaceChildren(); $('typeChips').replaceChildren(); return;
+    }
+    const docId = docs.some(d => d.id === r.doc) ? r.doc : docs[0].id;
+    if (!V.doc || V.doc.id !== docId) await selectDoc(docId);
+    if (!V.doc) return;
+    V.q = r.q; V.t = r.t;
+    if ($('q').value !== r.q) $('q').value = r.q;
+    renderChips();
+    document.title = (r.q ? `${r.q} - ` : '') + `${V.doc.title} · ${name} · 교무업무 통합검색`;
+    if (r.code && V.by[r.code] && (!V.cur || V.cur.c !== r.code)) go(r.code, { fromHash: true });
+    else renderToc();
+  }
 
-    const info = manifest && manifest.levels && manifest.levels[r.slug];
-    if (!info || !info.documents) {
-      $('catChips').replaceChildren(); $('hints').replaceChildren(); $('summary').textContent = '';
-      $('results').replaceChildren(h('div', { class: 'empty' }, `${name} 자료는 아직 준비 중입니다.`));
+  // ---------- 자료 불러오기와 목차 준비 ----------
+  async function loadDoc(id) {
+    if (V.docs.has(id)) return V.docs.get(id);
+    const d = await loader.doc(id);
+    const nodes = d.outline && d.outline.nodes ? d.outline.nodes.map(n => Object.assign({}, n)) : fallbackOutline(d);
+    const links = new Map((d.links || []).map(l => [l.id, l]));
+    const prep = { id: d.id, title: d.title, raw: d, nodes, by: {}, kids: {} };
+    nodes.forEach((n, i) => {
+      n.i = i;
+      if (n.l && links.has(n.l)) { const l = links.get(n.l); n.link = l; n.t = l.text || n.t; n.ty = l.type || typeFromKind(l); }
+      prep.by[n.c] = n;
+      n.p = n.c.includes('.') ? n.c.slice(0, n.c.lastIndexOf('.')) : '';
+      (prep.kids[n.p] = prep.kids[n.p] || []).push(n);
+    });
+    V.docs.set(id, prep);
+    return prep;
+  }
+  function typeFromKind(l) { return l.kind === 'law' ? '법령' : l.kind === 'site' ? '사이트' : '서식'; }
+  /** 번호 목차가 없는 예전 자료: 업무 목록과 링크로 간단한 목차를 만든다 */
+  function fallbackOutline(d) {
+    const nodes = [];
+    let ch = null, ci = 0, ti = 0;
+    (d.sections || []).forEach(s => {
+      const name = s.parent_heading || '본문';
+      if (!ch || ch.t !== name) { ch = { c: String(++ci), k: 'ch', t: name, b: s.block_start, y: 0 }; nodes.push(ch); ti = 0; }
+      const tc = `${ch.c}.${++ti}`;
+      // 목차 없이 길이로 나눈 구간은 제목이 아니므로 구간 번호를 붙여 구분한다
+      const untitled = SAS.isUntitled ? SAS.isUntitled(d, s) : false;
+      nodes.push({ c: tc, k: 'task', t: untitled ? `구간 ${ti} · ${s.heading}` : s.heading, b: s.block_start, y: 0 });
+      (d.links || []).filter(l => l.section_id === s.id).forEach((l, i) => nodes.push({ c: `${tc}.${i + 1}`, k: 'link', t: l.text, b: l.block, y: 0, l: l.id }));
+    });
+    return nodes;
+  }
+
+  async function selectDoc(id) {
+    renderDocList(id);
+    $('tree').replaceChildren(h('div', { class: 'v-empty' }, h('span', { class: 'spinner' }), ' 목차를 불러오는 중…'));
+    let prep;
+    try { prep = await loadDoc(id); }
+    catch (e) { $('tree').replaceChildren(h('div', { class: 'v-empty' }, '자료를 불러오지 못했습니다. 새로고침해 주세요.')); return; }
+    V.doc = prep; V.nodes = prep.nodes; V.by = prep.by; V.kids = prep.kids; V.cur = null;
+    V.open = new Set(prep.nodes.filter(n => n.k === 'ch').map(n => n.c));
+    $('docTitle').textContent = prep.title;
+    renderStats();
+    crumb(null);
+    renderToc();
+    await renderPages();
+  }
+
+  function renderDocList(activeId) {
+    const docs = (V.index && V.index.docs) || [];
+    $('docList').replaceChildren(...docs.map(d => h('a', { class: 'v-doc' + (d.id === activeId ? ' on' : ''), href: hashFor({ slug: V.slug, doc: d.id }), 'aria-current': d.id === activeId ? 'true' : null },
+      h('b', {}, d.t), h('span', {}, [d.y ? d.y + '년' : '', d.f === 'pdf' && d.n ? d.n + '쪽' : '', (d.f || '').toUpperCase(), d.f === 'pdf' && !d.p ? '쪽 보기 준비 중' : ''].filter(Boolean).join(' · ')))));
+  }
+  function renderStats() {
+    const n = V.nodes, raw = V.doc.raw;
+    const count = f => n.filter(f).length;
+    const rows = [['업무', count(x => x.k === 'task')], ['세부 항목', count(x => ['group', 'item', 'bullet'].includes(x.k))],
+      ...TYPES.map(t => [t === '참고' ? '참고자료' : t, count(x => x.ty === t)])];
+    $('docStats').replaceChildren(...rows.flatMap(([a, b]) => [h('span', {}, a), h('b', {}, b)]),
+      raw.origin && raw.origin.site ? h('span', { class: 'v-src' }, `출처: ${raw.origin.site}${raw.year ? ' · ' + raw.year : ''}`) : null);
+  }
+
+  // ---------- 가운데: 목차 / 검색 결과 ----------
+  const ancIn = (by, n) => { const a = []; while (n) { a.unshift(n); n = by[n.p]; } return a; };
+  const anc = n => ancIn(V.by, n);
+  function pp(raw, b) { const bl = raw.blocks && raw.blocks[b]; return bl ? (bl.printed_page != null ? bl.printed_page + 'p' : (bl.pdf_page ? bl.pdf_page + '쪽' : '')) : ''; }
+
+  function rowHTML(n, raw, opts) {
+    opts = opts || {};
+    const has = !opts.flat && !!V.kids[n.c];
+    const isOpen = V.open.has(n.c);
+    const tg = has ? `<button class="tg" data-tg="${n.c}" aria-label="${isOpen ? '접기' : '펼치기'}" aria-expanded="${isOpen}">${isOpen ? '−' : '+'}</button>` : '<span class="tg sp"></span>';
+    const badge = n.ty ? `<span class="badge b-${n.ty}">${TYPE_SHORT[n.ty]}</span>` : '';
+    const url = n.link ? SS.safeUrl(n.link.url) : '';
+    const open = url ? `<a class="open o-${n.ty}" href="${esc(url)}" target="_blank" rel="noopener noreferrer" title="새 탭에서 열기">${n.ty === '법령' ? '법령 ↗' : n.ty === '사이트' ? '열기 ↗' : '받기 ⤓'}</a>` : '';
+    const t = opts.hl ? opts.hl(n.t) : esc(n.t);
+    const cur = V.cur && V.cur.c === n.c && (!opts.doc || opts.doc === V.doc.id);
+    return `<div class="row k-${n.k}${cur ? ' cur' : ''}" data-c="${n.c}"${opts.doc ? ` data-d="${opts.doc}"` : ''}><span class="pg">${pp(raw, n.b)}</span><span class="code">${tg}${n.c}</span><span class="ttl">${badge}${t}${open}</span></div>`;
+  }
+  function renderToc() {
+    if (!V.doc) return;
+    if (V.q || V.t) return renderResults();
+    const out = [];
+    (function walk(list) { (list || []).forEach(n => { out.push(rowHTML(n, V.doc.raw)); if (V.open.has(n.c)) walk(V.kids[n.c]); }); })(V.kids['']);
+    $('tree').innerHTML = out.join('') || '<div class="v-empty">목차가 없습니다.</div>';
+    markCur();
+  }
+  function markCur() {
+    document.querySelectorAll('#tree .row.cur').forEach(r => r.classList.remove('cur'));
+    if (!V.cur) return null;
+    for (const a of anc(V.cur).reverse()) {
+      const r = document.querySelector(`#tree .row[data-c="${CSS.escape(a.c)}"]:not([data-d]), #tree .row[data-c="${CSS.escape(a.c)}"][data-d="${CSS.escape(V.doc.id)}"]`);
+      if (r) { r.classList.add('cur'); return r; }
+    }
+    return null;
+  }
+
+  function parseQuery(raw, t) {
+    let q = String(raw || '').trim(), f = t || '';
+    const m = q.match(/^(서|참|법|사)\]\s*/);
+    if (m) { f = TYPE_PREFIX[m[1]]; q = q.slice(m[0].length); }
+    return { words: q.split(/\s+/).filter(Boolean), f };
+  }
+  let searchSeq = 0;
+  async function renderResults() {
+    const seq = ++searchSeq;
+    const { words, f } = parseQuery(V.q, V.t);
+    const lw = words.map(w => SAS.norm(w)).filter(Boolean);
+    $('tree').innerHTML = '<div class="v-empty"><span class="spinner"></span> 찾는 중…</div>';
+    // 같은 학교급의 모든 자료에서 찾는다
+    const preps = [];
+    for (const d of (V.index.docs || [])) { try { preps.push(await loadDoc(d.id)); } catch (e) { /* 못 불러온 자료는 건너뜀 */ } }
+    if (seq !== searchSeq || !(V.q || V.t)) return;
+    const marks = words.length ? new RegExp('(' + words.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')', 'gi') : null;
+    const hl = s => marks ? esc(s).replace(marks, '<mark>$1</mark>') : esc(s);
+    let total = 0, html = '';
+    const pageHits = [];
+    preps.forEach(p => {
+      const hay = n => SAS.norm(n.t + ' ' + (n.d || []).join(' '));
+      const hits = p.nodes.filter(n => n.k !== 'ch' && (!f || n.ty === f) && (!lw.length || lw.every(w => hay(n).includes(w))));
+      // 목차에 없는 본문 글(표 안 글 등)은 쪽 단위로 알려 준다
+      if (lw.length && !f) (p.raw.blocks || []).forEach((b, bi) => {
+        if (lw.every(w => SAS.norm(b.text).includes(w)) && !hits.some(n => n.b === bi)) pageHits.push({ p, bi, b });
+      });
+      if (!hits.length) return;
+      total += hits.length;
+      if (preps.length > 1) html += `<div class="doc-grp">${esc(p.title)}</div>`;
+      const taskOf = n => { let x = n; while (x && x.k !== 'task') x = p.by[x.p]; return x || n; };
+      const rank = n => n.k === 'task' ? 0 : (lw.length && lw.every(w => SAS.norm(n.t).includes(w)) ? 1 : 2);
+      const groups = new Map();
+      hits.forEach(n => { const tk = taskOf(n); if (!groups.has(tk.c)) groups.set(tk.c, { task: tk, list: [], self: false }); if (n === tk) groups.get(tk.c).self = true; else groups.get(tk.c).list.push(n); });
+      [...groups.values()].sort((a, b) => Math.min(a.self ? 0 : 9, ...a.list.map(rank)) - Math.min(b.self ? 0 : 9, ...b.list.map(rank)) || a.task.i - b.task.i).forEach(g => {
+        const ch = p.by[g.task.p];
+        html += `<div class="grp row-go" data-c="${g.task.c}" data-d="${p.id}"><span>${esc(ch ? ch.t : '')} ›</span> <b>${g.task.c} ${hl(g.task.t)}</b> <span class="pg">${pp(p.raw, g.task.b)}</span></div>`;
+        g.list.sort((a, b) => rank(a) - rank(b) || a.i - b.i).slice(0, 80).forEach(n => { html += rowHTML(n, p.raw, { hl, flat: true, doc: p.id }); });
+      });
+    });
+    if (pageHits.length) {
+      html += `<div class="doc-grp">목차에 없는 본문에서 찾은 쪽 ${pageHits.length}개</div>`;
+      pageHits.slice(0, 60).forEach(x => {
+        const sn = SAS.snippet(x.b.text, words[0], 24, 48).text;
+        html += `<div class="row k-page" data-d="${x.p.id}" data-page="${x.bi}"><span class="pg">${pp(x.p.raw, x.bi)}</span><span class="code"><span class="tg sp"></span>본문</span><span class="ttl">${preps.length > 1 ? `<span class="muted">${esc(x.p.title)} · </span>` : ''}${hl(sn)}</span></div>`;
+      });
+    }
+    const label = (f ? `[${f}] ` : '') + (words.join(' ') || '전체');
+    const head = `<div class="res-h"><span>‘${esc(label)}’ 목차 <b>${total}</b>건${pageHits.length ? ` · 본문 ${pageHits.length}쪽` : ''}</span><button type="button" class="linkbtn" id="clearSearch">검색 지우기</button></div>`;
+    $('tree').innerHTML = head + (total || pageHits.length ? html : '<div class="v-empty">찾는 내용이 없습니다. 낱말을 줄이거나 바꿔 보세요. 여러 낱말을 띄어 쓰면 모두 들어 있는 항목만 보여 줍니다.</div>');
+    $('tocScroll').scrollTop = 0;
+    markCur();
+  }
+
+  function renderChips() {
+    const cnt = t => V.nodes.filter(n => n.ty === t).length;
+    $('typeChips').replaceChildren(
+      h('button', { type: 'button', 'aria-pressed': String(!V.t), onclick: () => setRoute({ t: '' }) }, '전체'),
+      ...TYPES.filter(t => cnt(t)).map(t => h('button', { type: 'button', 'aria-pressed': String(V.t === t), onclick: () => setRoute({ t: V.t === t ? '' : t }) }, t, h('i', {}, cnt(t)))));
+  }
+  function setRoute(patch) {
+    const r = Object.assign(parseHash(), { slug: V.slug, doc: V.doc ? V.doc.id : '' }, patch);
+    location.hash = hashFor(r);
+  }
+
+  // ---------- 오른쪽: 쪽 보기 ----------
+  function pageSize(b) { const bl = (V.doc.raw.blocks || [])[b] || {}; return { w: bl.w || 595, h: bl.h || 842 }; }
+
+  async function renderPages() {
+    const token = ++V.renderToken;
+    const raw = V.doc.raw;
+    if (V.pdfTask) { try { V.pdfTask.destroy(); } catch (e) { /* 무시 */ } V.pdfTask = null; V.pdf = null; }
+    if (V.observer) { V.observer.disconnect(); V.observer = null; }
+    const blocks = raw.blocks || [];
+    $('pTotal').textContent = `/ ${blocks.length}`;
+    $('pNum').value = 1;
+    // 원본 내려받기: 따로 넣은 링크가 있으면 그것, 없으면 사이트의 PDF
+    const down = SS.safeUrl(raw.works_url) || (raw.pdf ? raw.pdf.path : '');
+    const btn = $('btnDown');
+    btn.classList.toggle('hidden', !down);
+    if (down) { btn.href = down; btn.textContent = raw.works_url ? '원본 내려받기' : 'PDF 내려받기'; if (raw.works_url) btn.removeAttribute('download'); else btn.setAttribute('download', ''); }
+    const hasPdf = !!(raw.pdf && raw.pdf.path);
+    const linksBy = new Map();
+    (raw.links || []).forEach(l => { if (l.box && l.block != null) { if (!linksBy.has(l.block)) linksBy.set(l.block, []); linksBy.get(l.block).push(l); } });
+    $('viewer').scrollTop = 0;
+    document.querySelector('.v-pager').classList.toggle('no-pages', raw.format !== 'pdf');
+    if (!hasPdf && raw.format !== 'pdf') {
+      // HWPX 등 문단 자료: 한 장에 문단을 이어서 보여 준다
+      $('pages').replaceChildren(h('div', { class: 'v-note' }, '이 자료는 PDF가 아니어서 추출한 글자로 보여 줍니다. 원본은 「원본 내려받기」로 받으세요.'),
+        h('div', { class: 'v-page text flow' }, ...blocks.map((b, bi) => h('p', { id: 'pg' + bi, 'data-b': bi }, b.text || ''))));
+      applyZoom();
       return;
     }
-    let index;
-    $('summary').replaceChildren(spinner('자료 목록을 불러오는 중…'));
-    try { index = await loader.level(r.slug); }
-    catch (e) { $('summary').textContent = ''; $('results').replaceChildren(h('div', { class: 'notice err' }, '검색 자료를 불러오지 못했습니다. 새로고침해 주세요. ', h('span', { class: 'small' }, e.message))); return; }
-    if (current !== r) return;
-    renderChips(index, r);
-    renderHints(index, r);
-    if (r.q) runSearch(index, r); else renderBrowse(index, r);
-  }
-
-  function categoriesOf(index) {
-    const present = new Set(index.docs.map(d => d.c).filter(Boolean));
-    const order = (SAS.CATEGORIES || []).filter(c => present.has(c));
-    [...present].filter(c => !order.includes(c)).sort((a, b) => a.localeCompare(b, 'ko')).forEach(c => order.push(c));
-    return order;
-  }
-
-  function renderChips(index, r) {
-    const cats = categoriesOf(index);
-    const box = $('catChips');
-    if (cats.length < 2) { box.replaceChildren(); return; }
-    box.replaceChildren(...['', ...cats].map(c => h('button', { type: 'button', 'aria-pressed': String((r.c || '') === c), onclick: () => go(r.slug, r.q, c) }, c || '전체')));
-  }
-
-  function renderHints(index, r) {
-    const box = $('hints');
-    if (r.q) { box.replaceChildren(); return; }
-    // 관리자가 넣은 업무 검색어 중 몇 개를 예시로 보여 준다
-    const kws = [...new Set(index.sections.flatMap(s => s.k || []))].slice(0, 6);
-    box.replaceChildren(...(kws.length ? ['예: ', ...kws.map(k => h('button', { type: 'button', onclick: () => go(r.slug, k, r.c) }, k))] : []));
-  }
-
-  // ---------- 업무별 보기(검색어 없을 때) ----------
-  function renderBrowse(index, r) {
-    const docs = index.docs.filter(d => !r.c || d.c === r.c);
-    $('summary').replaceChildren('자료 ', h('b', {}, `${docs.length}건`), ' · 자료를 펼치면 업무 목록이 나옵니다.');
-    const out = [];
-    const cats = categoriesOf(index);
-    const groups = cats.map(c => [c, docs.filter(d => d.c === c)]).concat([['분류 없음', docs.filter(d => !d.c)]]).filter(g => g[1].length);
-    groups.forEach(([c, list]) => {
-      if (groups.length > 1) out.push(h('div', { class: 'group-title' }, c));
-      list.forEach(d => out.push(docCard(index, d, r, { collapsed: true })));
-    });
-    $('results').replaceChildren(...out);
-  }
-
-  // ---------- 검색 ----------
-  async function runSearch(index, r) {
-    const token = ++searchToken;
-    const opts = { category: r.c || '' };
-    const meta = SS.metaSearch(index, r.q, opts);
-    const q = meta.q;
-    const results = $('results');
-    results.replaceChildren();
-    const secBox = h('div'), docBox = h('div'), bodyBox = h('div'), moreRow = h('div', { class: 'more-row' });
-    results.append(secBox, docBox, bodyBox, moreRow);
-    meta.sections.forEach(x => secBox.append(sectionCard(index, x, q)));
-    if (meta.docs.length) {
-      if (meta.sections.length) docBox.append(h('div', { class: 'group-title' }, '자료'));
-      meta.docs.forEach(x => docBox.append(docCard(index, x.doc, r, { q, collapsed: true, tier: x.tier })));
-    }
-    let bodyCount = 0;
-    const summary = searching => {
-      const total = meta.sections.length + bodyCount;
-      const parts = [h('b', {}, `‘${r.q}’`), ' 검색 결과: 업무 ', h('b', {}, `${total}건`)];
-      if (meta.docs.length) parts.push(' · 자료 ', h('b', {}, `${meta.docs.length}건`));
-      if (searching) parts.push(' · ', spinner('본문 확인 중…'));
-      $('summary').replaceChildren(...parts);
-    };
-    summary(true);
-
-    let cands;
-    try { cands = await SS.bodyCandidates(index, r.slug, q, p => loader.fetchJSON(p), opts, meta.seen); }
-    catch (e) { if (token !== searchToken) return; cands = []; moreRow.replaceChildren(h('span', { class: 'small muted' }, '본문 검색 자료를 불러오지 못했습니다. ', e.message)); }
-    if (token !== searchToken) return;
-    if (cands === null) {
-      summary(false);
-      moreRow.replaceChildren(h('span', { class: 'small muted' }, '본문 검색은 두 글자 이상일 때 합니다.'));
-      return finish();
-    }
-    let pos = 0, headed = false;
-    const untitledShown = new Set();
-    async function more() {
-      moreRow.replaceChildren(spinner('본문 확인 중…'));
-      let shown = 0;
-      while (pos < cands.length && shown < BODY_PAGE) {
-        const s = cands[pos++];
-        const doc = index.docs[s.d];
-        if (s.u && untitledShown.has(s.d)) continue; // 목차 없는 자료는 자료당 한 번만
-        let detail;
-        try { detail = await loader.doc(doc.id); } catch (e) { continue; }
-        if (token !== searchToken) return;
-        const v = SS.verifySection(detail, s.id, q);
-        if (!v) continue;
-        if (s.u) untitledShown.add(s.d);
-        if (!headed && (meta.sections.length || meta.docs.length)) { bodyBox.append(h('div', { class: 'group-title' }, '본문에서 찾은 업무')); headed = true; }
-        bodyBox.append(sectionCard(index, { tier: SS.TIER.BODY, sec: s, doc }, q, v));
-        shown++; bodyCount++;
-      }
-      if (token !== searchToken) return;
-      summary(false);
-      moreRow.replaceChildren(...(pos < cands.length ? [h('button', { type: 'button', onclick: more }, '본문 결과 더 보기')] : []));
-      finish();
-    }
-    function finish() {
-      if (!meta.sections.length && !meta.docs.length && !bodyCount) {
-        results.prepend(h('div', { class: 'empty' }, h('b', {}, `‘${r.q}’에 맞는 자료를 찾지 못했습니다.`), h('br'),
-          '띄어쓰기를 바꾸거나 더 짧은 낱말로 찾아보세요.', r.c ? h('span', {}, h('br'), h('a', { href: hashFor(r.slug, r.q, '') }, '모든 분류에서 다시 찾기')) : null));
-      }
-    }
-    await more();
-  }
-
-  // ---------- 카드 ----------
-  function linkBtn(url, label, primary, emptyLabel) {
-    const u = SS.safeUrl(url);
-    if (!u) return emptyLabel ? h('span', { class: 'btn disabled', title: '관리자가 링크를 아직 넣지 않았습니다' }, emptyLabel) : null;
-    return h('a', { class: 'btn' + (primary ? ' primary' : ''), href: u, target: '_blank', rel: 'noopener noreferrer' }, label);
-  }
-
-  /** 업무 결과 카드 */
-  function sectionCard(index, x, q, v) {
-    const s = x.sec, d = x.doc;
-    const path = [d.c, s.u ? '' : d.t, s.p].filter(Boolean).join(' › ');
-    const title = s.u ? d.t : s.h; // 목차 없는 자료는 구간 이름 대신 자료명을 제목으로
-    const pg = SS.pageLabel(s.pg, s.pp);
-    const info = [];
-    if (pg) info.push(h('span', {}, pg));
-    if (v && v.page != null && (s.pg || []).length > 1) info.push(' · 일치: ', h('b', {}, SS.pageLabel([v.page], v.printed != null ? [v.printed] : [])));
-    if (s.n) info.push(` · 서식 ${s.n}개`);
-    const snippetHtml = v ? SS.highlightTerms(v.snippet, q.rawTerms) : SS.highlightTerms(s.l || '', q.rawTerms);
-    const detail = h('div', { class: 'detail hidden' });
-    const toggle = h('button', { type: 'button', class: 'toggle', 'aria-expanded': 'false' }, '상세 미리보기 ▾');
-    toggle.addEventListener('click', () => toggleDetail(toggle, detail, d, s, q));
-    return h('article', { class: 'result' },
-      h('div', { class: 'meta-row' }, h('span', { class: 'tag' + (x.tier === SS.TIER.BODY ? ' body' : '') }, SS.TIER_LABEL[x.tier]), h('span', { class: 'path' }, path)),
-      h('h3', { html: SS.highlightTerms(title, q.rawTerms) }),
-      info.length ? h('div', { class: 'pages' }, ...info) : null,
-      snippetHtml ? h('p', { class: 'snippet', html: snippetHtml }) : null,
-      h('div', { class: 'card-actions' }, toggle,
-        linkBtn(d.w, '원본 내려받기 ↗', true, '원본 링크 준비 중'),
-        s.n ? linkBtn(d.fb, '서식 모음 내려받기 ↗', false, null) : null),
-      detail);
-  }
-
-  async function toggleDetail(btn, box, d, s, q) {
-    const open = box.classList.contains('hidden');
-    box.classList.toggle('hidden', !open);
-    btn.setAttribute('aria-expanded', String(open));
-    btn.textContent = open ? '상세 미리보기 접기 ▴' : '상세 미리보기 ▾';
-    if (!open || box.dataset.loaded) return;
-    box.replaceChildren(spinner('본문을 불러오는 중…'));
-    try {
-      const detail = await loader.doc(d.id);
-      const sd = SS.sectionDetail(detail, s.id);
-      if (!sd) throw new Error('업무를 찾지 못했습니다');
-      const kids = [];
-      sd.blocks.forEach(b => {
-        const lbl = SS.pageLabel(b.pdf_page != null ? [b.pdf_page] : [], b.printed_page != null ? [b.printed_page] : []);
-        if (lbl && sd.blocks.length > 1) kids.push(h('div', { class: 'page-mark' }, `— ${lbl} —`));
-        kids.push(h('div', { class: 'body', html: SS.highlightTerms(b.text, q ? q.rawTerms : []) }));
+    $('pages').replaceChildren(...blocks.map((b, bi) => {
+      const { w, h: hh } = pageSize(bi);
+      const el = h('div', { class: 'v-page' + (hasPdf ? '' : ' text'), id: 'pg' + bi, 'data-b': bi, style: hasPdf ? `aspect-ratio:${w}/${hh}` : null },
+        h('span', { class: 'no' }, `${b.pdf_page || bi + 1} / ${blocks.length}${b.printed_page != null ? ' · 인쇄 ' + b.printed_page + '쪽' : ''}`));
+      if (!hasPdf) el.append(h('div', { class: 'v-text' }, b.text || ''));
+      else (linksBy.get(bi) || []).forEach(l => {
+        const url = SS.safeUrl(l.url); if (!url) return;
+        const [x0, y0, x1, y1] = l.box;
+        el.append(h('a', { class: 'hot', href: url, target: '_blank', rel: 'noopener noreferrer', title: `${l.type || ''} ${l.text}`.trim(), 'aria-label': `${l.text} ${l.type === '법령' ? '법령 열기' : '내려받기'}`,
+          style: `left:${x0 / w * 100}%;top:${y0 / hh * 100}%;width:${(x1 - x0) / w * 100}%;height:${(y1 - y0) / hh * 100}%` }));
       });
-      if (sd.forms.length) kids.push(formsBox(sd, d));
-      box.replaceChildren(...kids);
-      box.dataset.loaded = '1';
+      return el;
+    }));
+    applyZoom();
+    if (!hasPdf) {
+      if (!blocks.length) $('pages').replaceChildren(h('div', { class: 'v-empty' }, '본문이 없는 자료입니다.'));
+      else $('pages').prepend(h('div', { class: 'v-note' }, '이 자료는 원본 PDF가 없어 추출한 글자로 보여 줍니다.'));
+      return;
+    }
+    const lib = await pdfLib();
+    if (token !== V.renderToken) return;
+    if (!lib) { $('pages').prepend(h('div', { class: 'v-note' }, 'PDF 보기 도구를 불러오지 못했습니다. 「PDF 내려받기」로 원문을 열어 주세요.')); return; }
+    try {
+      V.pdfTask = lib.getDocument({ url: raw.pdf.path + (raw.updated_at ? '?v=' + encodeURIComponent(raw.updated_at) : ''), cMapUrl: VENDOR + 'cmaps/', cMapPacked: true, isEvalSupported: false, disableAutoFetch: true, rangeChunkSize: 262144 });
+      V.pdf = await V.pdfTask.promise;
     } catch (e) {
-      box.replaceChildren(h('div', { class: 'small muted' }, '본문을 불러오지 못했습니다. ', e.message));
+      if (token !== V.renderToken) return;
+      $('pages').prepend(h('div', { class: 'v-note' }, 'PDF를 불러오지 못했습니다. 관리자가 방금 올렸다면 1~2분 뒤 새로고침해 주세요.'));
+      return;
+    }
+    if (token !== V.renderToken) return;
+    V.observer = new IntersectionObserver(entries => entries.forEach(en => {
+      const el = en.target;
+      if (en.isIntersecting) drawPage(el, token);
+      else if (el.dataset.drawn && Math.abs(en.boundingClientRect.top) > window.innerHeight * 5) { const c = el.querySelector('canvas'); if (c) c.remove(); delete el.dataset.drawn; }
+    }), { root: $('viewer'), rootMargin: '1200px 0px' });
+    document.querySelectorAll('#pages .v-page').forEach(el => V.observer.observe(el));
+  }
+  function pdfLib() {
+    if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+    return new Promise(res => { const t = setTimeout(() => res(null), 10000); window.addEventListener('pdfjs-ready', () => { clearTimeout(t); res(window.pdfjsLib); }, { once: true }); });
+  }
+  async function drawPage(el, token) {
+    if (!V.pdf || el.dataset.drawn === String(V.zoom) || el.dataset.busy) return;
+    el.dataset.busy = '1';
+    try {
+      const page = await V.pdf.getPage(Number(el.dataset.b) + 1);
+      if (token !== V.renderToken) return;
+      const cssW = el.clientWidth, dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const base = page.getViewport({ scale: 1 });
+      const vp = page.getViewport({ scale: cssW / base.width * dpr });
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.floor(vp.width); canvas.height = Math.floor(vp.height);
+      await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+      if (token !== V.renderToken) return;
+      const old = el.querySelector('canvas'); if (old) old.remove();
+      el.prepend(canvas);
+      el.dataset.drawn = String(V.zoom);
+    } catch (e) { /* 그리지 못한 쪽은 비워 둔다 */ }
+    finally { delete el.dataset.busy; }
+  }
+  function applyZoom() {
+    $('pages').style.setProperty('--zw', Math.round(820 * V.zoom) + 'px');
+    try { localStorage.setItem('sas-zoom', String(V.zoom)); } catch (e) { /* 무시 */ }
+  }
+  function redrawAll() {
+    document.querySelectorAll('#pages .v-page').forEach(el => { delete el.dataset.drawn; });
+    if (V.observer) { V.observer.disconnect(); document.querySelectorAll('#pages .v-page').forEach(el => V.observer.observe(el)); }
+  }
+
+  function pageEl(b) { return $('pg' + b); }
+  /** 본문 칸 안에서 요소의 위쪽 위치(스크롤 기준) */
+  function topIn(el) { const v = $('viewer'); return el.getBoundingClientRect().top - v.getBoundingClientRect().top + v.scrollTop; }
+  function scrollToPos(b, y, smooth) {
+    const el = pageEl(b); if (!el) return;
+    const s = el.offsetHeight / pageSize(b).h;
+    const top = topIn(el) + (V.doc.raw.pdf ? Math.max(0, (y || 0) - 30) * s : 0) - 24;
+    $('viewer').scrollTo({ top: Math.max(0, top), behavior: smooth && !reduceMotion ? 'smooth' : 'auto' });
+  }
+  function flash(n) {
+    const el = pageEl(n.b); if (!el || !V.doc.raw.pdf || !n.y) return;
+    el.querySelectorAll('.flash').forEach(f => f.remove());
+    const { w, h: hh } = pageSize(n.b);
+    let x0, y0, x1, y1;
+    if (n.link && n.link.box) { [x0, y0, x1, y1] = n.link.box; x0 -= 3; y0 -= 2; x1 += 3; y1 += 2; }
+    else {
+      const left = (n.x || 0) < w / 2 - 8;
+      x0 = (n.x || 56) - 4; x1 = ['task', 'part', 'ch'].includes(n.k) ? w - 50 : (left ? w / 2 - 6 : w - 50); y0 = n.y - 3; y1 = n.y + 15;
+    }
+    el.append(h('div', { class: 'flash', style: `left:${x0 / w * 100}%;top:${y0 / hh * 100}%;width:${(x1 - x0) / w * 100}%;height:${(y1 - y0) / hh * 100}%` }));
+  }
+  function crumb(n) {
+    const a = n ? anc(n).filter(x => !['bullet', 'link'].includes(x.k)) : [];
+    $('crumb').replaceChildren(h('span', { class: 'src' }, SAS.levelName(V.slug) || ''),
+      ...(a.length ? a.flatMap((x, i) => [i ? h('span', { class: 'sep' }, '›') : null, i === a.length - 1 ? h('b', {}, x.t) : h('span', {}, x.t)]).filter(Boolean) : [h('span', {}, V.doc ? V.doc.title : '')]));
+  }
+
+  // ---------- 이동 ----------
+  let lockSpy = 0;
+  function go(code, opts) {
+    opts = opts || {};
+    const n = V.by[code]; if (!n) return;
+    V.cur = n;
+    anc(n).slice(0, -1).forEach(a => V.open.add(a.c));
+    if (opts.openSelf && V.kids[n.c]) V.open.add(n.c);
+    if (!V.q && !V.t) renderToc(); else markCur();
+    crumb(n); $('pNum').value = n.b + 1;
+    lockSpy = Date.now() + 1000;
+    // 폰에서는 본문 칸을 먼저 보여야 위치를 잴 수 있다
+    if (isNarrow() && !opts.fromHash) show('doc', true);
+    if (opts.fromHash) requestAnimationFrame(() => { scrollToPos(n.b, n.y, false); flash(n); });
+    else { scrollToPos(n.b, n.y, !isNarrow()); flash(n); }
+    if (opts.scrollToc !== false) { const r = markCur(); if (r) r.scrollIntoView({ block: opts.fromHash ? 'center' : 'nearest' }); }
+    if (!opts.fromHash) quietHash({ slug: V.slug, doc: V.doc.id, code, q: V.q, t: V.t });
+  }
+
+  // 스크롤에 따라 현재위치
+  let spyTimer;
+  $('viewer').addEventListener('scroll', () => { clearTimeout(spyTimer); spyTimer = setTimeout(spy, 100); }, { passive: true });
+  function spy() {
+    if (!V.doc) return;
+    const top = $('viewer').scrollTop + 60;
+    let b = 0;
+    for (const el of document.querySelectorAll('#pages [data-b]')) { if (topIn(el) <= top) b = Number(el.dataset.b); else break; }
+    $('pNum').value = b + 1;
+    if (Date.now() < lockSpy) return;
+    const el = pageEl(b); if (!el) return;
+    const y = (top - topIn(el)) / (el.offsetHeight / pageSize(b).h);
+    let best = null;
+    for (const n of V.nodes) {
+      if (n.y == null || n.k === 'link' || n.k === 'ch') continue;
+      if (n.b < b || (n.b === b && n.y <= y + 20)) { if (!best || n.b > best.b || (n.b === best.b && n.y >= best.y)) best = n; }
+    }
+    if (best && best !== V.cur) { V.cur = best; crumb(best); markCur(); quietHash({ slug: V.slug, doc: V.doc.id, code: best.c, q: V.q, t: V.t }); }
+  }
+
+  // ---------- 이벤트 ----------
+  $('tree').addEventListener('click', async e => {
+    if (e.target.closest('a.open')) return;
+    if (e.target.id === 'clearSearch') { setRoute({ q: '', t: '' }); return; }
+    const tg = e.target.closest('[data-tg]');
+    if (tg) { const c = tg.dataset.tg; V.open.has(c) ? V.open.delete(c) : V.open.add(c); renderToc(); return; }
+    const r = e.target.closest('.row, .row-go'); if (!r) return;
+    const docId = r.dataset.d;
+    if (docId && (!V.doc || docId !== V.doc.id)) { await selectDoc(docId); renderChips(); renderToc(); }
+    if (r.dataset.page != null) { lockSpy = 0; if (isNarrow()) show('doc', true); scrollToPos(Number(r.dataset.page), 0, !isNarrow()); return; }
+    go(r.dataset.c, { openSelf: !V.q && !V.t, scrollToc: !V.q && !V.t });
+  });
+  $('searchForm').addEventListener('submit', e => { e.preventDefault(); setRoute({ q: $('q').value.trim(), code: '' }); show('toc'); });
+  let qTimer;
+  $('q').addEventListener('input', () => { clearTimeout(qTimer); qTimer = setTimeout(() => { const v = $('q').value.trim(); if (v !== V.q && (v.length >= 2 || !v)) setRoute({ q: v, code: '' }); }, 500); });
+  $('btnFold').onclick = () => { V.open = new Set(V.nodes.filter(n => n.k === 'ch').map(n => n.c)); if (V.q || V.t) setRoute({ q: '', t: '' }); else renderToc(); $('tocScroll').scrollTop = 0; };
+  $('btnHere').onclick = () => {
+    if (!V.cur) { toast('오른쪽 본문을 움직이면 현재위치가 표시됩니다.'); return; }
+    if (V.q || V.t) { setRoute({ q: '', t: '', code: V.cur.c }); return; }
+    anc(V.cur).slice(0, -1).forEach(a => V.open.add(a.c)); renderToc();
+    const r = markCur(); if (r) r.scrollIntoView({ block: 'center' }); show('toc');
+  };
+  $('btnShare').onclick = () => {
+    if (!V.doc) return;
+    const url = location.href.split('#')[0] + hashFor({ slug: V.slug, doc: V.doc.id, code: V.cur ? V.cur.c : '' });
+    const done = () => toast('현재 위치 주소를 복사했습니다. 메신저에 붙여 넣으면 이 위치가 바로 열립니다.');
+    if (navigator.clipboard) navigator.clipboard.writeText(url).then(done, () => toast(url)); else toast(url);
+  };
+  const lastPage = () => (V.doc && V.doc.raw.blocks ? V.doc.raw.blocks.length : 1);
+  $('pPrev').onclick = () => { lockSpy = 0; scrollToPos(Math.max(0, Number($('pNum').value) - 2), 0, true); };
+  $('pNext').onclick = () => { lockSpy = 0; scrollToPos(Math.min(lastPage() - 1, Number($('pNum').value)), 0, true); };
+  $('pNum').addEventListener('change', e => { const n = Math.min(lastPage(), Math.max(1, parseInt(e.target.value, 10) || 1)); lockSpy = 0; scrollToPos(n - 1, 0, false); });
+  function zoomBy(d) { const b = Number($('pNum').value) - 1; V.zoom = Math.min(1.8, Math.max(0.5, Math.round((V.zoom + d) * 100) / 100)); applyZoom(); redrawAll(); requestAnimationFrame(() => scrollToPos(b, 0, false)); }
+  $('zIn').onclick = () => zoomBy(0.15);
+  $('zOut').onclick = () => zoomBy(-0.15);
+  function show(which, quiet) {
+    const was = $('cols').dataset.show;
+    $('cols').dataset.show = which; $('tabToc').setAttribute('aria-selected', String(which === 'toc')); $('tabDoc').setAttribute('aria-selected', String(which === 'doc'));
+    if (which === 'doc' && was !== 'doc' && isNarrow()) {
+      if (V.pdf) redrawAll();
+      // 목차에서 고른 위치(또는 주소로 연 위치)로 본문을 옮긴다
+      if (!quiet && V.cur) { lockSpy = Date.now() + 800; requestAnimationFrame(() => { scrollToPos(V.cur.b, V.cur.y, false); flash(V.cur); }); }
     }
   }
-
-  function formsBox(sd, d) {
-    const hasBundle = !!SS.safeUrl(d.fb);
-    return h('div', { class: 'forms' },
-      h('h4', {}, `이 업무의 서식 ${sd.forms.length}개`),
-      h('p', {}, hasBundle
-        ? '서식은 자료별 「서식 모음」 한글 파일 하나에 번호 순서대로 들어 있습니다. 서식 모음을 내려받아 번호나 쪽으로 찾으세요.'
-        : '서식 모음 파일은 준비 중입니다. 원본 문서에서 서식 이름으로 찾아 주세요.'),
-      h('ol', {}, ...sd.forms.map(f => h('li', {},
-        h('span', { class: 'no' }, `${f.no}번`),
-        h('span', {}, f.name),
-        h('span', { class: 'pg' }, f.page != null ? `서식 모음 ${f.page}쪽` : '')))),
-      hasBundle ? h('div', { class: 'card-actions' }, linkBtn(d.fb, '서식 모음 내려받기 ↗', true)) : null);
-  }
-
-  /** 자료 카드(자료명·검색어 결과, 업무별 보기) */
-  function docCard(index, d, r, o) {
-    const allSecs = index.sections.filter(s => s.d === d._i);
-    const secs = allSecs.filter(s => !s.u); // 목차 없이 나눈 구간은 업무 목록에 보이지 않는다
-    const fmt = (d.f || '').toUpperCase();
-    const meta = [d.c, d.y ? `${d.y}년` : '', fmt, d.o ? `출처: ${d.o}` : ''].filter(Boolean).join(' · ');
-    const rawTerms = o.q ? o.q.rawTerms : [];
-    const list = h('div', { class: 'sec-list hidden' });
-    const toggle = secs.length ? h('button', { type: 'button', class: 'toggle', 'aria-expanded': 'false' }, `업무 목록 ${secs.length}개 ▾`) : null;
-    if (toggle) toggle.addEventListener('click', () => {
-      const open = list.classList.contains('hidden');
-      list.classList.toggle('hidden', !open);
-      toggle.setAttribute('aria-expanded', String(open));
-      toggle.textContent = open ? `업무 목록 접기 ▴` : `업무 목록 ${secs.length}개 ▾`;
-      if (open && !list.childElementCount) list.append(...secGroups(secs, r));
-    });
-    const formCount = allSecs.reduce((a, s) => a + (s.n || 0), 0);
-    return h('article', { class: 'doc-card' },
-      h('div', { class: 'meta-row' }, o.tier ? h('span', { class: 'tag' }, SS.TIER_LABEL[o.tier]) : h('span', { class: 'tag gray' }, d.f === 'pdf' || d.f === 'hwpx' ? '자료' : '내려받기 자료'), h('span', {}, meta)),
-      h('h3', { html: SS.highlightTerms(d.t, rawTerms) }),
-      (d.k || []).length ? h('div', { class: 'kw' }, ...d.k.map(k => h('span', { class: 'tag gray', html: SS.highlightTerms(k, rawTerms) }))) : null,
-      h('div', { class: 'card-actions' }, toggle,
-        linkBtn(d.w, '원본 내려받기 ↗', true, '원본 링크 준비 중'),
-        formCount ? linkBtn(d.fb, '서식 모음 내려받기 ↗', false, null) : null),
-      list);
-  }
-
-  function secGroups(secs, r) {
-    const groups = [];
-    secs.forEach(s => { const g = groups[groups.length - 1]; if (g && g.name === s.p) g.items.push(s); else groups.push({ name: s.p, items: [s] }); });
-    return groups.map(g => h('div', { class: 'sec-group' },
-      g.name ? h('div', { class: 'gname' }, g.name) : null,
-      h('ul', {}, ...g.items.map(s => h('li', {}, h('a', { href: hashFor(r.slug, s.h, r.c) }, s.h))))));
-  }
-
-  // ---------- 입력 ----------
-  $('searchForm').addEventListener('submit', e => {
-    e.preventDefault();
-    const q = $('q').value.trim();
-    $('q').blur();
-    if (current.slug) go(current.slug, q, current.c);
-  });
-  $('q').addEventListener('search', () => { if (!$('q').value && current.slug && current.q) go(current.slug, '', current.c); });
+  $('tabToc').onclick = () => show('toc');
+  $('tabDoc').onclick = () => show('doc');
+  let resizeTimer, lastW = window.innerWidth;
+  window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { if (Math.abs(window.innerWidth - lastW) > 40 && V.pdf) { lastW = window.innerWidth; redrawAll(); } }, 250); });
 
   init();
 })();

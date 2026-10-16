@@ -103,7 +103,8 @@
      */
     async function commit({ files, deletions, message, parent, onProgress }) {
       let treeSha = parent.treeSha;
-      const entries = files.map(f => ({ path: f.path, mode: '100644', type: 'blob', content: f.content }))
+      // 글자 파일은 내용을 트리 요청에 직접 담고, PDF 같은 이진 파일은 미리 만든 조각(sha)으로 넣는다
+      const entries = files.map(f => f.sha ? { path: f.path, mode: '100644', type: 'blob', sha: f.sha } : { path: f.path, mode: '100644', type: 'blob', content: f.content })
         .concat((deletions || []).map(p => ({ path: p, mode: '100644', type: 'blob', sha: null })));
       const enc = new TextEncoder();
       let batch = [], size = 0, done = 0;
@@ -125,6 +126,12 @@
       return { commitSha: c.sha, treeSha };
     }
 
+    /** 이진 파일(PDF) 조각 만들기 → sha. bytes: Uint8Array */
+    async function createBlob(bytes) {
+      const r = await api('/git/blobs', { method: 'POST', body: { content: toBase64(bytes), encoding: 'base64' } });
+      return r.sha;
+    }
+
     /** 최근 커밋 목록(최신순) */
     async function listCommits(perPage) {
       const list = await api(`/commits?sha=${encodeURIComponent(cfg.branch || 'main')}&per_page=${perPage || 30}`);
@@ -142,12 +149,20 @@
       return (c.files || []).map(f => ({ path: f.filename, status: f.status }));
     }
 
-    return { api, getHead, getBlobText, verify, commit, listCommits, commitFiles, get lastExpiry() { return lastExpiry; } };
+    return { api, getHead, getBlobText, verify, commit, createBlob, listCommits, commitFiles, get lastExpiry() { return lastExpiry; } };
   }
 
-  /** git이 쓰는 파일 지문(blob SHA-1). 바뀐 파일만 올리기 위해 비교한다 */
+  /** 큰 이진 파일도 멈추지 않게 조금씩 base64로 */
+  function toBase64(bytes) {
+    let out = '';
+    const CH = 8192 * 3; // 3의 배수로 잘라야 이어 붙여도 올바른 base64가 된다
+    for (let i = 0; i < bytes.length; i += CH) out += btoa(String.fromCharCode.apply(null, bytes.subarray(i, Math.min(i + CH, bytes.length))));
+    return out;
+  }
+
+  /** git이 쓰는 파일 지문(blob SHA-1). 바뀐 파일만 올리기 위해 비교한다. text는 글자 또는 Uint8Array */
   async function gitBlobSha(text) {
-    const body = new TextEncoder().encode(text);
+    const body = typeof text === 'string' ? new TextEncoder().encode(text) : text;
     const head = new TextEncoder().encode(`blob ${body.length}\0`);
     const all = new Uint8Array(head.length + body.length);
     all.set(head); all.set(body, head.length);
@@ -190,5 +205,5 @@
     return ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//school-search//token-reminder//KO', 'CALSCALE:GREGORIAN', ...events, 'END:VCALENDAR'].join('\r\n') + '\r\n';
   }
 
-  root.SASGitHub = { GitHubError, detectRepo, parseRepo, client, gitBlobSha, expiryInfo, LEVEL_RANK, calendarFile, addDays, ymd };
+  root.SASGitHub = { toBase64, GitHubError, detectRepo, parseRepo, client, gitBlobSha, expiryInfo, LEVEL_RANK, calendarFile, addDays, ymd };
 })(typeof self !== 'undefined' ? self : this);
