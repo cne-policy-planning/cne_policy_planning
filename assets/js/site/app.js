@@ -40,7 +40,7 @@
     const parts = path.split('/').filter(Boolean).map(decodeURIComponent);
     const slug = SAS.levelName(parts[0]) ? parts[0] : null;
     const p = new URLSearchParams(query || '');
-    return { slug, doc: parts[1] || '', code: parts[2] || '', q: p.get('q') || '', t: TYPES.includes(p.get('t')) ? p.get('t') : '' };
+    return { slug, doc: parts[1] || '', code: parts[2] || '', q: p.get('q') || '', t: TYPES.includes(p.get('t')) ? p.get('t') : '', p: /^\d+$/.test(p.get('p') || '') ? Number(p.get('p')) : null };
   }
   function hashFor(r) {
     let s = `#/${r.slug}`;
@@ -48,6 +48,7 @@
     const p = new URLSearchParams();
     if (r.q) p.set('q', r.q);
     if (r.t) p.set('t', r.t);
+    if (r.p != null && r.doc && !r.code) p.set('p', r.p);
     const qs = p.toString();
     return s + (qs ? '?' + qs : '');
   }
@@ -91,7 +92,7 @@
   const V = {
     slug: null, index: null, docs: new Map(),   // 자료ID → 목차가 준비된 상세
     doc: null, nodes: [], by: {}, kids: {}, open: new Set(), cur: null,
-    q: '', t: '', zoom: 1, pdf: null, pdfTask: null, renderToken: 0, observer: null
+    q: '', t: '', mode: 'home', zoom: 1, pdf: null, pdfTask: null, renderToken: 0, observer: null
   };
   try { V.zoom = Number(localStorage.getItem('sas-zoom')) || 1; } catch (e) { /* 무시 */ }
 
@@ -115,22 +116,82 @@
       if (parseHash().slug !== r.slug) return;
     }
     const docs = V.index.docs || [];
-    $('docsLabel').textContent = `${name} 자료 ${docs.length}건`;
-    if (!docs.length) {
-      $('docList').replaceChildren(h('div', { class: 'v-empty' }, `${name} 자료는 아직 준비 중입니다.`));
-      $('tree').replaceChildren(h('div', { class: 'v-empty' }, `${name} 자료는 아직 준비 중입니다. 다른 학교급을 골라 보세요.`));
-      $('docTitle').textContent = ''; $('pages').replaceChildren(); $('typeChips').replaceChildren(); return;
-    }
-    const docId = docs.some(d => d.id === r.doc) ? r.doc : docs[0].id;
-    if (!V.doc || V.doc.id !== docId) await selectDoc(docId);
-    if (!V.doc) return;
+    $('docsLabel').textContent = `← ${name} 자료 ${docs.length}건`;
+    $('docsLabel').href = `#/${r.slug}`;
     V.q = r.q; V.t = r.t;
     if ($('q').value !== r.q) $('q').value = r.q;
-    renderChips();
+    // 학교급 첫 화면: 자료 목록과 검색(문서를 바로 열지 않는다)
+    if (!r.doc || !docs.some(d => d.id === r.doc)) { setMode('home'); return renderLevelHome(r); }
+    setMode('doc');
+    if (!V.doc || V.doc.id !== r.doc) await selectDoc(r.doc);
+    if (!V.doc) return;
+    renderStats(); renderChips(V.nodes);
     document.title = (r.q ? `${r.q} - ` : '') + `${V.doc.title} · ${name} · 교무업무 통합검색`;
     if (r.code && V.by[r.code] && (!V.cur || V.cur.c !== r.code)) go(r.code, { fromHash: true });
-    else renderToc();
+    else {
+      renderToc();
+      if (r.p != null && pageEl(r.p)) { lockSpy = 0; requestAnimationFrame(() => scrollToPos(r.p, 0, false)); if (isNarrow()) show('doc', true); }
+    }
   }
+
+  function setMode(mode) {
+    V.mode = mode;
+    $('levelHome').classList.toggle('hidden', mode !== 'home');
+    $('cols').classList.toggle('hidden', mode !== 'doc');
+    document.querySelector('.v-tabs').classList.toggle('hidden', mode !== 'doc');
+    document.body.classList.toggle('level-home', mode === 'home');
+    if (mode !== 'home') $('homeResults').replaceChildren();
+  }
+
+  // ---------- 학교급 첫 화면 ----------
+  async function renderLevelHome(r) {
+    const name = SAS.levelName(r.slug);
+    const docs = V.index.docs || [];
+    document.title = (r.q ? `${r.q} - ` : '') + `${name} 자료 · 교무업무 통합검색`;
+    if (!docs.length) {
+      $('homeHead').replaceChildren(h('h1', {}, `${name} 자료`));
+      $('homeDocs').replaceChildren(h('div', { class: 'v-empty' }, `${name} 자료는 아직 준비 중입니다. 다른 학교급을 골라 보세요.`));
+      $('homeResults').replaceChildren(); $('docStats').replaceChildren(); $('typeChips').replaceChildren(); return;
+    }
+    $('homeHead').replaceChildren(h('h1', {}, `${name} 자료 ${docs.length}건`), h('p', {}, '자료를 누르면 왼쪽 목차와 오른쪽 원문이 함께 열립니다. 위 검색창에서 모든 자료의 목차·서식·본문을 한꺼번에 찾을 수 있습니다.'));
+    const preps = [];
+    for (const d of docs) { try { preps.push(await loadDoc(d.id)); } catch (e) { /* 못 불러온 자료는 목록 정보만 */ } }
+    if (parseHash().doc || V.mode !== 'home') return;
+    const all = preps.flatMap(p => p.nodes);
+    const count = (list, f) => list.filter(f).length;
+    $('docStats').replaceChildren(...[[`${name} 자료`, docs.length + '건'], ['업무', count(all, x => x.k === 'task')], ['세부 항목', count(all, x => ['group', 'item', 'bullet'].includes(x.k))]]
+      .map(([a, b]) => h('span', { class: 'st' }, a, ' ', h('b', {}, b))));
+    renderChips(all);
+    if (V.q || V.t) {
+      $('homeDocs').classList.add('hidden');
+      const res = buildResults(preps, V.q, V.t, true);
+      $('homeResults').innerHTML = res.head + res.body;
+      return;
+    }
+    $('homeDocs').classList.remove('hidden');
+    $('homeResults').replaceChildren();
+    $('homeDocs').replaceChildren(...docs.map(d => {
+      const p = preps.find(x => x.id === d.id);
+      const n = p ? p.nodes : [];
+      const chs = n.filter(x => x.k === 'ch').map(x => x.t).slice(0, 6);
+      const raw = p ? p.raw : {};
+      return h('a', { class: 'lv-doc', href: hashFor({ slug: r.slug, doc: d.id }) },
+        h('div', { class: 'lv-doc-top' }, h('span', { class: 'lv-fmt' }, (d.f || '').toUpperCase()), d.c ? h('span', { class: 'lv-cat' }, d.c) : null),
+        h('h2', {}, d.t),
+        h('div', { class: 'lv-meta' }, [d.y ? d.y + '년' : '', d.f === 'pdf' && d.n ? d.n + '쪽' : '', raw.origin && raw.origin.site ? '출처 ' + raw.origin.site : ''].filter(Boolean).join(' · ')),
+        n.length ? h('div', { class: 'lv-counts' }, ...[['업무', count(n, x => x.k === 'task')], ['서식', count(n, x => x.ty === '서식')], ['참고', count(n, x => x.ty === '참고')], ['법령', count(n, x => x.ty === '법령')]]
+          .filter(([, v]) => v).map(([a, v]) => h('span', {}, a, ' ', h('b', {}, v)))) : null,
+        chs.length ? h('div', { class: 'lv-chs' }, ...chs.map(c => h('span', {}, c))) : null,
+        h('span', { class: 'lv-open' }, '목차와 원문 보기 →'));
+    }));
+  }
+  // 첫 화면 검색 결과에서 고르면 그 자료의 그 위치로 연다
+  $('homeResults').addEventListener('click', e => {
+    if (e.target.closest('a.open')) return;
+    if (e.target.id === 'clearSearch') { setRoute({ q: '', t: '' }); return; }
+    const r = e.target.closest('.row, .row-go'); if (!r || !r.dataset.d) return;
+    location.hash = r.dataset.page != null ? hashFor({ slug: V.slug, doc: r.dataset.d, p: Number(r.dataset.page) }) : hashFor({ slug: V.slug, doc: r.dataset.d, code: r.dataset.c });
+  });
 
   // ---------- 자료 불러오기와 목차 준비 ----------
   async function loadDoc(id) {
@@ -186,13 +247,13 @@
     $('docList').replaceChildren(...docs.map(d => h('a', { class: 'v-doc' + (d.id === activeId ? ' on' : ''), href: hashFor({ slug: V.slug, doc: d.id }), 'aria-current': d.id === activeId ? 'true' : null },
       h('b', {}, d.t), h('span', {}, [d.y ? d.y + '년' : '', d.f === 'pdf' && d.n ? d.n + '쪽' : '', (d.f || '').toUpperCase(), d.f === 'pdf' && !d.p ? '쪽 보기 준비 중' : ''].filter(Boolean).join(' · ')))));
   }
+  /** 검색창 아래 줄: 이 자료의 업무·세부 항목 수와 출처 (서식·참고·법령·사이트 수는 옆의 종류 단추에) */
   function renderStats() {
     const n = V.nodes, raw = V.doc.raw;
     const count = f => n.filter(f).length;
-    const rows = [['업무', count(x => x.k === 'task')], ['세부 항목', count(x => ['group', 'item', 'bullet'].includes(x.k))],
-      ...TYPES.map(t => [t === '참고' ? '참고자료' : t, count(x => x.ty === t)])];
-    $('docStats').replaceChildren(...rows.flatMap(([a, b]) => [h('span', {}, a), h('b', {}, b)]),
-      raw.origin && raw.origin.site ? h('span', { class: 'v-src' }, `출처: ${raw.origin.site}${raw.year ? ' · ' + raw.year : ''}`) : null);
+    $('docStats').replaceChildren(h('span', { class: 'st st-doc' }, '이 자료'),
+      ...[['업무', count(x => x.k === 'task')], ['세부 항목', count(x => ['group', 'item', 'bullet'].includes(x.k))]].map(([a, b]) => h('span', { class: 'st' }, a, ' ', h('b', {}, b))),
+      raw.origin && raw.origin.site ? h('span', { class: 'st muted' }, `출처 ${raw.origin.site}${raw.year ? ' · ' + raw.year : ''}`) : null);
   }
 
   // ---------- 가운데: 목차 / 검색 결과 ----------
@@ -210,7 +271,11 @@
     const open = url ? `<a class="open o-${n.ty}" href="${esc(url)}" target="_blank" rel="noopener noreferrer" title="새 탭에서 열기">${n.ty === '법령' ? '법령 ↗' : n.ty === '사이트' ? '열기 ↗' : '받기 ⤓'}</a>` : '';
     const t = opts.hl ? opts.hl(n.t) : esc(n.t);
     const cur = V.cur && V.cur.c === n.c && (!opts.doc || opts.doc === V.doc.id);
-    return `<div class="row k-${n.k}${cur ? ' cur' : ''}" data-c="${n.c}"${opts.doc ? ` data-d="${opts.doc}"` : ''}><span class="pg">${pp(raw, n.b)}</span><span class="code">${tg}${n.c}</span><span class="ttl">${badge}${t}${open}</span></div>`;
+    // 번호는 단원(1)과 업무(1.1)까지만 보이고, 그 아래는 들여쓰기 + '-'
+    const depth = n.c.split('.').length;
+    const label = depth <= 2 ? n.c : '-';
+    const ind = depth > 2 && !opts.flat ? `<span class="ind" style="width:${(depth - 3) * 14 + 6}px"></span>` : '';
+    return `<div class="row k-${n.k} d${Math.min(depth, 6)}${cur ? ' cur' : ''}" data-c="${n.c}"${opts.doc ? ` data-d="${opts.doc}"` : ''}><span class="pg">${pp(raw, n.b)}</span><span class="code">${ind}${tg}<span class="num">${label}</span></span><span class="ttl">${badge}${t}${open}</span></div>`;
   }
   function renderToc() {
     if (!V.doc) return;
@@ -237,15 +302,10 @@
     return { words: q.split(/\s+/).filter(Boolean), f };
   }
   let searchSeq = 0;
-  async function renderResults() {
-    const seq = ++searchSeq;
-    const { words, f } = parseQuery(V.q, V.t);
+  /** 여러 자료에서 목차·링크·본문을 찾아 결과 HTML을 만든다 */
+  function buildResults(preps, rawQ, rawT, showDocs) {
+    const { words, f } = parseQuery(rawQ, rawT);
     const lw = words.map(w => SAS.norm(w)).filter(Boolean);
-    $('tree').innerHTML = '<div class="v-empty"><span class="spinner"></span> 찾는 중…</div>';
-    // 같은 학교급의 모든 자료에서 찾는다
-    const preps = [];
-    for (const d of (V.index.docs || [])) { try { preps.push(await loadDoc(d.id)); } catch (e) { /* 못 불러온 자료는 건너뜀 */ } }
-    if (seq !== searchSeq || !(V.q || V.t)) return;
     const marks = words.length ? new RegExp('(' + words.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')', 'gi') : null;
     const hl = s => marks ? esc(s).replace(marks, '<mark>$1</mark>') : esc(s);
     let total = 0, html = '';
@@ -259,7 +319,7 @@
       });
       if (!hits.length) return;
       total += hits.length;
-      if (preps.length > 1) html += `<div class="doc-grp">${esc(p.title)}</div>`;
+      if (showDocs || preps.length > 1) html += `<div class="doc-grp">${esc(p.title)}</div>`;
       const taskOf = n => { let x = n; while (x && x.k !== 'task') x = p.by[x.p]; return x || n; };
       const rank = n => n.k === 'task' ? 0 : (lw.length && lw.every(w => SAS.norm(n.t).includes(w)) ? 1 : 2);
       const groups = new Map();
@@ -274,24 +334,35 @@
       html += `<div class="doc-grp">목차에 없는 본문에서 찾은 쪽 ${pageHits.length}개</div>`;
       pageHits.slice(0, 60).forEach(x => {
         const sn = SAS.snippet(x.b.text, words[0], 24, 48).text;
-        html += `<div class="row k-page" data-d="${x.p.id}" data-page="${x.bi}"><span class="pg">${pp(x.p.raw, x.bi)}</span><span class="code"><span class="tg sp"></span>본문</span><span class="ttl">${preps.length > 1 ? `<span class="muted">${esc(x.p.title)} · </span>` : ''}${hl(sn)}</span></div>`;
+        html += `<div class="row k-page" data-d="${x.p.id}" data-page="${x.bi}"><span class="pg">${pp(x.p.raw, x.bi)}</span><span class="code"><span class="tg sp"></span><span class="num">본문</span></span><span class="ttl">${preps.length > 1 ? `<span class="muted">${esc(x.p.title)} · </span>` : ''}${hl(sn)}</span></div>`;
       });
     }
     const label = (f ? `[${f}] ` : '') + (words.join(' ') || '전체');
     const head = `<div class="res-h"><span>‘${esc(label)}’ 목차 <b>${total}</b>건${pageHits.length ? ` · 본문 ${pageHits.length}쪽` : ''}</span><button type="button" class="linkbtn" id="clearSearch">검색 지우기</button></div>`;
-    $('tree').innerHTML = head + (total || pageHits.length ? html : '<div class="v-empty">찾는 내용이 없습니다. 낱말을 줄이거나 바꿔 보세요. 여러 낱말을 띄어 쓰면 모두 들어 있는 항목만 보여 줍니다.</div>');
+    const body = total || pageHits.length ? html : '<div class="v-empty">찾는 내용이 없습니다. 낱말을 줄이거나 바꿔 보세요. 여러 낱말을 띄어 쓰면 모두 들어 있는 항목만 보여 줍니다.</div>';
+    return { head, body, total };
+  }
+  async function renderResults() {
+    const seq = ++searchSeq;
+    $('tree').innerHTML = '<div class="v-empty"><span class="spinner"></span> 찾는 중…</div>';
+    // 같은 학교급의 모든 자료에서 찾는다
+    const preps = [];
+    for (const d of (V.index.docs || [])) { try { preps.push(await loadDoc(d.id)); } catch (e) { /* 못 불러온 자료는 건너뜀 */ } }
+    if (seq !== searchSeq || !(V.q || V.t)) return;
+    const r = buildResults(preps, V.q, V.t, false);
+    $('tree').innerHTML = r.head + r.body;
     $('tocScroll').scrollTop = 0;
     markCur();
   }
 
-  function renderChips() {
-    const cnt = t => V.nodes.filter(n => n.ty === t).length;
+  function renderChips(nodes) {
+    const cnt = t => (nodes || V.nodes).filter(n => n.ty === t).length;
     $('typeChips').replaceChildren(
       h('button', { type: 'button', 'aria-pressed': String(!V.t), onclick: () => setRoute({ t: '' }) }, '전체'),
       ...TYPES.filter(t => cnt(t)).map(t => h('button', { type: 'button', 'aria-pressed': String(V.t === t), onclick: () => setRoute({ t: V.t === t ? '' : t }) }, t, h('i', {}, cnt(t)))));
   }
   function setRoute(patch) {
-    const r = Object.assign(parseHash(), { slug: V.slug, doc: V.doc ? V.doc.id : '' }, patch);
+    const r = Object.assign(parseHash(), { slug: V.slug, doc: V.mode === 'doc' && V.doc ? V.doc.id : '', p: null }, patch);
     location.hash = hashFor(r);
   }
 
@@ -467,7 +538,7 @@
     if (tg) { const c = tg.dataset.tg; V.open.has(c) ? V.open.delete(c) : V.open.add(c); renderToc(); return; }
     const r = e.target.closest('.row, .row-go'); if (!r) return;
     const docId = r.dataset.d;
-    if (docId && (!V.doc || docId !== V.doc.id)) { await selectDoc(docId); renderChips(); renderToc(); }
+    if (docId && (!V.doc || docId !== V.doc.id)) { await selectDoc(docId); renderChips(V.nodes); renderToc(); }
     if (r.dataset.page != null) { lockSpy = 0; if (isNarrow()) show('doc', true); scrollToPos(Number(r.dataset.page), 0, !isNarrow()); return; }
     go(r.dataset.c, { openSelf: !V.q && !V.t, scrollToc: !V.q && !V.t });
   });

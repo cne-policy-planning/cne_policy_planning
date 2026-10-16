@@ -45,7 +45,17 @@
         <input id="q" type="search" autocomplete="off" placeholder="업무·서식·법령 검색 (예: 현장체험학습, 서] 기안문, 법] 유아교육법)" aria-label="검색어">
         <button class="primary" type="submit">검색</button>
       </form>
+    </div>
+    <!-- 검색창과 문서 사이: 이 자료(또는 학교급 전체)의 항목 수 · 종류 모아 보기 -->
+    <div id="statBar" class="v-statbar">
+      <div id="docStats" class="v-stats"></div>
       <div id="typeChips" class="chips" role="group" aria-label="자료 종류"></div>
+    </div>
+    <!-- 학교급 첫 화면: 자료 목록 · 검색 결과 -->
+    <div id="levelHome" class="lv-home hidden">
+      <div id="homeHead" class="lv-head"></div>
+      <div id="homeDocs" class="lv-docs"></div>
+      <div id="homeResults" class="lv-results v-tree"></div>
     </div>
     <div class="v-tabs" role="tablist">
       <button id="tabToc" type="button" role="tab" aria-selected="true">목차</button>
@@ -53,10 +63,8 @@
     </div>
     <div id="cols" class="v-cols" data-show="toc">
       <nav class="v-pane v-docs" aria-label="자료 목록">
-        <div class="v-label" id="docsLabel">자료</div>
+        <a class="v-back" id="docsLabel" href="#/">자료</a>
         <div id="docList" class="v-doclist"></div>
-        <div class="v-label">이 자료</div>
-        <div id="docStats" class="v-stats"></div>
       </nav>
       <section class="v-pane v-toc" aria-label="목차">
         <div class="v-head">

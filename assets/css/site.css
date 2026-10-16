@@ -259,3 +259,42 @@ button.accent { color: #c2410c; border-color: #f5c9ad; background: #fff7f1; }
 }
 .v-page.flow p { margin: 0 0 .7em; white-space: pre-wrap; word-break: break-word; font-size: 14.5px; line-height: 1.8; }
 .v-pager.no-pages input, .v-pager.no-pages span, .v-pager.no-pages #pPrev, .v-pager.no-pages #pNext { display: none; }
+
+/* 검색창 아래 줄: 이 자료 수치 + 종류 단추 */
+.v-statbar { display: flex; align-items: center; gap: 8px 16px; flex-wrap: wrap; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 7px 12px; }
+.v-statbar .v-stats { display: flex; gap: 6px 14px; flex-wrap: wrap; align-items: center; padding: 0; font-size: 13.5px; color: var(--muted); }
+.v-statbar .st b { color: var(--text); font-variant-numeric: tabular-nums; margin-left: 2px; }
+.v-statbar .st-doc { font-weight: 700; color: var(--blue-text); }
+.v-statbar .chips { margin: 0 0 0 auto; }
+.v-statbar .chips button { padding: 3px 11px; }
+.v-back { display: block; font-size: 12.5px; font-weight: 700; color: var(--blue-text); text-decoration: none; padding: 12px 14px 6px; }
+.v-back:hover { text-decoration: underline; }
+
+/* 번호: 1 · 1.1까지만, 그 아래는 들여쓰기와 '-' */
+.row .ind { display: inline-block; flex: none; }
+.row .num { min-width: 1ch; }
+.row.d3 .num, .row.d4 .num, .row.d5 .num, .row.d6 .num { color: #98a2b3; }
+.row.k-ch .num { font-weight: 700; color: var(--text); }
+.row.k-task .num { color: var(--blue-text); font-weight: 600; }
+
+/* 학교급 첫 화면: 자료 목록 */
+.lv-home { flex: 1; min-height: 0; overflow: auto; padding: 4px 2px 30px; }
+.lv-head h1 { font-size: 20px; margin: 6px 0 4px; }
+.lv-head p { margin: 0 0 14px; color: var(--muted); font-size: 14px; }
+.lv-docs { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 14px; }
+.lv-doc { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 18px 20px; text-decoration: none; color: var(--text); display: flex; flex-direction: column; gap: 8px; box-shadow: 0 4px 16px #2667c90a; transition: border-color .15s, box-shadow .15s, transform .15s; }
+.lv-doc:hover, .lv-doc:focus-visible { border-color: #b9d0f5; box-shadow: 0 10px 26px #2667c91c; transform: translateY(-2px); }
+.lv-doc-top { display: flex; gap: 6px; }
+.lv-fmt, .lv-cat { font-size: 11.5px; font-weight: 700; padding: 1px 8px; border-radius: 6px; background: var(--blue-soft); color: var(--blue-text); }
+.lv-cat { background: var(--line2); color: var(--muted); }
+.lv-doc h2 { font-size: 17px; margin: 0; line-height: 1.4; word-break: keep-all; }
+.lv-meta { font-size: 13px; color: var(--muted); }
+.lv-counts { display: flex; gap: 12px; flex-wrap: wrap; font-size: 13.5px; color: var(--muted); }
+.lv-counts b { color: var(--text); font-variant-numeric: tabular-nums; }
+.lv-chs { display: flex; gap: 6px; flex-wrap: wrap; }
+.lv-chs span { font-size: 12.5px; background: #f6f8fc; border: 1px solid var(--line2); border-radius: 99px; padding: 2px 10px; color: #475467; }
+.lv-open { margin-top: auto; padding-top: 4px; font-size: 13.5px; font-weight: 700; color: var(--blue-text); }
+.lv-results { background: #fff; border: 1px solid var(--line); border-radius: 14px; }
+.lv-results:empty { display: none; }
+.lv-results .grp, .lv-results .row { cursor: pointer; }
+@media (max-width: 900px) { .v-statbar .chips { margin-left: 0; } }
