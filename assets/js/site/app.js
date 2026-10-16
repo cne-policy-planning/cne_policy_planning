@@ -28,6 +28,7 @@
     return el;
   }
   const esc = s => SAS.esc(String(s == null ? '' : s));
+  const cut = (s, n) => (s = String(s || '')).length > n ? s.slice(0, n) + '…' : s;
   let toastTimer;
   function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.remove('hidden'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.add('hidden'), 3600); }
 
@@ -163,8 +164,11 @@
       .map(([a, b]) => h('span', { class: 'st' }, a, ' ', h('b', {}, b))));
     renderChips(all);
     if (V.q || V.t) {
-      $('homeDocs').classList.add('hidden');
+      // 검색하면 3단 화면으로: 찾은 항목이 가장 많은 자료를 열고 가운데에 검색 결과를 보여 준다
       const res = buildResults(preps, V.q, V.t, true);
+      const best = Object.entries(res.byDoc).sort((a, b) => b[1] - a[1])[0];
+      if (res.total && best) { location.replace(hashFor({ slug: r.slug, doc: best[0], q: V.q, t: V.t })); return; }
+      $('homeDocs').classList.add('hidden');
       $('homeResults').innerHTML = res.head + res.body;
       return;
     }
@@ -302,6 +306,7 @@
     return { words: q.split(/\s+/).filter(Boolean), f };
   }
   let searchSeq = 0;
+  const SEARCH_KINDS = new Set(['task', 'part', 'group', 'item', 'link']);
   /** 여러 자료에서 목차·링크·본문을 찾아 결과 HTML을 만든다 */
   function buildResults(preps, rawQ, rawT, showDocs) {
     const { words, f } = parseQuery(rawQ, rawT);
@@ -310,13 +315,11 @@
     const hl = s => marks ? esc(s).replace(marks, '<mark>$1</mark>') : esc(s);
     let total = 0, html = '';
     const pageHits = [];
+    const byDoc = {};
     preps.forEach(p => {
-      const hay = n => SAS.norm(n.t + ' ' + (n.d || []).join(' '));
-      const hits = p.nodes.filter(n => n.k !== 'ch' && (!f || n.ty === f) && (!lw.length || lw.every(w => hay(n).includes(w))));
-      // 목차에 없는 본문 글(표 안 글 등)은 쪽 단위로 알려 준다
-      if (lw.length && !f) (p.raw.blocks || []).forEach((b, bi) => {
-        if (lw.every(w => SAS.norm(b.text).includes(w)) && !hits.some(n => n.b === bi)) pageHits.push({ p, bi, b });
-      });
+      // 목차 제목에서만 찾는다: 업무·부분·◆ 묶음·번호 항목·자료(서식 등) 이름. ▸ 세부 줄과 본문은 찾지 않는다
+      const hits = p.nodes.filter(n => SEARCH_KINDS.has(n.k) && (!f || n.ty === f) && (!lw.length || lw.every(w => SAS.norm(n.t).includes(w))));
+      byDoc[p.id] = hits.length;
       if (!hits.length) return;
       total += hits.length;
       if (showDocs || preps.length > 1) html += `<div class="doc-grp">${esc(p.title)}</div>`;
@@ -338,9 +341,9 @@
       });
     }
     const label = (f ? `[${f}] ` : '') + (words.join(' ') || '전체');
-    const head = `<div class="res-h"><span>‘${esc(label)}’ 목차 <b>${total}</b>건${pageHits.length ? ` · 본문 ${pageHits.length}쪽` : ''}</span><button type="button" class="linkbtn" id="clearSearch">검색 지우기</button></div>`;
-    const body = total || pageHits.length ? html : '<div class="v-empty">찾는 내용이 없습니다. 낱말을 줄이거나 바꿔 보세요. 여러 낱말을 띄어 쓰면 모두 들어 있는 항목만 보여 줍니다.</div>';
-    return { head, body, total };
+    const head = `<div class="res-h"><span>‘${esc(label)}’ 목차에서 <b>${total}</b>건</span><button type="button" class="linkbtn" id="clearSearch">검색 지우기</button></div>`;
+    const body = total ? html : '<div class="v-empty">목차에서 찾지 못했습니다. 낱말을 줄이거나 바꿔 보세요(예: 입학식 → 입학). 여러 낱말을 띄어 쓰면 모두 들어 있는 항목만 보여 줍니다.</div>';
+    return { head, body, total, byDoc };
   }
   async function renderResults() {
     const seq = ++searchSeq;
@@ -353,6 +356,13 @@
     $('tree').innerHTML = r.head + r.body;
     $('tocScroll').scrollTop = 0;
     markCur();
+    // 새 검색이면 이 자료의 첫 결과를 오른쪽 원문에 바로 보여 준다
+    const key = V.doc.id + '|' + V.q + '|' + V.t;
+    if (V.autoKey !== key) {
+      V.autoKey = key;
+      const first = document.querySelector(`#tree .row[data-d="${CSS.escape(V.doc.id)}"], #tree .row-go[data-d="${CSS.escape(V.doc.id)}"]`);
+      if (first && V.by[first.dataset.c]) { go(first.dataset.c, { scrollToc: false, toDoc: false }); first.classList.add('cur'); }
+    }
   }
 
   function renderChips(nodes) {
@@ -488,7 +498,7 @@
   function crumb(n) {
     const a = n ? anc(n).filter(x => !['bullet', 'link'].includes(x.k)) : [];
     $('crumb').replaceChildren(h('span', { class: 'src' }, SAS.levelName(V.slug) || ''),
-      ...(a.length ? a.flatMap((x, i) => [i ? h('span', { class: 'sep' }, '›') : null, i === a.length - 1 ? h('b', {}, x.t) : h('span', {}, x.t)]).filter(Boolean) : [h('span', {}, V.doc ? V.doc.title : '')]));
+      ...(a.length ? a.flatMap((x, i) => [i ? h('span', { class: 'sep' }, '›') : null, i === a.length - 1 ? h('b', { title: x.t }, cut(x.t, 34)) : h('span', { title: x.t }, cut(x.t, 22))]).filter(Boolean) : [h('span', {}, V.doc ? V.doc.title : '')]));
   }
 
   // ---------- 이동 ----------
@@ -503,9 +513,9 @@
     crumb(n); $('pNum').value = n.b + 1;
     lockSpy = Date.now() + 1000;
     // 폰에서는 본문 칸을 먼저 보여야 위치를 잴 수 있다
-    if (isNarrow() && !opts.fromHash) show('doc', true);
+    if (isNarrow() && !opts.fromHash && opts.toDoc !== false) show('doc', true);
     if (opts.fromHash) requestAnimationFrame(() => { scrollToPos(n.b, n.y, false); flash(n); });
-    else { scrollToPos(n.b, n.y, !isNarrow()); flash(n); }
+    else { scrollToPos(n.b, n.y, !isNarrow() && opts.toDoc !== false); flash(n); }
     if (opts.scrollToc !== false) { const r = markCur(); if (r) r.scrollIntoView({ block: opts.fromHash ? 'center' : 'nearest' }); }
     if (!opts.fromHash) quietHash({ slug: V.slug, doc: V.doc.id, code, q: V.q, t: V.t });
   }
