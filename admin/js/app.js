@@ -48,10 +48,14 @@
       document.body.append(inp); inp.click();
     });
   }
+  // 학교급 고르기: 공통은 다른 학교급과 함께 고르지 않는다(공통을 고르면 나머지를 풀고, 다른 학교급을 고르면 공통을 푼다)
   function levelChecks(container, selected, onChange) {
     container.replaceChildren(...SAS.LEVELS.map(l => {
-      const cb = h('input', { type: 'checkbox', value: l.name, checked: (selected || []).includes(l.name), onchange: () => onChange && onChange([...container.querySelectorAll('input:checked')].map(i => i.value)) });
-      return h('label', {}, cb, l.name);
+      const cb = h('input', { type: 'checkbox', value: l.name, checked: (selected || []).includes(l.name), onchange: () => {
+        if (cb.checked) container.querySelectorAll('input:checked').forEach(i => { if (i !== cb && (l.name === SAS.COMMON_LEVEL || i.value === SAS.COMMON_LEVEL)) i.checked = false; });
+        if (onChange) onChange([...container.querySelectorAll('input:checked')].map(i => i.value));
+      } });
+      return h('label', { class: l.name === SAS.COMMON_LEVEL ? 'common' : null }, cb, l.name);
     }));
   }
   const checkedLevels = container => [...container.querySelectorAll('input:checked')].map(i => i.value);
@@ -386,8 +390,19 @@
     return opts;
   }
 
+  // 부서 드롭다운: 고정 목록(SAS.DEPARTMENTS, 가나다순). 목록에 없는 기존 값은 지우지 않고 따로 보여 준다.
+  function deptOptions(current) {
+    const opts = [h('option', { value: '', selected: !current }, '부서 선택')];
+    if (current && !SAS.DEPARTMENTS.includes(current)) opts.push(h('option', { value: current, selected: true }, `${current} (목록에 없음)`));
+    SAS.DEPARTMENTS.forEach(c => opts.push(h('option', { value: c, selected: c === current }, c)));
+    return opts;
+  }
+
   // ---------- ① 자료 등록 ----------
   levelChecks($('regLevels'), []);
+  $('regDept').replaceChildren(...deptOptions(''));
+  // 원 출처를 학교업무자료실로 고르면 부서는 '교무학사 공통자료'로 채운다(비어 있을 때만)
+  $('regOriginSite').addEventListener('change', () => { if (!$('regDept').value && $('regOriginSite').value === '학교업무자료실') $('regDept').value = SAS.ACADEMIC_COMMON; });
   $('regOriginSite').replaceChildren(h('option', { value: '' }, '원 출처 선택(선택)'), ...SAS.ORIGIN_SITES.map(s => h('option', { value: s }, s)), h('option', { value: '기타' }, '기타'));
   $('regCategory').replaceChildren(...categoryOptions(''));
   $('regYear').value = new Date().getFullYear();
@@ -440,7 +455,7 @@
       queue.push({
         key: ++qSeq, file, path, filename: file.name, size: file.size, format: SAS.formatOf(file.name),
         title: SAS.titleFromFilename(file.name), titleEdited: false, works: '',
-        levels: g.levels, levelsFrom: g.levelsFrom, year: g.year, category: g.category, originSite: g.originSite,
+        levels: g.levels, levelsFrom: g.levelsFrom, year: g.year, category: g.category, originSite: g.originSite, department: g.department || '',
         action: 'add', targetId: null, actionSet: false, note: '', match: null,
         status: 'pending', message: '', doc: null, blocks: null
       });
@@ -450,11 +465,12 @@
     if (added || ignored) $('queueMsg').textContent = `${added}개 파일을 넣었습니다${ignored ? ` (숨김·임시·빈 파일 ${ignored}개 제외)` : ''}. 처리 방법을 확인한 뒤 「분석 시작」을 누르세요.`;
   }
 
-  // 행마다의 값이 비어 있으면 공통 정보를 쓴다
+  // 행마다의 값이 비어 있으면 위 기본값을 쓴다
   const rowLevels = q => q.levels.length ? q.levels : checkedLevels($('regLevels'));
   const rowYear = q => q.year || Number($('regYear').value) || null;
   const rowCategory = q => q.category || $('regCategory').value.trim();
   const rowOrigin = q => ({ site: q.originSite || $('regOriginSite').value, url: q.originSite ? '' : $('regOriginUrl').value.trim(), note: '' });
+  const rowDept = q => q.department || $('regDept').value || SAS.defaultDepartment({ origin: rowOrigin(q) });
   const targetOf = q => q.action === 'replace' && q.targetId ? S.getDoc(q.targetId) : null;
   /** 교체할 때는 기존 자료명의 연도만 새 연도로 바꿔 쓴다(직접 고친 이름은 그대로) */
   function rowTitle(q) {
@@ -464,7 +480,7 @@
   }
 
   function replan() {
-    // 짝 맞추기에는 폴더·파일 이름에서 찾았거나 직접 고른 학교급만 쓴다(공통 정보로 짐작이 빗나가지 않게)
+    // 짝 맞추기에는 폴더·파일 이름에서 찾았거나 직접 고른 학교급만 쓴다(기본값으로 짐작이 빗나가지 않게)
     SAS.planBatch(queue, S.state.docs);
   }
 
@@ -523,23 +539,29 @@
   function metaCell(q) {
     const chips = h('div', { class: 'checks mini' }, ...SAS.LEVELS.map(l => {
       const cb = h('input', { type: 'checkbox', value: l.name, checked: q.levels.includes(l.name), onchange: () => {
+        // 공통은 다른 학교급과 함께 고르지 않는다
+        if (cb.checked) chips.querySelectorAll('input:checked').forEach(i => { if (i !== cb && (l.name === SAS.COMMON_LEVEL || i.value === SAS.COMMON_LEVEL)) i.checked = false; });
         q.levels = [...chips.querySelectorAll('input:checked')].map(i => i.value); q.levelsFrom = 'manual';
         replan(); renderQueue();
       } });
-      return h('label', {}, cb, l.name);
+      return h('label', { class: l.name === SAS.COMMON_LEVEL ? 'common' : null }, cb, l.name);
     }));
     const common = checkedLevels($('regLevels'));
     const lvNote = q.levels.length
       ? (q.levelsFrom === 'folder' ? '폴더 이름에서 찾음' : q.levelsFrom === 'file' ? '파일 이름에서 찾음' : '')
-      : (common.length ? `공통 정보 사용: ${common.join('·')}` : '학교급을 골라 주세요');
+      : (common.length ? `기본값 사용: ${common.join('·')}` : '학교급을 골라 주세요');
     const cat = h('select', { onchange: e => { q.category = e.target.value; } }, ...categoryOptions(q.category));
     const tq = targetOf(q);
     cat.options[0].textContent = tq && tq.category ? `기존: ${tq.category}` : $('regCategory').value ? `공통: ${$('regCategory').value}` : '분류 선택';
     const year = h('input', { type: 'number', class: 'num', min: 2000, max: 2100, value: q.year || '', placeholder: $('regYear').value || '연도',
       onchange: e => { q.year = Number(e.target.value) || null; renderQueue(); } });
+    const dept = h('select', { onchange: e => { q.department = e.target.value; } }, ...deptOptions(q.department));
+    dept.options[0].textContent = tq && tq.department ? `기존: ${tq.department}` : $('regDept').value ? `기본: ${$('regDept').value}` : '부서 선택';
     return h('td', { class: 'meta-cell' }, chips,
       h('div', { class: 'small ' + (q.levels.length || common.length ? 'muted' : 'warn-text') }, lvNote),
       h('div', { class: 'row small-gap' }, cat, year),
+      h('div', { class: 'row small-gap' }, dept),
+      q.department ? h('div', { class: 'small muted' }, `부서: ${q.department} (폴더 이름)`) : null,
       q.originSite ? h('div', { class: 'small muted' }, `원 출처: ${q.originSite} (폴더 이름)`) : null);
   }
 
@@ -583,8 +605,8 @@
     $('btnAddDocs').disabled = analyzing || !ready;
     $('btnAddDocs').textContent = ready ? `자료 목록에 반영 (${ready}건)` : '자료 목록에 반영';
   }
-  // 공통 정보를 바꾸면 행의 표시(공통 정보 사용…)와 짝 맞추기를 다시 한다
-  ['regLevels', 'regCategory', 'regYear', 'regOriginSite'].forEach(id => $(id).addEventListener('change', () => { replan(); renderQueue(); }));
+  // 기본값을 바꾸면 행의 표시(기본값 사용…)와 짝 맞추기를 다시 한다
+  ['regLevels', 'regCategory', 'regDept', 'regYear', 'regOriginSite'].forEach(id => $(id).addEventListener('change', () => { replan(); renderQueue(); }));
 
   function summaryOf(doc) {
     if (!doc) return [];
@@ -608,7 +630,7 @@
     const t = targetOf(q);
     const year = rowYear(q);
     const meta = {
-      title: rowTitle(q), school_levels: rowLevels(q), category: rowCategory(q), year,
+      title: rowTitle(q), school_levels: rowLevels(q), category: rowCategory(q), department: rowDept(q), year,
       filename: q.filename, format: q.format, works_url: q.works, origin: rowOrigin(q)
     };
     if (!t) return { doc: SAS.createDocument(meta, q.blocks, ids), carry: null };
@@ -616,6 +638,7 @@
       id: t.id,
       school_levels: q.levels.length ? q.levels : t.school_levels,
       category: q.category || t.category || meta.category,
+      department: q.department || t.department || meta.department,
       works_url: q.works || t.works_url,
       origin: q.originSite ? meta.origin : t.origin,
       search_keywords: t.search_keywords, created_at: t.created_at, forms_bundle: t.forms_bundle
@@ -665,7 +688,7 @@
     const ready = queue.filter(q => q.action !== 'skip' && q.status === 'done');
     const noLevel = ready.filter(q => !rowLevels(q).length && !targetOf(q));
     if (noLevel.length) {
-      toast(`학교급이 없는 파일이 ${noLevel.length}개 있습니다. 행에서 고르거나 공통 정보에서 선택해 주세요.`, 5000);
+      toast(`학교급이 없는 파일이 ${noLevel.length}개 있습니다. 행에서 고르거나 위 기본값에서 선택해 주세요.`, 5000);
       $('regLevels').scrollIntoView({ behavior: 'smooth', block: 'center' }); return;
     }
     // 같은 기존 자료를 두 파일이 교체하려 하면 막는다
@@ -734,7 +757,7 @@
     fCat.replaceChildren(h('option', { value: '' }, '모든 분류'), ...cats.map(c => h('option', { value: c, selected: c === curCat }, c)));
     const q = SAS.norm($('fQuery').value);
     const list = S.state.docs.filter(d =>
-      (!q || SAS.norm(d.title + d.category).includes(q)) &&
+      (!q || SAS.norm(d.title + d.category + (d.department || '')).includes(q)) &&
       (!fLevel.value || d.school_levels.includes(fLevel.value)) &&
       (!fCat.value || d.category === fCat.value) &&
       (!$('fNoWorks').checked || !d.pdf) &&
@@ -748,6 +771,7 @@
         h('div', { class: 't' }, d.title),
         h('div', { class: 'm' },
           d.school_levels.map(l => h('span', { class: 'tag' }, l)),
+          d.department ? h('span', { class: 'tag gray' }, d.department) : null,
           h('span', { class: 'tag gray' }, d.format.toUpperCase()),
           v.errors.length ? h('span', { class: 'tag err' }, '오류') : v.warnings.length ? h('span', { class: 'tag warn' }, '확인') : null,
           S.state.changedIds.has(d.id) ? h('span', { class: 'tag warn' }, '저장 전') : null,
@@ -825,6 +849,7 @@
         field('자료명', h('input', { type: 'text', value: doc.title, onchange: e => { doc.title = e.target.value.trim(); changed(doc, true); renderList(); } })),
         field('학교급', lv),
         field('업무 분류', h('select', { onchange: e => { doc.category = e.target.value; changed(doc); renderList(); } }, ...categoryOptions(doc.category))),
+        field('부서', h('select', { onchange: e => { doc.department = e.target.value; changed(doc); renderList(); } }, ...deptOptions(doc.department || '')), '공통 자료는 사용자 화면에서 이 부서로 묶여 나옵니다. 전체 자료가 1~2건인 부서는 「기타 부서」로 묶입니다.'),
         field('연도', h('input', { type: 'number', value: doc.year || '', onchange: e => { doc.year = e.target.value ? Number(e.target.value) : null; changed(doc); } })),
         field('원본 내려받기 링크 (선택)', h('div', { class: 'row' }, worksInput, doc.works_url ? h('a', { class: 'btn small', href: doc.works_url, target: '_blank', rel: 'noopener noreferrer', style: 'flex:0' }, '열기 ↗') : null), doc.pdf ? '비워 두면 사이트에 올린 PDF를 내려받습니다. HWP 원본 등을 따로 주고 싶을 때만 넣으세요.' : null),
         field('원 출처', h('div', { class: 'row' }, originSel, h('input', { type: 'url', value: doc.origin.url, placeholder: '게시글 주소', onchange: e => { doc.origin.url = e.target.value.trim(); changed(doc); } })), '개정판 확인용 기록입니다. 사용자 화면의 내려받기는 웍스 링크로 연결됩니다.')),
@@ -1155,7 +1180,7 @@ ${groups.map(g => `<div class="card"><h2>${e(g.title)}</h2><table>${g.items.map(
     let r;
     try { r = await withProgress('새 파일을 분석하는 중…', p => X.extractFile(file, p)); }
     catch (e) { toast('분석 실패 — 기존 자료를 유지합니다: ' + e.message, 6000); return; }
-    const nd = SAS.createDocument({ id: doc.id, title: doc.title, school_levels: doc.school_levels, category: doc.category, year: doc.year, filename: file.name, format: r.format,
+    const nd = SAS.createDocument({ id: doc.id, title: doc.title, school_levels: doc.school_levels, category: doc.category, department: doc.department, year: doc.year, filename: file.name, format: r.format,
       works_url: doc.works_url, origin: doc.origin, search_keywords: doc.search_keywords, created_at: doc.created_at, forms_bundle: doc.forms_bundle }, r.blocks, []);
     const kept = SAS.carryKeywords(doc, nd);
     const keptForms = SAS.carryForms(doc, nd);

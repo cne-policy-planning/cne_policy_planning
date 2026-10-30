@@ -47,13 +47,14 @@ body:has(#home:not(.hidden)) #home { flex: 1; }
 .hero h1 { font-size: clamp(26px, min(3.4vw, 6vh), 50px); margin: 0 0 clamp(6px, 1.8vh, 18px); letter-spacing: -1.2px; font-weight: 800; line-height: 1.25; }
 .hero h1 em { font-style: normal; color: var(--blue); }
 .hero p { margin: 0; color: #4a5568; font-size: clamp(14px, min(1.35vw, 2.4vh), 20px); }
-.level-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(14px, 1.6vw, 26px); width: min(100%, 1200px); margin: 0 auto; position: relative; z-index: 1; }
+.level-cards { display: grid; grid-template-columns: repeat(5, 1fr); gap: clamp(12px, 1.4vw, 24px); width: min(100%, 1320px); margin: 0 auto; position: relative; z-index: 1; }
 .level-card { --tint: #fff; background: #fff; border: 1px solid #e3e9f2; border-radius: 18px; padding: clamp(14px, min(2.6vw, 4vh), 38px) 16px clamp(14px, min(2.4vw, 3.6vh), 34px); text-align: center; text-decoration: none; color: var(--text); display: flex; flex-direction: column; align-items: center; gap: 8px; box-shadow: 0 6px 22px #2667c90d; transition: border-color .15s, box-shadow .15s, transform .15s, background .15s; }
 .level-card:hover, .level-card:focus-visible { background: var(--tint); border-color: #cddcf2; box-shadow: 0 12px 30px #2667c91f; transform: translateY(-3px); }
 .level-card.kindergarten { --tint: #fffaf2; }
 .level-card.elementary { --tint: #fff7f7; }
 .level-card.middle { --tint: #f6faff; }
 .level-card.special { --tint: #f4fbf7; }
+.level-card.common { --tint: #f8f5ff; }
 .level-card img { width: clamp(60px, min(6.4vw, 11vh), 104px); height: auto; aspect-ratio: 1; margin-bottom: clamp(4px, 1.2vh, 12px); }
 .level-card .name { font-size: clamp(18px, min(1.7vw, 3.2vh), 27px); font-weight: 800; }
 .level-card .count { font-size: clamp(14px, 1.1vw, 17px); color: var(--muted); }
@@ -129,6 +130,8 @@ footer.site .org { display: inline-flex; align-items: center; gap: 8px; color: v
 
 @media (max-width: 760px) {
   .level-cards { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .level-card.common { grid-column: 1 / -1; flex-direction: row; justify-content: center; gap: 14px; }
+  .level-card.common img { margin: 0; width: 56px; }
   #home { padding: 28px 0 120px; min-height: 0; }
   .hero { padding-bottom: 24px; }
   .eyebrow::before, .eyebrow::after { width: 24px; }
@@ -298,3 +301,33 @@ button.accent { color: #c2410c; border-color: #f5c9ad; background: #fff7f1; }
 .lv-results:empty { display: none; }
 .lv-results .grp, .lv-results .row { cursor: pointer; }
 @media (max-width: 900px) { .v-statbar .chips { margin-left: 0; } }
+
+/* 학교급 첫 화면: 이 학교급 자료 · 공통 자료(부서별) */
+.lv-sec { margin: 26px 0 10px; }
+.lv-sec.first { margin-top: 4px; }
+.lv-sec h2 { font-size: 17px; margin: 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.lv-sec h2 i { font-style: normal; font-size: 13.5px; color: var(--muted); font-weight: 600; }
+.lv-sec p { margin: 4px 0 0; color: var(--muted); font-size: 13.5px; }
+.lv-head + .lv-docs, #homeDocs > .lv-sec:first-child { margin-top: 0; }
+.lv-tag { font-size: 11.5px; font-weight: 700; padding: 1px 8px; border-radius: 6px; background: #f1ecfd; color: #5b3fb8; white-space: nowrap; }
+.lv-tools { display: flex; gap: 6px; margin-top: 10px; }
+.lv-none { background: #fff; border: 1px dashed #ccd5e1; border-radius: 14px; }
+.lv-depts { display: grid; gap: 8px; }
+details.lv-dept { background: #fff; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+details.lv-dept > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 10px; padding: 12px 16px; font-size: 15px; }
+details.lv-dept > summary::-webkit-details-marker { display: none; }
+details.lv-dept > summary::before { content: "+"; width: 20px; height: 20px; border-radius: 50%; border: 1px solid #b8c4d6; display: inline-grid; place-items: center; font-size: 13px; color: #475467; flex: none; }
+details.lv-dept[open] > summary::before { content: "−"; }
+details.lv-dept > summary:hover { background: #f8faff; }
+details.lv-dept > summary i { font-style: normal; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.lv-rows { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 2px 12px; padding: 0 10px 10px; border-top: 1px solid var(--line2); }
+.lv-row { display: grid; gap: 1px; padding: 9px 10px; border-radius: 10px; text-decoration: none; color: var(--text); }
+.lv-row:hover, .lv-row:focus-visible { background: var(--blue-soft); }
+.lv-row b { font-size: 14.5px; font-weight: 600; line-height: 1.4; word-break: keep-all; }
+.lv-row:hover b { color: var(--blue-text); }
+.lv-row span { font-size: 12.5px; color: var(--muted); }
+/* 3단 화면 왼쪽: 공통 자료 부서 묶음 */
+.v-label-com { margin-top: 10px; border-top: 1px solid var(--line2); padding-top: 12px; color: #5b3fb8; }
+.v-dept { font-size: 12px; font-weight: 700; color: #475467; padding: 8px 10px 2px; }
+.v-crumb .src.com { background: #f1ecfd; color: #5b3fb8; }
+.doc-grp .lv-tag { font-size: 11px; vertical-align: 1px; }

@@ -1,7 +1,9 @@
 /*
  * 교무업무 통합검색 · 사용자 화면
- *  - 첫 화면: 학교급 카드
- *  - 학교급 화면(충교위키식 3단): 왼쪽 자료 목록 · 가운데 번호 목차(또는 검색 결과) · 오른쪽 원문 쪽 보기
+ *  - 첫 화면: 학교급 카드 5개(유아 · 초등 · 중등 · 특수 · 공통)
+ *  - 학교급 첫 화면: 그 학교급 자료 + 공통 자료(부서별 묶음, 가나다순). 공통은 공통 자료만 부서별로
+ *  - 자료 화면(충교위키식 3단): 왼쪽 자료 목록 · 가운데 번호 목차(또는 검색 결과) · 오른쪽 원문 쪽 보기
+ *  - 검색: 그 학교급 자료와 공통 자료의 목차에서 함께 찾는다
  *  - 주소: #/학교급  ·  #/학교급/자료ID  ·  #/학교급/자료ID/목차번호  ·  #/학교급?q=검색어&t=서식
  */
 (function () {
@@ -14,6 +16,7 @@
   const VENDOR = 'assets/vendor/pdfjs/';
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const isNarrow = () => matchMedia('(max-width: 900px)').matches;
+  const COMMON = 'common';
 
   function h(tag, props, ...kids) {
     const el = document.createElement(tag);
@@ -75,12 +78,18 @@
     document.title = '교무업무 통합검색';
     document.body.classList.remove('viewing');
     $('home').classList.remove('hidden'); $('level').classList.add('hidden'); $('levelNav').classList.add('hidden');
+    const levels = (manifest && manifest.levels) || {};
+    const nOf = slug => (levels[slug] && levels[slug].documents) || 0;
+    const common = nOf(COMMON);
     $('levelCards').replaceChildren(...SAS.LEVELS.map(l => {
-      const info = (manifest && manifest.levels && manifest.levels[l.slug]) || { documents: 0 };
-      return h('a', { class: `level-card ${l.slug}` + (info.documents ? '' : ' no-docs'), href: `#/${l.slug}` },
+      const own = nOf(l.slug);
+      // 학교급 카드는 그 학교급 자료 수와 함께 볼 수 있는 공통 자료 수를 보여 준다
+      const count = l.slug === COMMON ? (own ? `자료 ${own}건` : '자료 준비 중')
+        : own || common ? [own ? `자료 ${own}건` : '', common ? `공통 ${common}건` : ''].filter(Boolean).join(' + ') : '자료 준비 중';
+      return h('a', { class: `level-card ${l.slug}` + (own || (l.slug !== COMMON && common) ? '' : ' no-docs'), href: `#/${l.slug}` },
         h('img', { src: `assets/img/level-${l.slug}.png`, alt: '', width: 104, height: 104 }),
         h('span', { class: 'name' }, l.name),
-        h('span', { class: 'count' }, info.documents ? `자료 ${info.documents}건` : '자료 준비 중'));
+        h('span', { class: 'count' }, count));
     }));
   }
   function renderNav(slug) {
@@ -92,6 +101,7 @@
   // ---------- 학교급 화면 상태 ----------
   const V = {
     slug: null, index: null, docs: new Map(),   // 자료ID → 목차가 준비된 상세
+    own: [], com: [], all: [], meta: new Map(),  // 이 학교급 자료 · 공통 자료 · 둘을 합친 목록 · 자료ID → 목록 정보
     doc: null, nodes: [], by: {}, kids: {}, open: new Set(), cur: null,
     q: '', t: '', mode: 'home', zoom: 1, pdf: null, pdfTask: null, renderToken: 0, observer: null
   };
@@ -106,23 +116,28 @@
       V.slug = r.slug; V.index = null; V.doc = null;
       $('docList').replaceChildren(h('div', { class: 'v-empty' }, h('span', { class: 'spinner' }), ' 자료 목록을 불러오는 중…'));
       $('tree').replaceChildren(); $('pages').replaceChildren(); $('crumb').replaceChildren(); $('docTitle').textContent = ''; $('docStats').replaceChildren();
-      try { V.index = await loader.level(r.slug); }
-      catch (e) {
-        V.index = { docs: [], sections: [] };
-        const msg = e.status === 404 ? `${name} 자료는 아직 준비 중입니다.` : '자료 목록을 불러오지 못했습니다. 새로고침해 주세요.';
+      // 학교급 화면은 그 학교급 색인과 공통 색인을 함께 불러온다. 공통 화면은 공통 색인만
+      const want = r.slug === COMMON ? [COMMON] : [r.slug, COMMON];
+      const got = await Promise.all(want.map(s => loader.level(s).catch(e => (e.status === 404 ? { docs: [], sections: [] } : Promise.reject(e))))).catch(() => null);
+      if (!got) {
+        V.index = { docs: [], sections: [] }; V.own = []; V.com = []; V.all = []; V.meta = new Map();
+        const msg = '자료 목록을 불러오지 못했습니다. 새로고침해 주세요.';
         $('docList').replaceChildren(h('div', { class: 'v-empty' }, msg));
         $('tree').replaceChildren(h('div', { class: 'v-empty' }, msg));
+        $('homeHead').replaceChildren(); $('homeDocs').replaceChildren(h('div', { class: 'v-empty' }, msg));
+        setMode('home');
         return;
       }
       if (parseHash().slug !== r.slug) return;
+      setLists(r.slug, got);
     }
-    const docs = V.index.docs || [];
-    $('docsLabel').textContent = `← ${name} 자료 ${docs.length}건`;
+    const docs = V.all;
+    $('docsLabel').textContent = `← ${name} 자료 목록`;
     $('docsLabel').href = `#/${r.slug}`;
     V.q = r.q; V.t = r.t;
     if ($('q').value !== r.q) $('q').value = r.q;
     // 학교급 첫 화면: 자료 목록과 검색(문서를 바로 열지 않는다)
-    if (!r.doc || !docs.some(d => d.id === r.doc)) { setMode('home'); return renderLevelHome(r); }
+    if (!r.doc || !V.meta.has(r.doc)) { setMode('home'); return renderLevelHome(r); }
     setMode('doc');
     if (!V.doc || V.doc.id !== r.doc) await selectDoc(r.doc);
     if (!V.doc) return;
@@ -135,6 +150,36 @@
     }
   }
 
+  /** 색인을 받아 이 학교급 자료(own)와 공통 자료(com)로 나눈다. 공통 자료는 부서별(가나다순)로 정렬 */
+  function setLists(slug, got) {
+    const own = slug === COMMON ? [] : (got[0].docs || []);
+    const com = (slug === COMMON ? got[0].docs : (got[1] && got[1].docs)) || [];
+    com.forEach(d => { d._c = true; d._g = SAS.deptGroup(d.dp, deptCounts()); });
+    own.forEach(d => { d._c = false; });
+    V.index = got[0];
+    V.own = own;
+    V.com = byDept(com).flatMap(([, list]) => list);
+    V.all = V.own.concat(V.com);
+    V.meta = new Map(V.all.map(d => [d.id, d]));
+  }
+  function deptCounts() { return (manifest && manifest.departments) || {}; }
+  /** [[부서 묶음 이름, 자료 목록], …] 가나다순 */
+  function byDept(list) {
+    const m = new Map();
+    list.forEach(d => { const g = d._g || SAS.deptGroup(d.dp, deptCounts()); if (!m.has(g)) m.set(g, []); m.get(g).push(d); });
+    return [...m].sort((a, b) => a[0].localeCompare(b[0], 'ko'));
+  }
+  /** 자료 여러 건을 동시에 몇 개씩 불러온다(못 불러온 자료는 건너뜀) */
+  async function loadMany(list, limit) {
+    const out = new Array(list.length); let next = 0;
+    async function worker() { while (next < list.length) { const i = next++; try { out[i] = await loadDoc(list[i].id); } catch (e) { out[i] = null; } } }
+    await Promise.all(Array.from({ length: Math.min(limit || 6, list.length) }, worker));
+    return out.filter(Boolean);
+  }
+  const isCommonDoc = id => { const d = V.meta.get(id); return !!(d && d._c); };
+  /** 자료가 속한 학교급 이름(공통 자료면 '공통') */
+  const srcName = id => (isCommonDoc(id) ? SAS.levelName(COMMON) : SAS.levelName(V.slug));
+
   function setMode(mode) {
     V.mode = mode;
     $('levelHome').classList.toggle('hidden', mode !== 'home');
@@ -145,49 +190,85 @@
   }
 
   // ---------- 학교급 첫 화면 ----------
+  // 학교급: ① 그 학교급 자료(카드) ② 공통 자료(부서별 묶음, 가나다순) · 공통: 공통 자료만 부서별
   async function renderLevelHome(r) {
     const name = SAS.levelName(r.slug);
-    const docs = V.index.docs || [];
+    const isCommon = r.slug === COMMON;
+    const own = V.own, com = V.com;
     document.title = (r.q ? `${r.q} - ` : '') + `${name} 자료 · 교무업무 통합검색`;
-    if (!docs.length) {
+    if (!own.length && !com.length) {
       $('homeHead').replaceChildren(h('h1', {}, `${name} 자료`));
       $('homeDocs').replaceChildren(h('div', { class: 'v-empty' }, `${name} 자료는 아직 준비 중입니다. 다른 학교급을 골라 보세요.`));
+      $('homeDocs').classList.remove('hidden');
       $('homeResults').replaceChildren(); $('docStats').replaceChildren(); $('typeChips').replaceChildren(); return;
     }
-    $('homeHead').replaceChildren(h('h1', {}, `${name} 자료 ${docs.length}건`), h('p', {}, '자료를 누르면 왼쪽 목차와 오른쪽 원문이 함께 열립니다. 위 검색창에서 모든 자료의 목차·서식·본문을 한꺼번에 찾을 수 있습니다.'));
-    const preps = [];
-    for (const d of docs) { try { preps.push(await loadDoc(d.id)); } catch (e) { /* 못 불러온 자료는 목록 정보만 */ } }
-    if (parseHash().doc || V.mode !== 'home') return;
-    const all = preps.flatMap(p => p.nodes);
-    const count = (list, f) => list.filter(f).length;
-    $('docStats').replaceChildren(...[[`${name} 자료`, docs.length + '건'], ['업무', count(all, x => x.k === 'task')], ['세부 항목', count(all, x => ['group', 'item', 'bullet'].includes(x.k))]]
-      .map(([a, b]) => h('span', { class: 'st' }, a, ' ', h('b', {}, b))));
-    renderChips(all);
+    $('homeHead').replaceChildren(
+      h('h1', {}, isCommon ? `공통 자료 ${com.length}건` : `${name} 자료 ${own.length}건` + (com.length ? ` · 공통 자료 ${com.length}건` : '')),
+      h('p', {}, isCommon ? '모든 학교급에 해당하는 자료를 부서별로 모았습니다. 위 검색창에서 모든 공통 자료의 목차·서식을 한꺼번에 찾을 수 있습니다.'
+        : `${name} 자료 아래에 모든 학교급에 해당하는 공통 자료를 부서별로 함께 보여 줍니다. 위 검색창은 ${name} 자료와 공통 자료를 함께 찾습니다.`));
+    // 검색하면 3단 화면으로: 찾은 항목이 가장 많은 자료를 열고 가운데에 검색 결과를 보여 준다
     if (V.q || V.t) {
-      // 검색하면 3단 화면으로: 찾은 항목이 가장 많은 자료를 열고 가운데에 검색 결과를 보여 준다
-      const res = buildResults(preps, V.q, V.t, true);
-      const best = Object.entries(res.byDoc).sort((a, b) => b[1] - a[1])[0];
-      if (res.total && best) { location.replace(hashFor({ slug: r.slug, doc: best[0], q: V.q, t: V.t })); return; }
       $('homeDocs').classList.add('hidden');
+      $('homeResults').innerHTML = '<div class="v-empty"><span class="spinner"></span> 찾는 중…</div>';
+      const preps = await loadMany(V.all);
+      if (parseHash().doc || V.mode !== 'home' || !(V.q || V.t)) return;
+      const res = buildResults(preps, V.q, V.t, true);
+      const best = Object.entries(res.byDoc).sort((a, b) => b[1] - a[1] || (isCommonDoc(a[0]) - isCommonDoc(b[0])))[0];
+      if (res.total && best && best[1]) { location.replace(hashFor({ slug: r.slug, doc: best[0], q: V.q, t: V.t })); return; }
       $('homeResults').innerHTML = res.head + res.body;
       return;
     }
+    // 이 학교급 자료는 카드에 목차 요약을 보여 주려고 미리 불러온다(공통 자료는 목록 정보만)
+    const preps = await loadMany(own);
+    if (parseHash().doc || V.mode !== 'home' || V.q || V.t) return;
+    const all = preps.flatMap(p => p.nodes);
+    const count = (list, f) => list.filter(f).length;
+    $('docStats').replaceChildren(...[
+      !isCommon ? [`${name} 자료`, own.length + '건'] : null,
+      com.length ? ['공통 자료', com.length + '건'] : null,
+      all.length ? ['업무', count(all, x => x.k === 'task')] : null,
+      all.length ? ['세부 항목', count(all, x => ['group', 'item', 'bullet'].includes(x.k))] : null
+    ].filter(Boolean).map(([a, b]) => h('span', { class: 'st' }, a, ' ', h('b', {}, b))));
+    renderChips(all);
     $('homeDocs').classList.remove('hidden');
     $('homeResults').replaceChildren();
-    $('homeDocs').replaceChildren(...docs.map(d => {
-      const p = preps.find(x => x.id === d.id);
-      const n = p ? p.nodes : [];
-      const chs = n.filter(x => x.k === 'ch').map(x => x.t).slice(0, 6);
-      const raw = p ? p.raw : {};
-      return h('a', { class: 'lv-doc', href: hashFor({ slug: r.slug, doc: d.id }) },
-        h('div', { class: 'lv-doc-top' }, h('span', { class: 'lv-fmt' }, (d.f || '').toUpperCase()), d.c ? h('span', { class: 'lv-cat' }, d.c) : null),
-        h('h2', {}, d.t),
-        h('div', { class: 'lv-meta' }, [d.y ? d.y + '년' : '', d.f === 'pdf' && d.n ? d.n + '쪽' : '', raw.origin && raw.origin.site ? '출처 ' + raw.origin.site : ''].filter(Boolean).join(' · ')),
-        n.length ? h('div', { class: 'lv-counts' }, ...[['업무', count(n, x => x.k === 'task')], ['서식', count(n, x => x.ty === '서식')], ['참고', count(n, x => x.ty === '참고')], ['법령', count(n, x => x.ty === '법령')]]
-          .filter(([, v]) => v).map(([a, v]) => h('span', {}, a, ' ', h('b', {}, v)))) : null,
-        chs.length ? h('div', { class: 'lv-chs' }, ...chs.map(c => h('span', {}, c))) : null,
-        h('span', { class: 'lv-open' }, '목차와 원문 보기 →'));
-    }));
+    const parts = [];
+    if (!isCommon) {
+      parts.push(h('div', { class: 'lv-sec' }, h('h2', {}, `${name} 자료`, h('i', {}, own.length + '건'))));
+      parts.push(own.length ? h('div', { class: 'lv-docs' }, ...own.map(d => docCard(r.slug, d, preps.find(x => x.id === d.id))))
+        : h('div', { class: 'v-empty lv-none' }, `${name} 자료는 아직 준비 중입니다. 아래 공통 자료를 확인해 보세요.`));
+    }
+    if (com.length) {
+      const groups = byDept(com);
+      const open = isCommon ? com.length <= 40 : com.length <= 12;   // 적으면 펼쳐 두고, 많으면 부서 이름만
+      parts.push(h('div', { class: 'lv-sec' + (isCommon ? ' first' : '') },
+        isCommon ? null : h('h2', {}, '공통 자료', h('i', {}, com.length + '건'), h('span', { class: 'lv-tag' }, '모든 학교급')),
+        h('p', {}, `부서별로 묶었습니다(가나다순). 자료가 1~${SAS.OTHER_DEPT_MAX}건인 부서는 「${SAS.OTHER_DEPT}」에 모았습니다.`),
+        groups.length > 1 ? h('div', { class: 'lv-tools' },
+          h('button', { type: 'button', class: 'small', onclick: () => document.querySelectorAll('#homeDocs details.lv-dept').forEach(x => { x.open = true; }) }, '모두 펼치기'),
+          h('button', { type: 'button', class: 'small', onclick: () => document.querySelectorAll('#homeDocs details.lv-dept').forEach(x => { x.open = false; }) }, '모두 접기')) : null));
+      parts.push(h('div', { class: 'lv-depts' }, ...groups.map(([g, list]) => h('details', { class: 'lv-dept', open: open || groups.length === 1 },
+        h('summary', {}, h('b', {}, g), h('i', {}, list.length + '건')),
+        h('div', { class: 'lv-rows' }, ...list.map(d => h('a', { class: 'lv-row', href: hashFor({ slug: r.slug, doc: d.id }) },
+          h('b', {}, d.t),
+          h('span', {}, [d.y ? d.y + '년' : '', (d.f || '').toUpperCase(), d.f === 'pdf' && d.n ? d.n + '쪽' : '', g === SAS.OTHER_DEPT && d.dp ? d.dp : '', d.o ? '출처 ' + d.o : ''].filter(Boolean).join(' · ')))))))));
+    } else if (isCommon) parts.push(h('div', { class: 'v-empty' }, '공통 자료는 아직 준비 중입니다.'));
+    $('homeDocs').replaceChildren(...parts);
+  }
+  /** 이 학교급 자료 카드(목차 요약 포함) */
+  function docCard(slug, d, p) {
+    const n = p ? p.nodes : [];
+    const count = f => n.filter(f).length;
+    const chs = n.filter(x => x.k === 'ch').map(x => x.t).slice(0, 6);
+    const raw = p ? p.raw : {};
+    return h('a', { class: 'lv-doc', href: hashFor({ slug, doc: d.id }) },
+      h('div', { class: 'lv-doc-top' }, h('span', { class: 'lv-fmt' }, (d.f || '').toUpperCase()), d.c ? h('span', { class: 'lv-cat' }, d.c) : null),
+      h('h2', {}, d.t),
+      h('div', { class: 'lv-meta' }, [d.y ? d.y + '년' : '', d.f === 'pdf' && d.n ? d.n + '쪽' : '', raw.origin && raw.origin.site ? '출처 ' + raw.origin.site : ''].filter(Boolean).join(' · ')),
+      n.length ? h('div', { class: 'lv-counts' }, ...[['업무', count(x => x.k === 'task')], ['서식', count(x => x.ty === '서식')], ['참고', count(x => x.ty === '참고')], ['법령', count(x => x.ty === '법령')]]
+        .filter(([, v]) => v).map(([a, v]) => h('span', {}, a, ' ', h('b', {}, v)))) : null,
+      chs.length ? h('div', { class: 'lv-chs' }, ...chs.map(c => h('span', {}, c))) : null,
+      h('span', { class: 'lv-open' }, '목차와 원문 보기 →'));
   }
   // 첫 화면 검색 결과에서 고르면 그 자료의 그 위치로 연다
   $('homeResults').addEventListener('click', e => {
@@ -247,9 +328,16 @@
   }
 
   function renderDocList(activeId) {
-    const docs = (V.index && V.index.docs) || [];
-    $('docList').replaceChildren(...docs.map(d => h('a', { class: 'v-doc' + (d.id === activeId ? ' on' : ''), href: hashFor({ slug: V.slug, doc: d.id }), 'aria-current': d.id === activeId ? 'true' : null },
-      h('b', {}, d.t), h('span', {}, [d.y ? d.y + '년' : '', d.f === 'pdf' && d.n ? d.n + '쪽' : '', (d.f || '').toUpperCase(), d.f === 'pdf' && !d.p ? '쪽 보기 준비 중' : ''].filter(Boolean).join(' · ')))));
+    const item = d => h('a', { class: 'v-doc' + (d.id === activeId ? ' on' : ''), href: hashFor({ slug: V.slug, doc: d.id }), 'aria-current': d.id === activeId ? 'true' : null },
+      h('b', {}, d.t), h('span', {}, [d.y ? d.y + '년' : '', d.f === 'pdf' && d.n ? d.n + '쪽' : '', (d.f || '').toUpperCase(), d.f === 'pdf' && !d.p ? '쪽 보기 준비 중' : ''].filter(Boolean).join(' · ')));
+    const out = [];
+    if (V.slug !== COMMON) { out.push(h('div', { class: 'v-label' }, `${SAS.levelName(V.slug)} 자료 ${V.own.length}`)); out.push(...V.own.map(item)); }
+    if (V.com.length) {
+      out.push(h('div', { class: 'v-label v-label-com' }, `공통 자료 ${V.com.length}`));
+      byDept(V.com).forEach(([g, list]) => { out.push(h('div', { class: 'v-dept' }, g)); out.push(...list.map(item)); });
+    }
+    $('docList').replaceChildren(...out);
+    const on = $('docList').querySelector('.v-doc.on'); if (on) on.scrollIntoView({ block: 'nearest' });
   }
   /** 검색창 아래 줄: 이 자료의 업무·세부 항목 수와 출처 (서식·참고·법령·사이트 수는 옆의 종류 단추에) */
   function renderStats() {
@@ -322,7 +410,8 @@
       byDoc[p.id] = hits.length;
       if (!hits.length) return;
       total += hits.length;
-      if (showDocs || preps.length > 1) html += `<div class="doc-grp">${esc(p.title)}</div>`;
+      const m = V.meta.get(p.id);
+      if (showDocs || preps.length > 1) html += `<div class="doc-grp">${m && m._c && V.slug !== COMMON ? `<span class="lv-tag">공통 · ${esc(m._g)}</span> ` : ''}${esc(p.title)}</div>`;
       const taskOf = n => { let x = n; while (x && x.k !== 'task') x = p.by[x.p]; return x || n; };
       const rank = n => n.k === 'task' ? 0 : (lw.length && lw.every(w => SAS.norm(n.t).includes(w)) ? 1 : 2);
       const groups = new Map();
@@ -348,9 +437,8 @@
   async function renderResults() {
     const seq = ++searchSeq;
     $('tree').innerHTML = '<div class="v-empty"><span class="spinner"></span> 찾는 중…</div>';
-    // 같은 학교급의 모든 자료에서 찾는다
-    const preps = [];
-    for (const d of (V.index.docs || [])) { try { preps.push(await loadDoc(d.id)); } catch (e) { /* 못 불러온 자료는 건너뜀 */ } }
+    // 이 학교급 자료와 공통 자료에서 함께 찾는다
+    const preps = await loadMany(V.all);
     if (seq !== searchSeq || !(V.q || V.t)) return;
     const r = buildResults(preps, V.q, V.t, false);
     $('tree').innerHTML = r.head + r.body;
@@ -367,6 +455,7 @@
 
   function renderChips(nodes) {
     const cnt = t => (nodes || V.nodes).filter(n => n.ty === t).length;
+    if (!TYPES.some(cnt) && !V.t) { $('typeChips').replaceChildren(); return; }
     $('typeChips').replaceChildren(
       h('button', { type: 'button', 'aria-pressed': String(!V.t), onclick: () => setRoute({ t: '' }) }, '전체'),
       ...TYPES.filter(t => cnt(t)).map(t => h('button', { type: 'button', 'aria-pressed': String(V.t === t), onclick: () => setRoute({ t: V.t === t ? '' : t }) }, t, h('i', {}, cnt(t)))));
@@ -497,7 +586,7 @@
   }
   function crumb(n) {
     const a = n ? anc(n).filter(x => !['bullet', 'link'].includes(x.k)) : [];
-    $('crumb').replaceChildren(h('span', { class: 'src' }, SAS.levelName(V.slug) || ''),
+    $('crumb').replaceChildren(h('span', { class: 'src' + (V.doc && isCommonDoc(V.doc.id) ? ' com' : '') }, (V.doc ? srcName(V.doc.id) : SAS.levelName(V.slug)) || ''),
       ...(a.length ? a.flatMap((x, i) => [i ? h('span', { class: 'sep' }, '›') : null, i === a.length - 1 ? h('b', { title: x.t }, cut(x.t, 34)) : h('span', { title: x.t }, cut(x.t, 22))]).filter(Boolean) : [h('span', {}, V.doc ? V.doc.title : '')]));
   }
 

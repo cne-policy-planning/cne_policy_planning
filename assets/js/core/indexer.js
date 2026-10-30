@@ -2,7 +2,7 @@
  * 공개 사이트용 데이터 파일 생성과 일관성 검사
  *
  * 생성 파일(모두 data/ 아래):
- *   manifest.json                 생성 시각, 학교급별 개수, 조각 수
+ *   manifest.json                 생성 시각, 학교급별 개수, 부서별 개수(기타 부서 묶음 판단용), 조각 수
  *   documents.json                전체 자료 목록과 메타데이터
  *   documents/<id>.json           자료별 상세(본문 블록·업무·서식 링크)
  *   indexes/<slug>.json           학교급별 목록 색인(업무명·검색어·서식명·업무 시작 문장)
@@ -22,7 +22,7 @@
 
   function docSummary(d) {
     return {
-      id: d.id, title: d.title, school_levels: d.school_levels, category: d.category, year: d.year,
+      id: d.id, title: d.title, school_levels: d.school_levels, category: d.category, department: d.department || '', year: d.year,
       format: d.format, kind: d.kind, works_url: d.works_url, origin: d.origin,
       search_keywords: d.search_keywords, forms_bundle_url: (d.forms_bundle && d.forms_bundle.works_url) || '', section_count: (d.sections || []).length,
       form_count: N.formList(d).length, updated_at: d.updated_at,
@@ -49,7 +49,7 @@
     const index = { schema_version: N.SCHEMA_VERSION, level: level.name, slug: level.slug, generated_at: generatedAt, shard_count: shardCount, sec_base: SEC_BASE, docs: [], sections: [] };
     const shards = Array.from({ length: shardCount }, () => new Map());
     list.forEach((d, di) => {
-      index.docs.push({ id: d.id, t: d.title, c: d.category, y: d.year, f: d.format, w: d.works_url || '', fb: (d.forms_bundle && d.forms_bundle.works_url) || '', o: (d.origin && d.origin.site) || '', k: d.search_keywords || [], p: d.pdf ? d.pdf.path : '', n: (d.blocks || []).length });
+      index.docs.push({ id: d.id, t: d.title, c: d.category, dp: d.department || '', y: d.year, f: d.format, w: d.works_url || '', fb: (d.forms_bundle && d.forms_bundle.works_url) || '', o: (d.origin && d.origin.site) || '', k: d.search_keywords || [], p: d.pdf ? d.pdf.path : '', n: (d.blocks || []).length });
       (d.sections || []).forEach((s, si) => {
         if (si >= SEC_BASE) throw new Error(`${d.title}: 업무가 ${SEC_BASE}개를 넘습니다.`);
         const files = (d.links || []).filter(l => l.section_id === s.id && l.kind === 'file').length;
@@ -89,7 +89,10 @@
     files.set('data/documents.json', JSON.stringify({ schema_version: N.SCHEMA_VERSION, generated_at: generatedAt, count: sorted.length, documents: sorted.map(docSummary) }, null, 1));
     for (const d of sorted) files.set(`data/documents/${d.id}.json`, JSON.stringify(d));
 
-    const manifest = { schema_version: N.SCHEMA_VERSION, generated_at: generatedAt, shard_count: shardCount, document_count: sorted.length, levels: {} };
+    // 부서별 전체 자료 수: 사용자 화면이 1~2건인 부서를 '기타 부서'로 묶을 때 쓴다
+    const departments = {};
+    sorted.forEach(d => { const k = d.department || ''; if (k) departments[k] = (departments[k] || 0) + 1; });
+    const manifest = { schema_version: N.SCHEMA_VERSION, generated_at: generatedAt, shard_count: shardCount, document_count: sorted.length, levels: {}, departments };
     const stats = { levels: {} };
     for (const level of N.LEVELS) {
       const r = buildLevel(sorted, level, shardCount, generatedAt);

@@ -15,16 +15,48 @@
     { name: '유아', slug: 'kindergarten' },
     { name: '초등', slug: 'elementary' },
     { name: '중등', slug: 'middle' },
-    { name: '특수', slug: 'special' }
+    { name: '특수', slug: 'special' },
+    // 공통: 모든 학교급에 해당하는 자료. 다른 학교급과 함께 고르지 않는다.
+    // 사용자 화면에서 각 학교급을 누르면 그 학교급 자료 아래에 공통 자료가 함께 나온다.
+    { name: '공통', slug: 'common' }
   ];
+  const COMMON_LEVEL = '공통';
   const TEXT_FORMATS = ['pdf', 'hwpx'];
-  const ORIGIN_SITES = ['학교업무자료실', '부서별자료실', '학교업무최적화자료실'];
+  const ORIGIN_SITES = ['학교업무자료실', '기본계획나눔방', '부서별자료실', '학교업무최적화자료실'];
+  // 부서(자료를 만든 도교육청 부서). 관리자 도구 드롭다운에 이 순서(가나다순)로 나옵니다.
+  // 조직개편으로 이름이 바뀌면 이 목록만 고치면 됩니다. 목록에 없는 기존 값은 "목록에 없음"으로 표시됩니다.
+  // 학교업무자료실의 교무학사 도움자료는 부서 대신 '교무학사 공통자료'로 묶습니다.
+  const ACADEMIC_COMMON = '교무학사 공통자료';
+  const OTHER_DEPT = '기타 부서';
+  const OTHER_DEPT_MAX = 2;   // 전체 자료가 이 수 이하인 부서는 사용자 화면에서 '기타 부서'로 묶는다
+  const DEPARTMENTS = [ACADEMIC_COMMON, '감사관', '교원인사과', '교육과정평가지원부', '미래인재과', '미래학교추진단', '민주시민교육과', '소통담당관',
+    '안전총괄과', '예산과', '유아교육복지과', '재무과', '정책기획과', '중등교육과', '진로융합부', '체육건강과', '초등특수교육과', '총무과', '학교지원과']
+    .sort((a, b) => a.localeCompare(b, 'ko'));
   // 업무 분류(고정 목록). 관리자 도구의 드롭다운과 사용자 화면에서 이 순서대로 씁니다.
   // 바꿀 때는 이 목록만 고치면 됩니다. 이미 등록된 자료의 분류가 목록에 없으면 "목록에 없음"으로 표시됩니다.
   const CATEGORIES = ['교무학사실무'];
 
   function levelSlug(name) { const l = LEVELS.find(x => x.name === name); return l ? l.slug : null; }
   function levelName(slug) { const l = LEVELS.find(x => x.slug === slug); return l ? l.name : null; }
+  /** 학교급 정리: 목록에 있는 값만, 공통은 다른 학교급과 함께 쓰지 않는다(공통이 있으면 공통만) */
+  function cleanLevels(list) {
+    const v = [...new Set((list || []).filter(levelSlug))];
+    return v.includes(COMMON_LEVEL) ? [COMMON_LEVEL] : LEVELS.map(l => l.name).filter(n => v.includes(n));
+  }
+  /** 원 출처로 짐작한 부서(학교업무자료실 → 교무학사 공통자료) */
+  function defaultDepartment(meta) {
+    return meta && meta.origin && meta.origin.site === '학교업무자료실' ? ACADEMIC_COMMON : '';
+  }
+  /**
+   * 사용자 화면에서 묶을 부서 이름. counts = 전체 자료의 부서별 건수.
+   * 부서가 비었거나 전체 자료가 OTHER_DEPT_MAX건 이하이면 '기타 부서'.
+   */
+  function deptGroup(dept, counts) {
+    const d = String(dept || '').trim();
+    if (!d) return OTHER_DEPT;
+    if (d === ACADEMIC_COMMON) return d;
+    return counts && (counts[d] || 0) > OTHER_DEPT_MAX ? d : OTHER_DEPT;
+  }
 
   function formatOf(filename) {
     const m = String(filename || '').toLowerCase().match(/\.([a-z0-9]{2,5})$/);
@@ -58,8 +90,9 @@
       schema_version: SCHEMA_VERSION,
       id: meta.id || newDocId(existingIds, meta.year),
       title: (meta.title || titleFromFilename(meta.filename) || '제목 없음').trim(),
-      school_levels: (meta.school_levels || []).filter(levelSlug),
+      school_levels: cleanLevels(meta.school_levels),
       category: (meta.category || '').trim(),
+      department: (meta.department || defaultDepartment(meta) || '').trim(),
       year: meta.year ? Number(meta.year) : null,
       format,
       kind: kindOf(format),
@@ -206,6 +239,8 @@
 
   /** 저장 전 정리: 작업용 필드 제거, 섹션 쪽수 계산 */
   function finalizeDocument(doc) {
+    // 예전 자료(부서 칸이 생기기 전)는 원 출처로 부서를 채운다
+    if (doc.department == null) doc.department = defaultDepartment(doc);
     doc.blocks = (doc.blocks || []).map(b => {
       const o = { n: b.n, pdf_page: b.pdf_page, printed_page: b.printed_page, footer_label: b.footer_label || '', text: b.text };
       if (b.w) { o.w = b.w; o.h = b.h; }
@@ -264,7 +299,7 @@
       } else {
         blocks = pages.flatMap(p => N.clean(p.text).split('\n').filter(Boolean).map(t => ({ pdf_page: null, printed_page: null, text: t })));
       }
-      const levels = d.school_level === '공통' ? LEVELS.map(l => l.name) : [d.school_level].filter(Boolean);
+      const levels = [d.school_level].filter(Boolean);
       const year = (String(d.title || '').match(/(20\d{2})/) || [])[1];
       const doc = createDocument({
         title: titleFromFilename(d.title || d.filename),
@@ -297,6 +332,8 @@
     if (!doc.id || !/^doc-[a-z0-9-]+$/.test(doc.id)) errors.push('문서 ID 형식 오류');
     if (!doc.title) errors.push('자료명이 비어 있습니다');
     if (!doc.school_levels || !doc.school_levels.length) errors.push('학교급이 선택되지 않았습니다');
+    else if (doc.school_levels.includes(COMMON_LEVEL) && doc.school_levels.length > 1) errors.push('공통은 다른 학교급과 함께 고를 수 없습니다(공통만 고르거나 해당 학교급만 고르세요)');
+    if (!doc.department && (doc.school_levels || []).includes(COMMON_LEVEL)) warnings.push('부서가 비어 있습니다. 사용자 화면에서 「기타 부서」로 묶입니다');
     if (doc.works_url && !/^https?:\/\//i.test(doc.works_url)) errors.push('원본 내려받기 링크가 http(s)로 시작하지 않습니다');
     if (doc.format === 'pdf' && !doc.pdf) warnings.push('원본 PDF가 사이트에 없습니다. 「파일 교체」로 PDF를 다시 넣으면 쪽 보기가 됩니다');
     if (doc.pdf && !/^pdf\/[a-z0-9-]+\.pdf$/.test(doc.pdf.path || '')) errors.push('원본 PDF 경로 형식 오류');
@@ -358,5 +395,5 @@
     doc.outline.nodes.forEach(n => { if (n.k === 'task' && n.s && byId.has(n.s)) n.t = byId.get(n.s).heading; });
   }
 
-  return { setLinkUrl, setLinkInfo, carryLinkEdits, syncOutline, SCHEMA_VERSION, LEVELS, TEXT_FORMATS, ORIGIN_SITES, CATEGORIES, levelSlug, levelName, formatOf, kindOf, newDocId, titleFromFilename, createDocument, finalizeDocument, carryKeywords, carryForms, numberForms, addManualForms, removeManualForm, formList, matchBundle, migrateV1, validateDocument };
+  return { COMMON_LEVEL, ACADEMIC_COMMON, OTHER_DEPT, OTHER_DEPT_MAX, DEPARTMENTS, cleanLevels, defaultDepartment, deptGroup, setLinkUrl, setLinkInfo, carryLinkEdits, syncOutline, SCHEMA_VERSION, LEVELS, TEXT_FORMATS, ORIGIN_SITES, CATEGORIES, levelSlug, levelName, formatOf, kindOf, newDocId, titleFromFilename, createDocument, finalizeDocument, carryKeywords, carryForms, numberForms, addManualForms, removeManualForm, formList, matchBundle, migrateV1, validateDocument };
 });

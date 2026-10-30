@@ -197,6 +197,33 @@ test('정규화: 공백·가운뎃점·대소문자 무시', () => eq(SAS.norm('
 test('강조: 띄어쓰기가 달라도 찾음', () => ok(SAS.highlight('현장 체험학습 운영', '현장체험학습').includes('<mark>현장 체험학습</mark>')));
 test('강조 시 HTML 이스케이프', () => ok(!SAS.highlight('<script>소풍</script>', '소풍').includes('<script>')));
 
+console.log('\n[7-1] 공통 학교급 · 부서');
+test('학교급 정리: 공통은 다른 학교급과 함께 쓰지 않음', () => { eq(SAS.cleanLevels(['초등', '공통', '유아']), ['공통']); eq(SAS.cleanLevels(['중등', '유아', '없음', '유아']), ['유아', '중등']); });
+test('공통 + 다른 학교급은 검사 오류', () => { const d = JSON.parse(JSON.stringify(doc)); d.school_levels = ['공통', '초등']; ok(SAS.validateDocument(d).errors.some(e => e.includes('공통'))); });
+test('학교업무자료실 자료의 부서 = 교무학사 공통자료', () => { eq(SAS.defaultDepartment({ origin: { site: '학교업무자료실' } }), '교무학사 공통자료'); eq(SAS.defaultDepartment({ origin: { site: '기본계획나눔방' } }), ''); });
+test('부서 묶음: 1~2건 부서·빈 부서 → 기타 부서', () => { const c = { 민주시민교육과: 37, 소통담당관: 1, 재무과: 2, 감사관: 3 }; eq(['민주시민교육과', '소통담당관', '재무과', '감사관', ''].map(d => SAS.deptGroup(d, c)), ['민주시민교육과', '기타 부서', '기타 부서', '감사관', '기타 부서']); eq(SAS.deptGroup('교무학사 공통자료', {}), '교무학사 공통자료'); });
+test('부서 목록은 가나다순', () => eq(SAS.DEPARTMENTS, SAS.DEPARTMENTS.slice().sort((a, b) => a.localeCompare(b, 'ko'))));
+test('공통 색인·부서별 개수 생성, 예전 자료는 원 출처로 부서 채움', () => {
+  const a = JSON.parse(JSON.stringify(doc)); a.id = 'doc-2026-aaaaaa'; a.origin = { site: '학교업무자료실' }; delete a.department;
+  const b = JSON.parse(JSON.stringify(doc)); b.id = 'doc-2026-bbbbbb'; b.school_levels = ['공통']; b.department = '정책기획과';
+  const out = SAS.buildOutputs([a, b]);
+  const com = JSON.parse(out.files.get('data/indexes/common.json'));
+  eq(com.docs.map(d => [d.id, d.dp]), [['doc-2026-bbbbbb', '정책기획과']]);
+  eq(JSON.parse(out.files.get('data/indexes/kindergarten.json')).docs[0].dp, '교무학사 공통자료');
+  eq(out.manifest.departments, { '교무학사 공통자료': 1, 정책기획과: 1 });
+  eq(out.manifest.levels.common.documents, 1);
+  ok(SAS.checkConsistency([a, b], out).ok);
+});
+
+test('일괄 등록: 공통·부서 폴더 이름으로 짐작', () => {
+  const g = SAS.guessMeta('2026 자료/공통/민주시민교육과/2026 충남 인성교육시행계획.pdf');
+  eq(g.levels, ['공통']); eq(g.department, '민주시민교육과');
+  eq(SAS.guessMeta('공통/초등/2026 교무학사 도움자료.pdf').levels, ['초등'], '안쪽 폴더 우선');
+  eq(SAS.guessMeta('공통교육과정/2026 계획.pdf').levels, [], '"공통교육과정"은 공통이 아님');
+  eq(SAS.guessMeta('자료_분류/공통/초등특수교육과/2026 한자교육 기본계획.hwp').levels, ['공통'], '부서 폴더 이름의 학교급 낱말은 무시');
+  eq(SAS.guessMeta('자료_분류/공통/유아교육복지과/2026 교육복지 계획.pdf').department, '유아교육복지과');
+});
+
 console.log('\n[8] 사용자 검색 엔진');
 const SS = require(path.join(__dirname, '..', 'assets', 'js', 'site', 'search.js'));
 const fetchOut = async p => { const t = out.files.get(p); if (t == null) throw new Error('없음 ' + p); return JSON.parse(t); };

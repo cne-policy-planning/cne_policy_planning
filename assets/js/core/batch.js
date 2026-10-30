@@ -16,7 +16,9 @@
     { name: '유아', re: /유치원|유아|병설유/ },
     { name: '초등', re: /초등|초교/ },
     { name: '중등', re: /중등|중학|고등|중고/ },
-    { name: '특수', re: /특수/ }
+    { name: '특수', re: /특수/ },
+    // 공통: 폴더(또는 파일) 이름 전체가 '공통'·'공통자료'·'학교급공통'·'전학교급'일 때만 (예: "공통교육과정"은 아님)
+    { name: '공통', re: /^(공통|공통자료|학교급공통|전학교급)$/ }
   ];
   // 등록하지 않는 파일: 숨김·임시·시스템 파일
   const IGNORE_FILE = /^(\.|~\$|thumbs\.db$|desktop\.ini$)/i;
@@ -39,13 +41,17 @@
     const t = nfc(text).replace(/\s+/g, '');
     // "유·초 이음"처럼 두 학교급이 이어진 업무 이름은 학교급 표시가 아니다
     const cleaned = t.replace(/유[·ㆍ.\-]?초(이음|연계)/g, '');
-    return LEVEL_WORDS.filter(w => w.re.test(cleaned)).map(w => w.name);
+    const found = LEVEL_WORDS.filter(w => w.re.test(cleaned)).map(w => w.name);
+    return N.cleanLevels ? N.cleanLevels(found) : found;   // 공통은 다른 학교급과 함께 쓰지 않는다
   }
 
   /** 학교급 짐작: 가장 안쪽 폴더부터 바깥으로, 없으면 파일 이름 */
   function guessLevels(path) {
     const folders = folderParts(path);
+    // 부서 이름 폴더(초등특수교육과·유아교육복지과·중등교육과 등)는 학교급 낱말이 들어 있어도 학교급으로 보지 않는다
+    const depts = new Set((N.DEPARTMENTS || []).map(N.norm));
     for (let i = folders.length - 1; i >= 0; i--) {
+      if (depts.has(N.norm(folders[i]))) continue;
       const lv = levelsIn(folders[i]);
       if (lv.length) return { levels: lv, from: 'folder', where: folders[i] };
     }
@@ -76,7 +82,8 @@
       levels: lv.levels, levelsFrom: lv.from, levelsWhere: lv.where,
       year: guessYear(path),
       category: folderMatch(path, N.CATEGORIES),
-      originSite: folderMatch(path, N.ORIGIN_SITES)
+      originSite: folderMatch(path, N.ORIGIN_SITES),
+      department: folderMatch(path, N.DEPARTMENTS)   // 부서 이름 폴더(예: 민주시민교육과/…)
     };
   }
 
