@@ -392,45 +392,199 @@
   $('regCategory').replaceChildren(...categoryOptions(''));
   $('regYear').value = new Date().getFullYear();
 
+  // 대기 목록: 파일·폴더를 넣으면 폴더·파일 이름으로 학교급·연도·분류를 짐작하고,
+  // 기존 자료와 이름이 같거나 비슷하면 「교체」를 기본으로 정한다(같은 자료 ID·주소 유지).
   let queue = [];
   let qSeq = 0;
+  let stopReq = false, analyzing = false;
   const drop = $('drop');
-  drop.onclick = () => $('fileInput').click();
+  drop.onclick = e => { if (e.target.closest('button,label,input')) return; $('fileInput').click(); };
   drop.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('fileInput').click(); } };
   drop.ondragover = e => { e.preventDefault(); drop.classList.add('drag'); };
   drop.ondragleave = () => drop.classList.remove('drag');
-  drop.ondrop = e => { e.preventDefault(); drop.classList.remove('drag'); enqueue(e.dataTransfer.files); };
-  $('fileInput').onchange = e => { enqueue(e.target.files); e.target.value = ''; };
+  drop.ondrop = async e => {
+    e.preventDefault(); drop.classList.remove('drag');
+    try { enqueue(await droppedFiles(e.dataTransfer)); } catch (err) { toast('파일을 읽지 못했습니다: ' + err.message, 5000); }
+  };
+  $('fileInput').onchange = e => { enqueue([...e.target.files].map(f => ({ file: f, path: f.name }))); e.target.value = ''; };
+  $('folderInput').onchange = e => { enqueue([...e.target.files].map(f => ({ file: f, path: f.webkitRelativePath || f.name }))); e.target.value = ''; };
+  $('btnPickFiles').onclick = () => $('fileInput').click();
+  $('btnPickFolder').onclick = () => $('folderInput').click();
 
-  function enqueue(files) {
-    for (const f of files) {
-      if (queue.some(q => q.file.name === f.name && q.file.size === f.size)) continue;
-      queue.push({ key: ++qSeq, file: f, title: SAS.titleFromFilename(f.name), works: '', status: 'pending', message: '', doc: null });
+  /** 끌어다 놓은 파일·폴더(하위 폴더 포함)를 [{file, path}]로 */
+  async function droppedFiles(dt) {
+    const items = [...(dt.items || [])].map(i => i.webkitGetAsEntry && i.webkitGetAsEntry()).filter(Boolean);
+    if (!items.length) return [...dt.files].map(f => ({ file: f, path: f.name }));
+    const out = [];
+    const fileOf = entry => new Promise((res, rej) => entry.file(res, rej));
+    const readAll = reader => new Promise((res, rej) => {
+      const acc = [];
+      const step = () => reader.readEntries(batch => { if (!batch.length) res(acc); else { acc.push(...batch); step(); } }, rej);
+      step();
+    });
+    async function walk(entry, prefix) {
+      if (entry.isFile) out.push({ file: await fileOf(entry), path: prefix + entry.name });
+      else if (entry.isDirectory) for (const c of await readAll(entry.createReader())) await walk(c, prefix + entry.name + '/');
     }
-    renderQueue();
+    for (const it of items) await walk(it, '');
+    return out;
+  }
+
+  function enqueue(list) {
+    let added = 0, ignored = 0;
+    list = [...list].sort((a, b) => a.path.localeCompare(b.path, 'ko'));
+    for (const { file, path } of list) {
+      if (SAS.shouldIgnore(path, file.size)) { ignored++; continue; }
+      if (queue.some(q => q.path === path && q.file.size === file.size)) continue;
+      const g = SAS.guessMeta(path);
+      queue.push({
+        key: ++qSeq, file, path, filename: file.name, size: file.size, format: SAS.formatOf(file.name),
+        title: SAS.titleFromFilename(file.name), titleEdited: false, works: '',
+        levels: g.levels, levelsFrom: g.levelsFrom, year: g.year, category: g.category, originSite: g.originSite,
+        action: 'add', targetId: null, actionSet: false, note: '', match: null,
+        status: 'pending', message: '', doc: null, blocks: null
+      });
+      added++;
+    }
+    replan(); renderQueue();
+    if (added || ignored) $('queueMsg').textContent = `${added}개 파일을 넣었습니다${ignored ? ` (숨김·임시·빈 파일 ${ignored}개 제외)` : ''}. 처리 방법을 확인한 뒤 「분석 시작」을 누르세요.`;
+  }
+
+  // 행마다의 값이 비어 있으면 공통 정보를 쓴다
+  const rowLevels = q => q.levels.length ? q.levels : checkedLevels($('regLevels'));
+  const rowYear = q => q.year || Number($('regYear').value) || null;
+  const rowCategory = q => q.category || $('regCategory').value.trim();
+  const rowOrigin = q => ({ site: q.originSite || $('regOriginSite').value, url: q.originSite ? '' : $('regOriginUrl').value.trim(), note: '' });
+  const targetOf = q => q.action === 'replace' && q.targetId ? S.getDoc(q.targetId) : null;
+  /** 교체할 때는 기존 자료명의 연도만 새 연도로 바꿔 쓴다(직접 고친 이름은 그대로) */
+  function rowTitle(q) {
+    const t = targetOf(q);
+    if (t && !q.titleEdited) return SAS.renewTitle(t.title, t.year, rowYear(q));
+    return q.title.trim() || SAS.titleFromFilename(q.filename);
+  }
+
+  function replan() {
+    // 짝 맞추기에는 폴더·파일 이름에서 찾았거나 직접 고른 학교급만 쓴다(공통 정보로 짐작이 빗나가지 않게)
+    SAS.planBatch(queue, S.state.docs);
+  }
+
+  const ACTION_LABEL = { add: '새 자료', replace: '덮어쓰기', skip: '건너뜀' };
+
+  function actionCell(q) {
+    const sel = h('select', { class: 'act-sel' });
+    sel.append(h('option', { value: 'add', selected: q.action === 'add' }, '새 자료로 추가'));
+    const ranked = SAS.rankDocs({ filename: q.filename, title: q.title }, S.state.docs);
+    const shown = ranked.filter(r => r.score >= 0.4).slice(0, 6).map(r => r.doc);
+    const cur = targetOf(q);
+    if (cur && !shown.includes(cur)) shown.unshift(cur);
+    if (S.state.docs.length) {
+      const grp = h('optgroup', { label: '기존 자료 덮어쓰기 (같은 ID·주소 유지)' });
+      shown.forEach(d => grp.append(h('option', { value: 'replace:' + d.id, selected: q.action === 'replace' && q.targetId === d.id }, `덮어쓰기: ${d.title}${d.year ? ` (${d.year})` : ''}`)));
+      grp.append(h('option', { value: 'pick' }, '다른 자료 고르기…'));
+      sel.append(grp);
+    }
+    sel.append(h('option', { value: 'skip', selected: q.action === 'skip' }, '건너뛰기'));
+    sel.onchange = async () => {
+      let v = sel.value;
+      if (v === 'pick') { const d = await pickDocDialog(q); v = d ? 'replace:' + d.id : null; }
+      if (v) {
+        q.actionSet = true;
+        if (v.startsWith('replace:')) { q.action = 'replace'; q.targetId = v.slice(8); } else { q.action = v; q.targetId = null; }
+        if (q.status === 'done' || q.status === 'error') q.status = q.blocks ? 'done' : 'pending';
+      }
+      replan(); renderQueue();
+    };
+    const t = targetOf(q);
+    return h('td', {}, sel,
+      t ? h('div', { class: 'small muted' }, `기존 자료「${t.title}」를 덮어씁니다. 고친 링크·검색어는 이어받습니다.`) : null,
+      q.note ? h('div', { class: 'small ' + (q.match && q.match.how === 'similar' ? 'warn-text' : 'muted') }, q.note) : null);
+  }
+
+  async function pickDocDialog(q) {
+    const input = h('input', { type: 'search', placeholder: '자료명 검색' });
+    const list = h('div', { class: 'pick-list' });
+    let chosen = null;
+    const draw = () => {
+      const k = SAS.norm(input.value);
+      const docs = SAS.rankDocs({ filename: q.filename, title: q.title }, S.state.docs).map(r => r.doc)
+        .filter(d => !k || SAS.norm(d.title).includes(k));
+      list.replaceChildren(...docs.slice(0, 50).map(d => h('button', { class: 'pick-item', onclick: () => { chosen = d; $('modal').classList.add('hidden'); done(); } },
+        h('b', {}, d.title), h('span', { class: 'small muted' }, ` ${d.year || ''} · ${(d.school_levels || []).join('·')} · ${d.filename || ''}`))));
+    };
+    let done;
+    const p = new Promise(r => { done = r; });
+    input.oninput = draw; draw();
+    $('modalBody').replaceChildren(h('div', {}, h('h2', {}, '덮어쓸 기존 자료 고르기'), h('p', { class: 'small muted' }, q.filename), input, list,
+      h('div', { class: 'actions' }, h('button', { onclick: () => { $('modal').classList.add('hidden'); done(); } }, '취소'))));
+    $('modal').classList.remove('hidden'); input.focus();
+    await p; return chosen;
+  }
+
+  function metaCell(q) {
+    const chips = h('div', { class: 'checks mini' }, ...SAS.LEVELS.map(l => {
+      const cb = h('input', { type: 'checkbox', value: l.name, checked: q.levels.includes(l.name), onchange: () => {
+        q.levels = [...chips.querySelectorAll('input:checked')].map(i => i.value); q.levelsFrom = 'manual';
+        replan(); renderQueue();
+      } });
+      return h('label', {}, cb, l.name);
+    }));
+    const common = checkedLevels($('regLevels'));
+    const lvNote = q.levels.length
+      ? (q.levelsFrom === 'folder' ? '폴더 이름에서 찾음' : q.levelsFrom === 'file' ? '파일 이름에서 찾음' : '')
+      : (common.length ? `공통 정보 사용: ${common.join('·')}` : '학교급을 골라 주세요');
+    const cat = h('select', { onchange: e => { q.category = e.target.value; } }, ...categoryOptions(q.category));
+    const tq = targetOf(q);
+    cat.options[0].textContent = tq && tq.category ? `기존: ${tq.category}` : $('regCategory').value ? `공통: ${$('regCategory').value}` : '분류 선택';
+    const year = h('input', { type: 'number', class: 'num', min: 2000, max: 2100, value: q.year || '', placeholder: $('regYear').value || '연도',
+      onchange: e => { q.year = Number(e.target.value) || null; renderQueue(); } });
+    return h('td', { class: 'meta-cell' }, chips,
+      h('div', { class: 'small ' + (q.levels.length || common.length ? 'muted' : 'warn-text') }, lvNote),
+      h('div', { class: 'row small-gap' }, cat, year),
+      q.originSite ? h('div', { class: 'small muted' }, `원 출처: ${q.originSite} (폴더 이름)`) : null);
   }
 
   function renderQueue() {
     $('queueWrap').classList.toggle('hidden', !queue.length);
     const tbody = $('queueTable').querySelector('tbody');
     tbody.replaceChildren(...queue.map(q => {
-      const fmt = SAS.formatOf(q.file.name), kind = SAS.kindOf(fmt);
+      const kind = SAS.kindOf(q.format);
       const statusCell = h('td');
-      if (q.status === 'pending') statusCell.append(h('span', { class: 'tag gray' }, kind === 'text' ? '분석 대기' : '링크형'));
+      if (q.action === 'skip') statusCell.append(h('span', { class: 'tag gray' }, '건너뜀'));
+      else if (q.status === 'pending') statusCell.append(h('span', { class: 'tag gray' }, kind === 'text' ? '분석 대기' : '링크형'));
       else if (q.status === 'working') statusCell.append(h('span', { class: 'tag' }, '분석 중 ' + (q.progress || '')));
       else if (q.status === 'error') statusCell.append(h('span', { class: 'tag err' }, '실패'), h('div', { class: 'small' }, q.message));
       else statusCell.append(...summaryOf(q.doc), q.message ? h('div', { class: 'small muted' }, q.message) : '');
-      return h('tr', {},
-        h('td', {}, h('div', { class: 'fname' }, q.file.name), h('div', { class: 'small muted' }, fmt.toUpperCase() + ' · ' + fmtBytes(q.file.size))),
-        h('td', {}, h('input', { type: 'text', value: q.title, oninput: e => { q.title = e.target.value; if (q.doc) q.doc.title = q.title; } })),
-        h('td', {}, h('input', { type: 'url', value: q.works, placeholder: '비우면 사이트의 PDF', oninput: e => { q.works = e.target.value.trim(); if (q.doc) q.doc.works_url = q.works; } })),
+      const folder = q.path.includes('/') ? q.path.slice(0, q.path.lastIndexOf('/')) : '';
+      const t = targetOf(q);
+      const titleInput = h('input', { type: 'text', value: rowTitle(q), oninput: e => { q.title = e.target.value; q.titleEdited = true; } });
+      return h('tr', { class: 'act-' + q.action },
+        h('td', {}, h('span', { class: 'tag ' + (q.action === 'replace' ? 'warn' : q.action === 'skip' ? 'gray' : 'ok') }, ACTION_LABEL[q.action]),
+          h('div', { class: 'fname' }, q.filename),
+          folder ? h('div', { class: 'small muted' }, '📁 ' + folder) : null,
+          h('div', { class: 'small muted' }, q.format.toUpperCase() + ' · ' + fmtBytes(q.size))),
+        h('td', {}, titleInput,
+          h('input', { type: 'url', value: q.works, placeholder: t && t.works_url ? '원본 링크: 비우면 기존 링크 유지' : '원본 내려받기 링크(선택)', style: 'margin-top:6px', oninput: e => { q.works = e.target.value.trim(); } })),
+        metaCell(q),
+        actionCell(q),
         statusCell,
-        h('td', {}, h('button', { class: 'small ghost', title: '목록에서 빼기', onclick: () => { queue = queue.filter(x => x !== q); renderQueue(); } }, '✕')));
+        h('td', {}, h('button', { class: 'small ghost', title: '목록에서 빼기', onclick: () => { queue = queue.filter(x => x !== q); replan(); renderQueue(); } }, '✕')));
     }));
-    const ready = queue.filter(q => q.status === 'done').length;
-    $('btnAddDocs').disabled = !ready;
-    $('btnAddDocs').textContent = ready ? `목록에 추가 (${ready}건)` : '목록에 추가';
+    const c = { add: 0, replace: 0, skip: 0 };
+    queue.forEach(q => c[q.action]++);
+    const todo = queue.filter(q => q.action !== 'skip');
+    const ready = todo.filter(q => q.status === 'done').length;
+    const waiting = todo.filter(q => q.status === 'pending' || q.status === 'error').length;
+    $('queueSummary').replaceChildren(
+      h('span', { class: 'tag ok' }, `새 자료 ${c.add}`), h('span', { class: 'tag warn' }, `덮어쓰기 ${c.replace}`), h('span', { class: 'tag gray' }, `건너뜀 ${c.skip}`),
+      h('span', { class: 'small muted' }, ` · 분석 완료 ${ready}/${todo.length}`));
+    $('btnAnalyze').disabled = analyzing || !waiting;
+    $('btnAnalyze').textContent = waiting ? `분석 시작 (${waiting}건)` : '분석 시작';
+    $('btnStop').classList.toggle('hidden', !analyzing);
+    $('btnAddDocs').disabled = analyzing || !ready;
+    $('btnAddDocs').textContent = ready ? `자료 목록에 반영 (${ready}건)` : '자료 목록에 반영';
   }
+  // 공통 정보를 바꾸면 행의 표시(공통 정보 사용…)와 짝 맞추기를 다시 한다
+  ['regLevels', 'regCategory', 'regYear', 'regOriginSite'].forEach(id => $(id).addEventListener('change', () => { replan(); renderQueue(); }));
 
   function summaryOf(doc) {
     if (!doc) return [];
@@ -449,62 +603,122 @@
     return out;
   }
 
-  function commonMeta() {
-    const site = $('regOriginSite').value;
-    return {
-      school_levels: checkedLevels($('regLevels')),
-      category: $('regCategory').value.trim(),
-      year: $('regYear').value,
-      origin: { site, url: $('regOriginUrl').value.trim(), note: '' }
+  /** 행의 값으로 문서를 만든다. 교체면 기존 자료 ID를 쓰고 고친 링크·검색어·서식 쪽을 이어받는다 */
+  function buildRowDoc(q, ids) {
+    const t = targetOf(q);
+    const year = rowYear(q);
+    const meta = {
+      title: rowTitle(q), school_levels: rowLevels(q), category: rowCategory(q), year,
+      filename: q.filename, format: q.format, works_url: q.works, origin: rowOrigin(q)
     };
+    if (!t) return { doc: SAS.createDocument(meta, q.blocks, ids), carry: null };
+    const nd = SAS.createDocument(Object.assign(meta, {
+      id: t.id,
+      school_levels: q.levels.length ? q.levels : t.school_levels,
+      category: q.category || t.category || meta.category,
+      works_url: q.works || t.works_url,
+      origin: q.originSite ? meta.origin : t.origin,
+      search_keywords: t.search_keywords, created_at: t.created_at, forms_bundle: t.forms_bundle
+    }), q.blocks, []);
+    const carry = { keywords: SAS.carryKeywords(t, nd), forms: SAS.carryForms(t, nd), links: SAS.carryLinkEdits(t, nd), oldSections: t.sections.length, oldWorks: !q.works && !!t.works_url };
+    return { doc: nd, carry };
+  }
+
+  function attachPdf(q, doc) {
+    if (q.format !== 'pdf') return;
+    // 원본 PDF도 사이트에 올려 쪽 보기에 쓴다(GitHub는 파일 하나 100MB까지)
+    if (q.size > PDF_MAX) throw new Error(`PDF가 ${fmtBytes(q.size)}입니다. 사이트에 올릴 수 있는 크기(약 95MB)를 넘습니다. 한글에서 그림 품질을 낮춰 다시 PDF로 저장해 주세요.`);
+    doc.pdf = { path: S.pdfPath(doc.id), bytes: q.size };
   }
 
   $('btnAnalyze').onclick = async () => {
-    const meta = commonMeta();
-    $('btnAnalyze').disabled = true;
-    const ids = S.allIds();
-    for (const q of queue.filter(q => q.status === 'pending' || q.status === 'error')) {
+    analyzing = true; stopReq = false; renderQueue();
+    const ids = () => S.allIds().concat(queue.map(x => x.doc && x.doc.id).filter(Boolean));
+    const todo = queue.filter(q => q.action !== 'skip' && (q.status === 'pending' || q.status === 'error'));
+    let i = 0;
+    for (const q of todo) {
+      if (stopReq) break;
+      i++;
+      $('queueMsg').textContent = `분석 중 ${i}/${todo.length}: ${q.filename}`;
       q.status = 'working'; q.progress = ''; renderQueue();
       try {
         const r = await X.extractFile(q.file, (a, b) => { q.progress = `${a}/${b}`; renderQueue(); });
-        q.doc = SAS.createDocument(Object.assign({}, meta, { title: q.title, filename: q.file.name, format: r.format, works_url: q.works }), r.blocks, ids.concat(queue.map(x => x.doc && x.doc.id).filter(Boolean)));
-        const same = S.state.docs.find(d => SAS.norm(d.title) === SAS.norm(q.doc.title) && (d.year || '') === (q.doc.year || ''));
-        q.message = same ? '같은 이름의 자료가 이미 있습니다. 새 판이면 「자료 관리 → 파일 교체」를 이용하세요.' : '';
-        if (r.format === 'pdf') {
-          // 원본 PDF도 사이트에 올려 쪽 보기에 쓴다(GitHub는 파일 하나 100MB까지)
-          if (q.file.size > PDF_MAX) throw new Error(`PDF가 ${fmtBytes(q.file.size)}입니다. 사이트에 올릴 수 있는 크기(약 95MB)를 넘습니다. 한글에서 그림 품질을 낮춰 다시 PDF로 저장해 주세요.`);
-          q.doc.pdf = { path: S.pdfPath(q.doc.id), bytes: q.file.size };
-          if (q.file.size > PDF_WARN) q.message += (q.message ? ' ' : '') + `PDF가 ${fmtBytes(q.file.size)}입니다. 15MB 이하로 줄이면 사용자 화면이 더 빨리 열립니다.`;
-        }
+        q.blocks = r.blocks; q.format = r.format;
+        // 미리보기용 문서(새 자료 기준). 교체할 때는 반영 시점에 기존 자료 ID로 다시 만든다.
+        q.doc = SAS.createDocument({ title: rowTitle(q), school_levels: rowLevels(q), year: rowYear(q), filename: q.filename, format: r.format }, r.blocks, ids());
+        attachPdf(q, q.doc);
+        q.message = q.size > PDF_WARN && q.format === 'pdf' ? `PDF가 ${fmtBytes(q.size)}입니다. 15MB 이하로 줄이면 사용자 화면이 더 빨리 열립니다.` : '';
         q.status = 'done';
-      } catch (e) { q.status = 'error'; q.message = e.message; console.error(e); }
+      } catch (e) { q.status = 'error'; q.message = e.message; q.blocks = null; console.error(e); }
       renderQueue();
     }
-    $('btnAnalyze').disabled = false;
-    const n = queue.filter(q => q.status === 'done').length;
-    $('queueMsg').textContent = n ? '결과를 확인한 뒤 "목록에 추가"를 누르세요.' : '';
+    analyzing = false;
+    const failed = queue.filter(q => q.action !== 'skip' && q.status === 'error').length;
+    const ready = queue.filter(q => q.action !== 'skip' && q.status === 'done').length;
+    $('queueMsg').textContent = stopReq ? `멈췄습니다. 분석 완료 ${ready}건 — 이어서 하려면 「분석 시작」을 누르세요.`
+      : `분석 완료 ${ready}건${failed ? `, 실패 ${failed}건` : ''}. 결과를 확인한 뒤 「자료 목록에 반영」을 누르세요.`;
+    renderQueue();
   };
+  $('btnStop').onclick = () => { stopReq = true; $('queueMsg').textContent = '지금 분석 중인 파일까지 마치고 멈춥니다…'; };
 
   $('btnAddDocs').onclick = async () => {
-    const meta = commonMeta();
-    const ready = queue.filter(q => q.status === 'done');
-    const noLevel = ready.filter(q => !(q.doc.school_levels.length || meta.school_levels.length));
-    if (noLevel.length) { toast('학교급을 하나 이상 선택해 주세요.', 4000); $('regLevels').scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
-    ready.forEach(q => {
-      // 분석 뒤에 공통 정보를 바꾼 경우에도 반영
-      if (!q.doc.school_levels.length) q.doc.school_levels = meta.school_levels.slice();
-      if (!q.doc.category) q.doc.category = meta.category;
-      if (!q.doc.year && meta.year) q.doc.year = Number(meta.year);
-      if (!q.doc.origin.site) q.doc.origin = meta.origin;
-      q.doc.title = q.title.trim() || q.doc.title; q.doc.works_url = q.works;
-    });
-    S.addDocs(ready.map(q => q.doc));
-    for (const q of ready) if (q.doc.pdf) await S.setPendingPdf(q.doc.id, q.file);
-    queue = queue.filter(q => q.status !== 'done');
-    renderQueue();
-    toast(`${ready.length}건을 추가했습니다. 「③ 점검·반영」에서 반영해야 사이트에 나타납니다.`, 5000);
+    const ready = queue.filter(q => q.action !== 'skip' && q.status === 'done');
+    const noLevel = ready.filter(q => !rowLevels(q).length && !targetOf(q));
+    if (noLevel.length) {
+      toast(`학교급이 없는 파일이 ${noLevel.length}개 있습니다. 행에서 고르거나 공통 정보에서 선택해 주세요.`, 5000);
+      $('regLevels').scrollIntoView({ behavior: 'smooth', block: 'center' }); return;
+    }
+    // 같은 기존 자료를 두 파일이 교체하려 하면 막는다
+    const tids = ready.filter(q => q.action === 'replace').map(q => q.targetId);
+    const dup = tids.find((t, i) => tids.indexOf(t) !== i);
+    if (dup) { toast(`「${S.getDoc(dup).title}」을(를) 두 파일이 덮어쓰려고 합니다. 하나만 남겨 주세요.`, 6000); return; }
+
+    const ids = S.allIds();
+    const built = [];
+    for (const q of ready) {
+      try {
+        const b = buildRowDoc(q, ids.concat(built.map(x => x.doc.id)));
+        attachPdf(q, b.doc);
+        built.push(Object.assign(b, { q, match: q.match }));
+      } catch (e) { q.status = 'error'; q.message = e.message; }
+    }
+    const adds = built.filter(b => !b.carry), reps = built.filter(b => b.carry);
+    const skipN = queue.filter(q => q.action === 'skip').length;
+    const li = b => {
+      const t = S.getDoc(b.doc.id);
+      return h('li', {},
+        h('div', {}, h('b', {}, t.title), h('span', { class: 'small muted' }, ` (${t.filename || '파일명 없음'}${t.year ? ' · ' + t.year : ''})`)),
+        h('div', {}, '→ ', h('b', {}, b.q.filename), b.match && b.match.sameFile ? h('span', { class: 'tag gray' }, '같은 파일') : null,
+          b.q.match && b.q.match.how === 'similar' ? h('span', { class: 'tag warn' }, '이름이 비슷함') : null),
+        h('div', { class: 'small muted' }, `업무 ${b.carry.oldSections}→${b.doc.sections.length}개 · 고친 링크 ${b.carry.links}개 유지${t.year !== b.doc.year ? ` · 연도 ${t.year || '-'}→${b.doc.year || '-'}` : ''}${t.title !== b.doc.title ? ` · 자료명 → ${b.doc.title}` : ''}`),
+        b.carry.oldWorks ? h('div', { class: 'small warn-text' }, '따로 넣은 원본 내려받기 링크(웍스)가 예전 판을 가리킬 수 있습니다. 반영 후 자료 관리에서 확인하세요.') : null);
+    };
+    const addList = adds.length ? h('details', {}, h('summary', {}, `새 자료 ${adds.length}건 추가`), h('ul', { class: 'small-list' }, adds.map(b => h('li', {}, b.doc.title, h('span', { class: 'small muted' }, ` · ${b.doc.school_levels.join('·')}${b.doc.year ? ' · ' + b.doc.year : ''}`))))) : null;
+    const after = h('p', { class: 'small muted' }, '아직 사이트에는 올라가지 않습니다. 「③ 점검·반영」에서 「사이트에 반영」을 한 번 누르면 모두 한꺼번에 올라갑니다.');
+    // 덮어쓸 자료가 있으면 덮어쓰기 확인 팝업, 없으면 간단한 확인
+    const ok = reps.length
+      ? await modal(h('div', {}, h('h2', {}, `⚠️ 덮어쓰기 확인 (${reps.length}건)`),
+          h('p', {}, '아래 기존 자료를 새 파일로 덮어씁니다. 자료 ID와 사이트 주소는 그대로이고, 고쳐 둔 링크·검색어는 이어받습니다.'),
+          h('ul', { class: 'small-list overwrite-list' }, reps.map(li)),
+          addList, skipN ? h('p', { class: 'small muted' }, `건너뜀 ${skipN}건`) : null,
+          h('p', { class: 'small muted' }, '「사이트에 반영」 전이라면 GitHub에서 자료를 다시 불러와 되돌릴 수 있습니다.'), after),
+        [{ label: '취소', value: false }, { label: `덮어쓰기 (${reps.length}건)${adds.length ? ` + 추가 ${adds.length}건` : ''}`, value: true, danger: true }])
+      : await modal(h('div', {}, h('h2', {}, '자료 목록에 반영'),
+          h('p', {}, `새 자료 ${adds.length}건을 추가합니다.${skipN ? ` (건너뜀 ${skipN}건)` : ''}`), addList, after),
+        [{ label: '취소', value: false }, { label: '반영', value: true, primary: true }]);
+    if (!ok) { renderQueue(); return; }
+
+    if (adds.length) S.addDocs(adds.map(b => b.doc));
+    for (const b of reps) S.replaceDoc(b.doc.id, b.doc);
+    for (const b of built) if (b.doc.pdf && b.q.format === 'pdf') await S.setPendingPdf(b.doc.id, b.q.file);
+    const doneSet = new Set(built.map(b => b.q));
+    queue = queue.filter(q => !doneSet.has(q) && q.action !== 'skip');
+    replan(); renderQueue();
+    $('queueMsg').textContent = '';
+    toast(`새 자료 ${adds.length}건 추가, ${reps.length}건 덮어썼습니다. 「③ 점검·반영」에서 반영해야 사이트에 나타납니다.`, 6000);
+    if (!queue.length) showTab('save');
   };
-  $('btnClearQueue').onclick = () => { queue = []; renderQueue(); $('queueMsg').textContent = ''; };
+  $('btnClearQueue').onclick = () => { if (analyzing) return; queue = []; renderQueue(); $('queueMsg').textContent = ''; };
 
   // ---------- ② 자료 관리: 목록 ----------
   let selectedId = null;

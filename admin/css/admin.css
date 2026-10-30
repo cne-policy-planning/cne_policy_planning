@@ -170,3 +170,23 @@ button.danger.small { background: var(--err-soft); }
 .links-table input[type=url] { font-size: 12px; }
 .links-table select { width: auto; }
 .mono { font-family: ui-monospace, Consolas, monospace; font-size: 11px; word-break: break-all; }
+
+/* 폴더 일괄 등록 */
+.queue-summary { margin-top: 12px; display: flex; align-items: center; gap: 2px; flex-wrap: wrap; }
+.table-scroll { overflow-x: auto; }
+#queueTable td { min-width: 120px; }
+#queueTable td:last-child { min-width: 0; }
+#queueTable tr.act-skip td { opacity: .6; }
+#queueTable tr.act-replace td { background: #fffbf2; }
+.meta-cell select { width: auto; flex: 1; padding: 5px 6px; font-size: 12px; }
+.meta-cell .num { width: 80px; flex: 0 0 80px; padding: 5px 6px; font-size: 12px; }
+.checks.mini { gap: 3px; margin-bottom: 4px; }
+.checks.mini label { padding: 2px 8px; font-size: 12px; }
+.act-sel { font-size: 12px; padding: 5px 6px; max-width: 260px; }
+.warn-text { color: var(--warn); }
+.pick-list { max-height: 50vh; overflow: auto; margin-top: 8px; display: flex; flex-direction: column; gap: 4px; }
+.pick-item { text-align: left; display: block; width: 100%; }
+.small-list { padding-left: 18px; max-height: 40vh; overflow: auto; }
+.small-list li { margin-bottom: 6px; }
+details.more pre { background: #f6f8fb; padding: 10px; border-radius: 8px; overflow-x: auto; }
+.overwrite-list li { border-left: 3px solid var(--warn); padding-left: 8px; list-style: none; margin-left: -18px; }

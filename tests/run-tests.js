@@ -7,7 +7,7 @@
 'use strict';
 const path = require('path');
 const core = p => require(path.join(__dirname, '..', 'assets', 'js', 'core', p));
-const SAS = Object.assign({}, core('normalize.js'), core('textlayout.js'), core('sectionizer.js'), core('outline.js'), core('schema.js'), core('indexer.js'));
+const SAS = Object.assign({}, core('normalize.js'), core('textlayout.js'), core('sectionizer.js'), core('outline.js'), core('schema.js'), core('indexer.js'), core('batch.js'));
 
 let pass = 0, fail = 0;
 function test(name, fn) {
@@ -222,6 +222,47 @@ atest('1글자 검색은 본문 검색 생략', async () => { const m = SS.metaS
 atest('업무 상세: 현장체험학습 서식 179~188번', async () => { const d = SS.sectionDetail(detail, sec('현장체험학습 운영').id); eq(d.forms.map(f => f.no), [179, 180, 181, 182, 183, 184, 185, 186, 187, 188]); eq(d.blocks[0].pdf_page, 26); });
 atest('쪽 표시·안전한 링크', async () => { eq(SS.pageLabel([23, 24], [19, 20]), 'PDF 23~24쪽(인쇄 19~20쪽)'); eq(SS.safeUrl('javascript:alert(1)'), ''); eq(SS.safeUrl('https://works.do/a'), 'https://works.do/a'); });
 atest('여러 단어 강조 + 이스케이프', async () => { const h = SS.highlightTerms('<b>소풍</b> 사전 답사', ['소풍', '사전답사']); ok(h.includes('<mark>소풍</mark>') && h.includes('<mark>사전 답사</mark>') && !h.includes('<b>')); });
+
+console.log('\n[폴더 일괄 등록]');
+test('학교급: 안쪽 폴더 우선, 없으면 파일 이름', () => {
+  eq(SAS.guessLevels('2027 자료/중등/유치원/a.pdf').levels, ['유아']);
+  eq(SAS.guessLevels('자료/2027 초등 학적 매뉴얼.pdf').levels, ['초등']);
+  eq(SAS.guessLevels('중학교 자료/학적.pdf').levels, ['중등']);
+  eq(SAS.guessLevels('유·초 이음교육 운영 안내.pdf').levels, []);
+});
+test('연도·분류·원 출처 짐작', () => {
+  const g = SAS.guessMeta('2027 자료/중등/학교업무자료실/교무학사실무/중학교 학적 매뉴얼.hwpx');
+  eq([g.year, g.category, g.originSite], [2027, '교무학사실무', '학교업무자료실']);
+});
+test('숨김·임시·빈 파일 제외', () => { ok(SAS.shouldIgnore('a/.DS_Store', 9)); ok(SAS.shouldIgnore('~$문서.hwp', 9)); ok(SAS.shouldIgnore('__MACOSX/a.pdf', 9)); ok(SAS.shouldIgnore('a.pdf', 0)); ok(!SAS.shouldIgnore('유치원/a.pdf', 9)); });
+test('짝 맞추기 열쇠: 연도·띄어쓰기·+·(최종)·맥 자모 분리 무시', () => {
+  const k = SAS.matchKey('2026+유치원+교무학사+업무+도움자료.pdf');
+  eq(SAS.matchKey('2027유치원교무학사업무도움자료(최종).pdf'), k);
+  eq(SAS.matchKey('2027학년도 유치원 교무학사 업무 도움자료 (1).pdf'), k);
+  eq(SAS.matchKey('2027유치원교무학사업무도움자료.pdf'.normalize('NFD')), k);
+});
+const bdocs = [{ id: 'doc-a', title: '2026 교무학사 도움자료 유치원', filename: '2026+유치원+교무학사+업무+도움자료.pdf', school_levels: ['유아'], year: 2026, pdf: { bytes: 1000 } },
+  { id: 'doc-b', title: '2026 초등 교무학사 도움자료', filename: '2026 초등 교무학사 도움자료.pdf', school_levels: ['초등'], year: 2026, pdf: { bytes: 2000 } }];
+const bitem = (key, filename, levels, size, year, format) => ({ key, filename, title: SAS.titleFromFilename(filename), levels, size, year, format: format || 'pdf' });
+test('새 판은 교체, 학교급 다른 자료와는 짝짓지 않음, 처음 보는 자료는 새 자료', () => {
+  const it = SAS.planBatch([bitem(1, '2027유치원교무학사업무도움자료.pdf', ['유아'], 5000, 2027), bitem(2, '2027 중등 교무학사 도움자료.pdf', ['중등'], 5, 2027), bitem(3, '2027 특수 학급 운영.pdf', ['특수'], 5, 2027)], bdocs);
+  eq(it.map(x => [x.action, x.targetId]), [['replace', 'doc-a'], ['add', null], ['add', null]]);
+});
+test('이름이 같은 파일은 덮어쓰기(같은 파일이 먼저 짝을 가져감)', () => {
+  const it = SAS.planBatch([bitem(1, '2027유치원교무학사업무도움자료.pdf', ['유아'], 5000, 2027), bitem(2, '2026유치원교무학사업무도움자료.pdf', ['유아'], 1000, 2026)], bdocs);
+  eq(it.map(x => [x.action, x.targetId]), [['add', null], ['replace', 'doc-a']]);
+  const it2 = SAS.planBatch([bitem(1, '2027유치원교무학사업무도움자료.pdf', ['유아'], 5000, 2027)], bdocs);
+  eq(it2[0].action, 'replace');
+});
+test('같은 이름 PDF가 있으면 HWP는 건너뜀 · 직접 고른 처리는 유지', () => {
+  const items = [bitem(1, '2027 초등 교무학사 도움자료.pdf', ['초등'], 5, 2027), bitem(2, '2027 초등 교무학사 도움자료.hwp', ['초등'], 5, 2027, 'hwp')];
+  SAS.planBatch(items, bdocs);
+  eq(items.map(x => x.action), ['replace', 'skip']);
+  items[0].action = 'add'; items[0].actionSet = true;
+  SAS.planBatch(items, bdocs);
+  eq(items[0].action, 'add');
+});
+test('교체할 때 자료명 연도만 바꿈', () => { eq(SAS.renewTitle('2026 교무학사 도움자료 유치원', 2026, 2027), '2027 교무학사 도움자료 유치원'); eq(SAS.renewTitle('교무학사 도움자료', 2026, 2027), '교무학사 도움자료'); });
 
 (async () => {
   for (const [name, fn] of asyncTests) {

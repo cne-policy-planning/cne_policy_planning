@@ -54,7 +54,7 @@
   <!-- ① 자료 등록 -->
   <section id="tab-register" class="tabpane">
     <div class="card">
-      <h2>공통 정보 <span class="muted small">이번에 등록하는 파일 모두에 적용됩니다. 등록 후 자료별로 고칠 수 있습니다.</span></h2>
+      <h2>공통 정보 <span class="muted small">폴더·파일 이름으로 알 수 없는 항목에만 적용됩니다. 파일마다 아래 목록에서 고칠 수 있습니다.</span></h2>
       <div class="grid2">
         <div>
           <label>학교급 <span class="req">필수 · 복수 선택</span></label>
@@ -79,21 +79,43 @@
     </div>
 
     <div class="card">
-      <h2>파일 선택</h2>
+      <h2>파일·폴더 넣기</h2>
       <div id="drop" class="drop" tabindex="0" role="button">
         <div class="drop-icon">📂</div>
-        <strong>파일을 끌어다 놓거나 눌러서 선택하세요</strong>
-        <span class="muted small">PDF는 목차·업무 항목·서식 링크를 자동으로 뽑아 번호 목차를 만들고, 원본 PDF도 사이트에 함께 올려 쪽 보기로 보여 줍니다(15MB 이하 권장). HWPX는 본문만, HWP·엑셀 등은 자료명·검색어로만 검색됩니다.</span>
+        <strong>파일이나 폴더를 통째로 끌어다 놓으세요</strong>
+        <span class="muted small">하위 폴더까지 모두 읽습니다. PDF는 번호 목차·서식 링크를 자동으로 뽑고 원본 PDF도 사이트에 함께 올립니다(15MB 이하 권장). HWPX는 본문만, HWP·엑셀 등은 자료명·검색어로만 검색됩니다.</span>
+        <div class="actions" style="margin-top:6px">
+          <button id="btnPickFiles" type="button">파일 선택</button>
+          <button id="btnPickFolder" type="button">폴더 선택</button>
+        </div>
         <input id="fileInput" type="file" multiple hidden>
+        <input id="folderInput" type="file" webkitdirectory multiple hidden>
       </div>
+      <details class="more">
+        <summary>폴더 이름 규칙 — 이렇게 나눠 두면 자동으로 채워집니다</summary>
+        <ul class="small">
+          <li><b>학교급</b>: 폴더나 파일 이름에 <code>유치원·유아</code>, <code>초등</code>, <code>중등·중학</code>, <code>특수</code>가 들어 있으면 그 학교급으로 정합니다. 안쪽 폴더가 우선입니다.</li>
+          <li><b>연도</b>: 파일 이름(없으면 폴더 이름)의 <code>2027</code> 같은 네 자리 연도.</li>
+          <li><b>업무 분류·원 출처</b>: 폴더 이름이 분류 목록(예: 교무학사실무)이나 자료실 이름(예: 학교업무자료실)과 같으면 그 값.</li>
+          <li><b>덮어쓰기</b>: 연도·띄어쓰기·(최종) 같은 표시를 뺀 이름이 기존 자료와 같으면 그 자료를 덮어씁니다(비슷하면 확인 표시). 자료 ID와 사이트 주소는 그대로이고, 고쳐 둔 링크·검색어는 이어받습니다. 덮어쓰기 전에 확인 팝업이 한 번 뜹니다.</li>
+        </ul>
+        <pre class="small">예)  2027 자료/
+       ├ 유치원/2027유치원교무학사업무도움자료.pdf   → 유아 · 2027 · 기존 2026 자료 덮어쓰기
+       ├ 초등/교무학사실무/2027 초등 학적 매뉴얼.pdf → 초등 · 2027 · 교무학사실무 · 새 자료
+       └ 중등/…</pre>
+      </details>
       <div id="queueWrap" class="hidden">
+        <div id="queueSummary" class="queue-summary"></div>
+        <div class="table-scroll">
         <table class="table" id="queueTable">
-          <thead><tr><th>파일</th><th>자료명</th><th>원본 내려받기 링크 <span class="muted small">(선택)</span></th><th>분석 결과</th><th></th></tr></thead>
+          <thead><tr><th>파일</th><th>자료명 · 원본 링크</th><th>학교급 · 분류 · 연도</th><th>처리 방법</th><th>분석 결과</th><th></th></tr></thead>
           <tbody></tbody>
         </table>
+        </div>
         <div class="actions">
           <button id="btnAnalyze" class="primary">분석 시작</button>
-          <button id="btnAddDocs" disabled>목록에 추가</button>
+          <button id="btnStop" class="hidden">멈추기</button>
+          <button id="btnAddDocs" disabled>자료 목록에 반영</button>
           <button id="btnClearQueue" class="ghost">비우기</button>
           <span id="queueMsg" class="muted small"></span>
         </div>
@@ -167,6 +189,7 @@
 <script src="../assets/js/core/outline.js"></script>
 <script src="../assets/js/core/schema.js"></script>
 <script src="../assets/js/core/indexer.js"></script>
+<script src="../assets/js/core/batch.js"></script>
 <script src="js/extract.js"></script>
 <script src="js/github.js"></script>
 <script src="js/store.js"></script>
