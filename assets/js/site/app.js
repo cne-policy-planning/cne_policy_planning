@@ -343,9 +343,14 @@
   function renderStats() {
     const n = V.nodes, raw = V.doc.raw;
     const count = f => n.filter(f).length;
+    if (raw.kind === 'link') {
+      $('docStats').replaceChildren(h('span', { class: 'st st-doc' }, '이 자료'), h('span', { class: 'st' }, `${((raw.original && raw.original.format) || raw.format || '').toUpperCase()} 원본 파일`),
+        raw.origin && raw.origin.site ? h('span', { class: 'st muted' }, `출처 ${raw.origin.site}${raw.year ? ' · ' + raw.year : ''}`) : '');
+      return;
+    }
     $('docStats').replaceChildren(h('span', { class: 'st st-doc' }, '이 자료'),
       ...[['업무', count(x => x.k === 'task')], ['세부 항목', count(x => ['group', 'item', 'bullet'].includes(x.k))]].map(([a, b]) => h('span', { class: 'st' }, a, ' ', h('b', {}, b))),
-      raw.origin && raw.origin.site ? h('span', { class: 'st muted' }, `출처 ${raw.origin.site}${raw.year ? ' · ' + raw.year : ''}`) : null);
+      raw.origin && raw.origin.site ? h('span', { class: 'st muted' }, `출처 ${raw.origin.site}${raw.year ? ' · ' + raw.year : ''}`) : '');
   }
 
   // ---------- 가운데: 목차 / 검색 결과 ----------
@@ -374,7 +379,7 @@
     if (V.q || V.t) return renderResults();
     const out = [];
     (function walk(list) { (list || []).forEach(n => { out.push(rowHTML(n, V.doc.raw)); if (V.open.has(n.c)) walk(V.kids[n.c]); }); })(V.kids['']);
-    $('tree').innerHTML = out.join('') || '<div class="v-empty">목차가 없습니다.</div>';
+    $('tree').innerHTML = out.join('') || `<div class="v-empty">${V.doc.raw.kind === 'link' ? '이 자료는 목차 없이 원본 파일로 제공됩니다. 오른쪽에서 내려받으세요.' : '목차가 없습니다.'}</div>`;
     markCur();
   }
   function markCur() {
@@ -476,16 +481,33 @@
     const blocks = raw.blocks || [];
     $('pTotal').textContent = `/ ${blocks.length}`;
     $('pNum').value = 1;
-    // 원본 내려받기: 따로 넣은 링크가 있으면 그것, 없으면 사이트의 PDF
-    const down = SS.safeUrl(raw.works_url) || (raw.pdf ? raw.pdf.path : '');
+    // 원본 내려받기: 따로 넣은 링크 → 창고의 원본 파일 → 사이트의 PDF 순서
+    const orig = raw.original && raw.original.path ? SAS.fileUrl(raw.original) : '';
+    const pdfUrl = SAS.fileUrl(raw.pdf);
+    const down = SS.safeUrl(raw.works_url) || orig || pdfUrl;
     const btn = $('btnDown');
     btn.classList.toggle('hidden', !down);
-    if (down) { btn.href = down; btn.textContent = raw.works_url ? '원본 내려받기' : 'PDF 내려받기'; if (raw.works_url) btn.removeAttribute('download'); else btn.setAttribute('download', ''); }
-    const hasPdf = !!(raw.pdf && raw.pdf.path);
+    if (down) {
+      btn.href = down;
+      const fmt = (raw.original && raw.original.format) || (raw.pdf ? 'pdf' : '');
+      btn.textContent = raw.works_url ? '원본 내려받기' : `${fmt ? fmt.toUpperCase() + ' ' : ''}원본 내려받기`;
+      // 같은 주소 아래(github.io)라 원래 파일 이름으로 저장된다
+      if (raw.works_url) btn.removeAttribute('download'); else btn.setAttribute('download', (raw.original && raw.original.name) || '');
+    }
+    const hasPdf = !!pdfUrl;
     const linksBy = new Map();
     (raw.links || []).forEach(l => { if (l.box && l.block != null) { if (!linksBy.has(l.block)) linksBy.set(l.block, []); linksBy.get(l.block).push(l); } });
     $('viewer').scrollTop = 0;
     document.querySelector('.v-pager').classList.toggle('no-pages', raw.format !== 'pdf');
+    if (raw.kind === 'link' || (!blocks.length && raw.format !== 'pdf')) {
+      // HWP·엑셀 등: 본문을 읽지 않는 자료 → 원본 파일 내려받기 안내
+      $('pages').replaceChildren(h('div', { class: 'v-filecard' },
+        h('div', { class: 'v-fileicon' }, ((raw.original && raw.original.format) || raw.format || '').toUpperCase()),
+        h('b', {}, (raw.original && raw.original.name) || raw.title),
+        h('p', {}, '이 자료는 본문 미리보기 없이 원본 파일로 제공됩니다.'),
+        down ? h('a', { class: 'btn primary', href: down, download: raw.works_url ? null : ((raw.original && raw.original.name) || ''), target: raw.works_url ? '_blank' : null, rel: 'noopener' }, '원본 파일 내려받기') : h('p', { class: 'muted' }, '아직 내려받을 파일이 준비되지 않았습니다.')));
+      return;
+    }
     if (!hasPdf && raw.format !== 'pdf') {
       // HWPX 등 문단 자료: 한 장에 문단을 이어서 보여 준다
       $('pages').replaceChildren(h('div', { class: 'v-note' }, '이 자료는 PDF가 아니어서 추출한 글자로 보여 줍니다. 원본은 「원본 내려받기」로 받으세요.'),
@@ -516,7 +538,7 @@
     if (token !== V.renderToken) return;
     if (!lib) { $('pages').prepend(h('div', { class: 'v-note' }, 'PDF 보기 도구를 불러오지 못했습니다. 「PDF 내려받기」로 원문을 열어 주세요.')); return; }
     try {
-      V.pdfTask = lib.getDocument({ url: raw.pdf.path + (raw.updated_at ? '?v=' + encodeURIComponent(raw.updated_at) : ''), cMapUrl: VENDOR + 'cmaps/', cMapPacked: true, isEvalSupported: false, disableAutoFetch: true, rangeChunkSize: 262144 });
+      V.pdfTask = lib.getDocument({ url: pdfUrl + (raw.updated_at ? '?v=' + encodeURIComponent(raw.updated_at) : ''), cMapUrl: VENDOR + 'cmaps/', cMapPacked: true, isEvalSupported: false, disableAutoFetch: true, rangeChunkSize: 262144 });
       V.pdf = await V.pdfTask.promise;
     } catch (e) {
       if (token !== V.renderToken) return;

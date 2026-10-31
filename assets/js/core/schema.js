@@ -33,7 +33,8 @@
   // 창고 이름 = <STORAGE_PREFIX>_<연도>_<번호> (예: cne_files_2026_1). 같은 계정(조직) 아래에 만들어 같은 주소로 열린다.
   const STORAGE_PREFIX = 'cne_files';
   const STORAGE_MAX = 900 * 1024 * 1024;     // 창고 하나에 담을 최대 크기(1GB 한도보다 여유 있게)
-  const FILE_MAX = 95 * 1024 * 1024;         // 파일 하나 최대(GitHub 한 파일 100MB 한도)
+  // 파일 하나 최대: GitHub 웹 API로 만들 수 있는 조각(blob)은 약 42MB까지라 여유를 두어 38MB(실제 확인: 42.05MB에서 거절됨)
+  const FILE_MAX = 38 * 1024 * 1024;
   const DEPARTMENTS = [ACADEMIC_COMMON, '감사관', '교원인사과', '교육과정평가지원부', '미래인재과', '미래학교추진단', '민주시민교육과', '소통담당관',
     '안전총괄과', '예산과', '유아교육복지과', '재무과', '정책기획과', '중등교육과', '진로융합부', '체육건강과', '초등특수교육과', '총무과', '학교지원과']
     .sort((a, b) => a.localeCompare(b, 'ko'));

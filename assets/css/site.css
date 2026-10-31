@@ -331,3 +331,9 @@ details.lv-dept > summary i { font-style: normal; font-size: 13px; color: var(--
 .v-dept { font-size: 12px; font-weight: 700; color: #475467; padding: 8px 10px 2px; }
 .v-crumb .src.com { background: #f1ecfd; color: #5b3fb8; }
 .doc-grp .lv-tag { font-size: 11px; vertical-align: 1px; }
+
+/* 본문 없이 원본 파일로 제공하는 자료(HWP·엑셀 등) */
+.v-filecard { max-width: 420px; margin: 40px auto; background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 28px 24px; text-align: center; display: grid; gap: 10px; justify-items: center; }
+.v-filecard b { font-size: 15px; word-break: keep-all; }
+.v-filecard p { margin: 0; color: var(--muted); font-size: 13.5px; }
+.v-fileicon { width: 64px; height: 76px; border-radius: 8px; background: var(--blue-soft); color: var(--blue-text); font-weight: 800; font-size: 14px; display: grid; place-items: center; border: 1px solid #c7d9f6; }

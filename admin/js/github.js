@@ -149,7 +149,21 @@
       return (c.files || []).map(f => ({ path: f.filename, status: f.status }));
     }
 
-    return { api, getHead, getBlobText, verify, commit, createBlob, listCommits, commitFiles, get lastExpiry() { return lastExpiry; } };
+    /** 빈 저장소(README 없음)에 첫 파일 만들기: Git 조각 API는 빈 저장소에서 쓸 수 없어 내용 API를 쓴다 */
+    async function initEmpty(path, text, message) {
+      return api(`/contents/${path.split('/').map(encodeURIComponent).join('/')}`, { method: 'PUT', body: { message: message || '처음 만들기', content: toBase64(new TextEncoder().encode(text || '')) } });
+    }
+    /** GitHub Pages 켜기(main 가지 · 맨 위 폴더). 출입증에 Pages 권한이 없으면 실패 → 호출한 쪽에서 안내 */
+    async function enablePages(branch) {
+      try { await api('/pages', { method: 'POST', body: { build_type: 'legacy', source: { branch: branch || 'main', path: '/' } } }); return 'enabled'; }
+      catch (e) { if (e.status === 409) return 'already'; return 'unknown'; }
+    }
+    async function pagesStatus() {
+      try { const p = await api('/pages'); return p && p.html_url ? 'on' : 'on'; }
+      catch (e) { return e.status === 404 ? 'off' : 'unknown'; }
+    }
+
+    return { api, getHead, getBlobText, verify, commit, createBlob, listCommits, commitFiles, initEmpty, enablePages, pagesStatus, get lastExpiry() { return lastExpiry; } };
   }
 
   /** 큰 이진 파일도 멈추지 않게 조금씩 base64로 */

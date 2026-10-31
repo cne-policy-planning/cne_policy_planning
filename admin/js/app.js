@@ -37,7 +37,7 @@
     });
   }
   const confirmBox = (html, okLabel, danger) => modal(html, [{ label: '취소', value: false }, { label: okLabel || '확인', value: true, primary: !danger, danger }]);
-  const PDF_WARN = 15 * 1024 * 1024, PDF_MAX = 95 * 1024 * 1024;
+  const PDF_WARN = 15 * 1024 * 1024, PDF_MAX = SAS.FILE_MAX;
   const fmtBytes = n => n > 1048576 ? (n / 1048576).toFixed(1) + 'MB' : Math.max(1, Math.round(n / 1024)) + 'KB';
   const pad3 = n => String(n).padStart(3, '0');
   const today = () => { const d = new Date(); return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`; };
@@ -67,7 +67,7 @@
     document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
     ['register', 'manage', 'save'].forEach(n => $('tab-' + n).classList.toggle('hidden', n !== name));
     if (name === 'manage') renderList();
-    if (name === 'save') renderSaveStatus();
+    if (name === 'save') { renderSaveStatus(); renderStorageCard(); }
   }
   document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => showTab(t.dataset.tab)));
 
@@ -301,9 +301,9 @@
 
   // ---------- 시작 ----------
   async function withProgress(title, fn) {
-    const bar = h('div'), wrap = h('div', {}, h('b', {}, title), h('div', { class: 'progress' }, bar), h('p', { class: 'muted small', text: '창을 닫지 마세요.' }));
+    const bar = h('div'), info = h('p', { class: 'muted small' }), wrap = h('div', {}, h('b', {}, title), h('div', { class: 'progress' }, bar), info, h('p', { class: 'muted small' }, '창을 닫지 마세요.'));
     $('modalBody').replaceChildren(wrap); $('modal').classList.remove('hidden');
-    try { return await fn((a, b) => { bar.style.width = Math.round(a / Math.max(1, b) * 100) + '%'; }); }
+    try { return await fn((a, b, label) => { bar.style.width = Math.round(a / Math.max(1, b) * 100) + '%'; info.textContent = `${a} / ${b}${label ? ' · ' + label : ''}`; }); }
     finally { $('modal').classList.add('hidden'); }
   }
   /** 예비: 저장소 폴더 열기 */
@@ -647,11 +647,12 @@
     return { doc: nd, carry };
   }
 
+  // 원본 파일(모든 형식)을 창고에 올려 사이트에서 바로 내려받게 한다. PDF는 쪽 보기에도 쓴다.
+  // 창고(연도별 저장소)는 「사이트에 반영」할 때 정한다. GitHub는 파일 하나 100MB까지.
   function attachPdf(q, doc) {
-    if (q.format !== 'pdf') return;
-    // 원본 PDF도 사이트에 올려 쪽 보기에 쓴다(GitHub는 파일 하나 100MB까지)
-    if (q.size > PDF_MAX) throw new Error(`PDF가 ${fmtBytes(q.size)}입니다. 사이트에 올릴 수 있는 크기(약 95MB)를 넘습니다. 한글에서 그림 품질을 낮춰 다시 PDF로 저장해 주세요.`);
-    doc.pdf = { path: S.pdfPath(doc.id), bytes: q.size };
+    if (q.size > PDF_MAX) throw new Error(`파일이 ${fmtBytes(q.size)}입니다. 사이트에 올릴 수 있는 크기(38MB)를 넘습니다.${q.format === 'pdf' ? ' PDF 용량을 줄여(그림 품질 낮추기) 다시 넣어 주세요.' : ''}`);
+    doc.original = SAS.makeOriginal(doc.id, q.filename, q.size, q.format);
+    if (q.format === 'pdf') doc.pdf = { repo: null, path: doc.original.path, bytes: q.size };
   }
 
   $('btnAnalyze').onclick = async () => {
@@ -733,7 +734,7 @@
 
     if (adds.length) S.addDocs(adds.map(b => b.doc));
     for (const b of reps) S.replaceDoc(b.doc.id, b.doc);
-    for (const b of built) if (b.doc.pdf && b.q.format === 'pdf') await S.setPendingPdf(b.doc.id, b.q.file);
+    for (const b of built) if (b.doc.original) await S.setPendingPdf(b.doc.id, b.q.file);
     const doneSet = new Set(built.map(b => b.q));
     queue = queue.filter(q => !doneSet.has(q) && q.action !== 'skip');
     replan(); renderQueue();
@@ -760,7 +761,7 @@
       (!q || SAS.norm(d.title + d.category + (d.department || '')).includes(q)) &&
       (!fLevel.value || d.school_levels.includes(fLevel.value)) &&
       (!fCat.value || d.category === fCat.value) &&
-      (!$('fNoWorks').checked || !d.pdf) &&
+      (!$('fNoWorks').checked || (!d.original && !d.pdf && !d.works_url)) &&
       (!$('fWarn').checked || needsCheck(d)))
       .sort((a, b) => (b.updated_at || '').localeCompare(a.updated_at || ''));
     const box = $('docList');
@@ -880,13 +881,15 @@
     else if (!doc.pdf) state = h('div', { class: 'notice warn' }, '원본 PDF가 사이트에 없습니다. 아래 「자료 교체·삭제 → 파일 교체」로 같은 PDF를 다시 넣으면 번호 목차와 쪽 보기가 만들어집니다.');
     else state = h('div', { class: 'kv' },
       h('span', {}, pending ? h('span', { class: 'tag warn' }, '반영 대기') : h('span', { class: 'tag ok' }, '사이트에 있음')),
-      h('span', {}, doc.pdf.path), doc.pdf.bytes ? h('span', {}, fmtBytes(doc.pdf.bytes)) : null,
+      h('span', {}, doc.pdf.repo ? `창고 ${doc.pdf.repo}` : doc.pdf.path.startsWith('files/') ? '창고는 반영할 때 정해집니다' : '본 저장소 ' + doc.pdf.path), doc.pdf.bytes ? h('span', {}, fmtBytes(doc.pdf.bytes)) : null,
       doc.pdf.bytes > PDF_WARN ? h('span', { class: 'tag warn' }, '15MB 넘음 — 열리는 데 오래 걸릴 수 있음') : null);
+    const orig = doc.original && doc.format !== 'pdf' ? h('div', { class: 'kv', style: 'margin-top:8px' }, h('span', {}, '원본 파일'), h('span', {}, doc.original.name), h('span', {}, fmtBytes(doc.original.bytes || 0)),
+      h('span', {}, pending ? h('span', { class: 'tag warn' }, '반영 대기') : doc.original.repo ? `창고 ${doc.original.repo}` : '')) : null;
     return h('div', { class: 'card' },
-      h('div', { class: 'editor-head' }, h('h2', {}, '원본 PDF · 쪽 보기'),
+      h('div', { class: 'editor-head' }, h('h2', {}, '원본 파일 · 쪽 보기'),
         doc.pdf && !pending ? h('a', { class: 'btn small', href: siteUrl(doc), target: '_blank', rel: 'noopener noreferrer' }, '사용자 화면에서 보기 ↗') : null),
-      state,
-      pending ? h('p', { class: 'small muted' }, '「③ 점검·반영」에서 반영하면 PDF가 사이트에 올라갑니다.') : null);
+      state, orig,
+      pending ? h('p', { class: 'small muted' }, '「③ 점검·반영」에서 반영하면 원본 파일이 창고에 올라가 사이트에서 바로 내려받을 수 있습니다.') : null);
   }
 
   const KIND_LABEL = { ch: '단원', task: '업무', part: '부분', group: '묶음', item: '항목', bullet: '세부', link: '링크' };
@@ -1185,19 +1188,19 @@ ${groups.map(g => `<div class="card"><h2>${e(g.title)}</h2><table>${g.items.map(
     const kept = SAS.carryKeywords(doc, nd);
     const keptForms = SAS.carryForms(doc, nd);
     const keptLinks = SAS.carryLinkEdits(doc, nd);
-    if (r.format === 'pdf') {
-      if (file.size > PDF_MAX) { toast(`PDF가 ${fmtBytes(file.size)}로 너무 큽니다(약 95MB까지). 기존 자료를 유지합니다.`, 6000); return; }
-      nd.pdf = { path: S.pdfPath(doc.id), bytes: file.size };
-    }
+    if (file.size > PDF_MAX) { toast(`파일이 ${fmtBytes(file.size)}로 너무 큽니다(38MB까지). PDF 용량을 줄여 다시 넣어 주세요. 기존 자료를 유지합니다.`, 6000); return; }
+    nd.original = SAS.makeOriginal(doc.id, file.name, file.size, r.format);
+    if (doc.original && doc.original.repo && doc.original.format === nd.original.format) nd.original.repo = doc.original.repo; // 같은 연도면 같은 창고 자리에 덮어쓰기
+    if (r.format === 'pdf') nd.pdf = { repo: null, path: nd.original.path, bytes: file.size };
     const ok = await confirmBox(`<h2>파일 교체</h2><p><b>${SAS.esc(file.name)}</b></p><ul>
       <li>업무: ${doc.sections.length}개 → <b>${nd.sections.length}개</b>${nd.extraction.toc_found ? ' (목차 인식)' : ''}</li>
       <li>업무 검색어 유지: ${kept}개 업무</li><li>링크: ${(doc.links || []).length}개 → <b>${(nd.links || []).length}개</b> (고친 주소·이름 유지 ${keptLinks}개)</li>
-      ${nd.outline ? `<li>번호 목차: <b>${nd.outline.nodes.length}개 항목</b></li>` : ''}${nd.pdf ? `<li>원본 PDF도 새 파일로 바꿉니다 (${fmtBytes(file.size)})</li>` : ''}
+      ${nd.outline ? `<li>번호 목차: <b>${nd.outline.nodes.length}개 항목</b></li>` : ''}<li>사이트의 원본 파일도 새 파일로 바꿉니다 (${fmtBytes(file.size)})</li>
       ${nd.extraction.warnings.length ? `<li>참고: ${nd.extraction.warnings.map(SAS.esc).join(' / ')}</li>` : ''}</ul>
       <p class="small muted">따로 넣은 원본 내려받기 링크가 있다면 새 판으로 바꿔 주세요.</p>`, '교체 적용');
     if (!ok) return;
     S.replaceDoc(doc.id, nd);
-    if (nd.pdf && r.format === 'pdf') await S.setPendingPdf(doc.id, file);
+    await S.setPendingPdf(doc.id, file);
     renderEditor(); renderList();
     toast('교체했습니다. 「③ 점검·반영」에서 반영해 주세요.');
   }
@@ -1232,7 +1235,7 @@ ${groups.map(g => `<div class="card"><h2>${e(g.title)}</h2><table>${g.items.map(
       chk.warnings.length ? h('details', {}, h('summary', {}, `확인 권장 ${chk.warnings.length}건 (반영은 가능)`), h('ul', { class: 'small' }, chk.warnings.slice(0, 200).map(w => h('li', {}, w)))) : '');
     return { outputs, chk, diff };
   }
-  $('btnCheck').onclick = () => runCheck();
+  $('btnCheck').onclick = () => { runCheck(); renderStorageCard(); };
 
   function renderSaveStatus() {
     const st = S.state.status, g = S.state.github, src = S.state.source;
@@ -1261,12 +1264,51 @@ ${groups.map(g => `<div class="card"><h2>${e(g.title)}</h2><table>${g.items.map(
 
   $('btnPublish').onclick = async () => {
     if (S.state.source !== 'github') { toast('GitHub에서 자료를 불러온 상태에서만 반영할 수 있습니다. 새로고침해 다시 불러와 주세요.', 5000); return; }
-    const { outputs, chk, diff } = await runCheck();
+    let { outputs, chk, diff } = await runCheck();
     if (!chk.ok) { toast('오류를 먼저 고쳐 주세요.', 4000); return; }
     const nPdf = S.pendingPdfIds().length;
     if (!diff.changed.length && !diff.deletions.length && !nPdf) { toast('바뀐 파일이 없습니다. 사이트와 내용이 같습니다.'); return; }
     const info = GH.expiryInfo(S.state.github && S.state.github.expiresAt);
     if (info.level === 'expired') { toast('출입증이 만료되었습니다. 새 출입증으로 바꿔 주세요.', 5000); openTokenDialog(); return; }
+    // 1) 원본 파일을 연도별 창고에 먼저 올린다(창고가 없으면 만드는 방법을 안내하고 멈춤)
+    if (nPdf) {
+      const big = S.pendingTooBig();
+      if (big.length) {
+        await modal(h('div', {}, h('h2', {}, `38MB가 넘는 파일 ${big.length}개 — 반영을 시작하지 않았습니다`),
+          h('p', {}, 'GitHub에는 파일 하나를 약 42MB까지만 올릴 수 있습니다. 아래 파일의 용량을 줄인 뒤(같은 이름으로) 「원본 파일 창고 → 원본 파일 다시 연결」로 바꿔 넣어 주세요. 아무것도 올리지 않았습니다.'),
+          h('ul', { class: 'small' }, big.map(x => h('li', {}, `${x.name} (${fmtBytes(x.bytes)})`)))));
+        renderStorageCard(); return;
+      }
+      const plan = S.planPendingStorage();
+      if (plan.repos.length) {
+        let st;
+        try { st = await withProgress('창고 저장소를 확인하는 중…', () => S.checkStorage(plan.repos)); }
+        catch (e) { await modal(h('div', {}, h('h2', {}, '창고를 확인하지 못했습니다'), h('p', {}, e.message))); return; }
+        const missing = st.filter(x => !x.ok);
+        if (missing.length) { await storageHelp(missing.map(x => x.repo), st); return; }
+        const size = repo => S.state.docs.filter(d => d.original && d.original.repo === repo && S.pendingPdfIds().includes(d.id)).reduce((a, d) => a + (d.original.bytes || 0), 0);
+        const ok = await confirmBox(h('div', {}, h('h2', {}, '원본 파일 올리기'),
+          h('p', {}, `원본 파일 ${plan.ids.length}개를 창고에 먼저 올린 뒤 사이트 데이터를 반영합니다.`),
+          h('ul', { class: 'small-list' }, plan.repos.map(r => h('li', {}, h('b', {}, r), ` · 이번에 ${fmtBytes(size(r))} · 창고 전체 ${fmtBytes(SAS.storageUsage(S.state.docs).get(r) || 0)} / 900MB`))),
+          h('p', { class: 'small muted' }, '파일이 많으면 오래 걸립니다(인터넷 속도에 따라 1GB에 10~30분). 중간에 끊겨도 올린 파일은 남고, 다시 누르면 남은 것부터 올립니다.')), '올리기 시작');
+        if (!ok) return;
+        try {
+          const r = await withProgress('원본 파일을 창고에 올리는 중…', p => S.publishStorage(p));
+          if (r.pagesWarn.length) await modal(h('div', {}, h('h2', {}, '창고의 GitHub Pages를 켜 주세요'),
+            h('p', {}, '파일은 올라갔지만, 아래 창고의 공개 주소(GitHub Pages)가 켜져 있는지 확인하지 못했습니다. 켜져 있지 않으면 사용자 화면에서 파일이 열리지 않습니다.'),
+            h('ul', {}, r.pagesWarn.map(x => h('li', {}, h('a', { href: `https://github.com/${S.state.github.owner}/${x}/settings/pages`, target: '_blank', rel: 'noopener' }, `${x} → Settings → Pages`)))),
+            h('p', { class: 'small' }, '「Build and deployment」에서 Source: Deploy from a branch, Branch: main / (root) → Save.')));
+        } catch (e) {
+          await modal(h('div', {}, h('h2', {}, '원본 파일을 다 올리지 못했습니다'), h('p', {}, e.message), h('p', { class: 'small muted' }, '올린 파일은 창고에 남아 있습니다. 문제를 해결한 뒤 다시 「사이트에 반영」을 누르면 남은 파일부터 올립니다. 사이트 데이터는 아직 바뀌지 않았습니다.')));
+          if (e.kind === 'auth') openTokenDialog();
+          if (e.kind === 'storage-missing') await storageHelp([(e.message.match(/「([^」]+)」/) || [])[1]].filter(Boolean), []);
+          return;
+        }
+      }
+    }
+    // 창고 주소가 정해졌으니 데이터를 다시 만든다
+    ({ outputs, chk, diff } = await runCheck());
+    if (!chk.ok) { toast('오류를 먼저 고쳐 주세요.', 4000); return; }
     const message = ($('commitMsg').value.trim() || autoMessage(diff)) + `\n\n관리자 도구에서 반영 · 바뀐 파일 ${diff.changed.length}개, 삭제 ${diff.deletions.length}개`;
     try {
       const r = await withProgress(`사이트에 반영하는 중… (파일 ${diff.changed.length + diff.deletions.length}개${nPdf ? ` · PDF ${nPdf}개` : ''})`, p => S.publishToGithub(outputs, message, p));
@@ -1278,6 +1320,44 @@ ${groups.map(g => `<div class="card"><h2>${e(g.title)}</h2><table>${g.items.map(
       await modal(h('div', {}, h('h2', {}, '반영하지 못했습니다'), h('p', {}, e.message), h('p', { class: 'small muted' }, '작업 내용은 이 브라우저에 보관되어 있습니다.')));
       if (e.kind === 'auth' || e.kind === 'permission') openTokenDialog();
     }
+  };
+
+  /** 창고 저장소 만드는 방법 안내 */
+  async function storageHelp(repos, st) {
+    const owner = S.state.github.owner;
+    await modal(h('div', {}, h('h2', {}, `창고 저장소 ${repos.length}개를 만들어 주세요`),
+      h('p', {}, '원본 파일을 담을 창고가 아직 없습니다. GitHub에서 아래 이름으로 저장소를 만들어 주세요.'),
+      h('ul', {}, repos.map(r => h('li', {}, h('b', {}, r), ' — ', h('a', { href: `https://github.com/new?owner=${encodeURIComponent(owner)}&name=${encodeURIComponent(r)}&visibility=public`, target: '_blank', rel: 'noopener' }, '만들기 화면 열기 ↗')))),
+      h('ol', { class: 'small' },
+        h('li', {}, `Owner는 ${owner}, 이름은 위와 똑같이, Public으로 만듭니다(README는 넣지 않아도 됩니다).`),
+        h('li', {}, '출입증이 새 저장소도 쓸 수 있어야 합니다. GitHub → Settings → Developer settings → Fine-grained tokens → 지금 출입증 → Repository access에서 새 저장소를 추가하세요(「All repositories」로 두면 다음부터는 이 단계가 필요 없습니다). 권한은 Contents: Read and write, 가능하면 Pages: Read and write도 켜 주세요(창고 공개 주소를 자동으로 켭니다).'),
+        h('li', {}, '다 만들었으면 다시 「사이트에 반영」을 누르세요.')),
+      st && st.some(x => x.ok) ? h('p', { class: 'small muted' }, '이미 있는 창고: ' + st.filter(x => x.ok).map(x => x.repo).join(', ')) : null));
+  }
+
+  // ---------- 원본 파일 창고 현황 · 원본 다시 연결 ----------
+  function renderStorageCard() {
+    const box = $('storageCard'); if (!box) return;
+    const usage = SAS.storageUsage(S.state.docs);
+    const pend = S.pendingPdfIds();
+    const pendBytes = pend.reduce((a, id) => { const d = S.getDoc(id); return a + ((d && d.original && d.original.bytes) || (d && d.pdf && d.pdf.bytes) || 0); }, 0);
+    const missing = S.docsWithoutOriginal();
+    const tooBig = S.pendingTooBig();
+    box.replaceChildren(
+      usage.size ? h('div', { class: 'stat' }, ...[...usage].sort().map(([r, b]) => h('div', {}, h('b', {}, fmtBytes(b)), h('span', {}, `${r} · ${Math.round(b / SAS.STORAGE_MAX * 100)}%`)))) : h('p', { class: 'muted small' }, '아직 창고에 올린 원본 파일이 없습니다.'),
+      h('p', { class: 'small' }, pend.length ? `반영 대기 원본 파일 ${pend.length}개 (${fmtBytes(pendBytes)}) — 「사이트에 반영」하면 연도별 창고에 먼저 올라갑니다.` : '반영 대기 원본 파일 없음'),
+      missing.length ? h('div', { class: 'notice warn' }, `원본 파일이 없어 사이트에서 내려받을 수 없는 자료가 ${missing.length}건 있습니다. 등록할 때 쓴 폴더를 다시 고르면 파일 이름으로 찾아 연결합니다.`) : '',
+      tooBig.length ? h('div', { class: 'notice err' }, h('b', {}, `38MB가 넘어 GitHub에 올릴 수 없는 파일 ${tooBig.length}개`), ' — 용량을 줄인 같은 이름의 파일이 든 폴더를 「원본 파일 다시 연결」로 고르면 바꿔 넣습니다.',
+        h('ul', { class: 'small' }, tooBig.slice(0, 30).map(x => h('li', {}, `${x.name} (${fmtBytes(x.bytes)})`)))) : '',
+      h('div', { class: 'actions' }, h('button', { onclick: () => $('reattachInput').click() }, '원본 파일 다시 연결 (폴더 선택)'),
+        h('span', { class: 'small muted' }, '이름이 같은 파일을 찾아 붙입니다. 반영 대기 중인 파일은 고른 파일이 더 작을 때만 바꿉니다.')));
+  }
+  $('reattachInput').onchange = async e => {
+    const files = [...e.target.files]; e.target.value = '';
+    if (!files.length) return;
+    const r = await withProgress('원본 파일을 찾아 연결하는 중…', () => S.attachOriginals(files));
+    toast(r.attached || r.replaced ? `원본 파일 ${r.attached}개를 연결하고 ${r.replaced}개를 더 작은 파일로 바꿨습니다. 「사이트에 반영」하면 창고에 올라갑니다.` : '새로 연결하거나 바꿀 파일을 찾지 못했습니다. 등록할 때 쓴 폴더(또는 용량을 줄인 파일 폴더)를 골라 주세요.', 7000);
+    renderStorageCard(); runCheck();
   };
 
   $('btnSaveFolder').onclick = async () => {

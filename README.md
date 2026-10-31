@@ -16,7 +16,7 @@ assets/css/site.css            사용자 화면 디자인
 assets/img/                    첫 화면 학교급 아이콘·장식 그림
 assets/js/site/search.js       데이터 불러오기·예전 검색 엔진(순위·본문 색인, Node 테스트 가능)
 assets/js/site/app.js          사용자 화면(3단 보기, pdf.js로 쪽 그리기)
-pdf/<자료ID>.pdf               원본 PDF(관리자 도구가 반영할 때 함께 올림)
+pdf/<자료ID>.pdf               (예전 방식) 원본 PDF. 새 원본 파일은 창고 저장소 cne_files_<올리는해>_<번호>/files/<자료ID>.<확장자> (Pages 1GB 한도 때문)
 admin/
   index.html                   관리자 도구
   css/admin.css
@@ -84,7 +84,8 @@ tests/
 
 ```jsonc
 {
-  "pdf": { "path": "pdf/doc-2026-kinder1.pdf", "bytes": 8813342 },     // 사이트에 함께 올린 원본
+  "pdf": { "repo": "cne_files_2026_1", "path": "files/doc-2026-kinder1.pdf", "bytes": 8813342 },   // 쪽 보기용 PDF(창고)
+  "original": { "repo": "cne_files_2026_1", "path": "files/doc-2026-kinder1.pdf", "name": "2026 유치원 업무 도움자료.pdf", "bytes": 8813342, "format": "pdf" }, // 내려받기용 원본(모든 형식)
   "blocks": [ { "n": 11, "pdf_page": 12, "w": 595, "h": 841, "…": "…" } ],  // 쪽 크기(pt)
   "links": [ { "id": "lnk-0042", "text": "유치원 평가 운영 계획(예시)", "url": "http://…", "type": "서식",
                "block": 11, "box": [92.4, 612.3, 246.1, 626.0],          // 쪽 위에서부터 [왼, 위, 오른, 아래] pt

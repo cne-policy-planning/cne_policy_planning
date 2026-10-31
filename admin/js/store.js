@@ -85,8 +85,9 @@
   }
   async function clearDraft() { clearTimeout(draftTimer); await kvDel('draft'); }
 
-  // ---------- 원본 PDF(아직 사이트에 올리지 않은 것) ----------
-  // 자료 ID → File/Blob. 창을 닫아도 이어서 반영할 수 있게 IndexedDB에도 넣어 둔다.
+  // ---------- 원본 파일(아직 사이트·창고에 올리지 않은 것) ----------
+  // 자료 ID → File/Blob(PDF·HWP·엑셀 등 모든 형식). 창을 닫아도 이어서 반영할 수 있게 IndexedDB에도 넣어 둔다.
+  // (예전 판과 맞추려고 함수·키 이름은 pdf를 그대로 쓴다)
   const pendingPdfs = new Map();
   async function setPendingPdf(id, blob) { pendingPdfs.set(id, blob); await kvSet('pdf:' + id, blob); markChanged(id); }
   async function dropPendingPdf(id) { pendingPdfs.delete(id); await kvDel('pdf:' + id); }
@@ -94,10 +95,10 @@
   async function restorePendingPdfs() {
     for (const k of await kvKeys('pdf:')) { const id = k.slice(4); const b = await kvGet(k); if (b && getDoc(id)) pendingPdfs.set(id, b); else await kvDel(k); }
   }
-  function pdfPath(id) { return `pdf/${id}.pdf`; }
+  function pdfPath(id) { return `files/${id}.pdf`; }
   /** 저장소의 PDF 중 어느 자료에서도 쓰지 않는 것(자료를 지운 경우) */
   function orphanPdfs(paths) {
-    const used = new Set(state.docs.filter(d => d.pdf).map(d => d.pdf.path));
+    const used = new Set(state.docs.filter(d => d.pdf && !d.pdf.repo).map(d => d.pdf.path));
     return [...paths].filter(p => /^pdf\/[^/]+\.pdf$/.test(p) && !used.has(p));
   }
 
@@ -235,8 +236,9 @@
     clearTimeout(draftTimer);
     const { changed, deletions } = await diffOutputs(outputs);
     const files = changed.map(p => ({ path: p, content: outputs.files.get(p) }));
-    // 원본 PDF: 새로 넣은 것은 조각으로 올리고, 지운 자료의 PDF는 함께 지운다
-    const pdfIds = pendingPdfIds();
+    // 예전 방식(본 저장소 pdf/ 폴더)의 원본 PDF: 새로 넣은 것은 조각으로 올리고, 지운 자료의 PDF는 함께 지운다.
+    // 창고 방식 자료는 publishStorage에서 먼저 올라가므로 여기서는 건너뛴다.
+    const pdfIds = pendingPdfIds().filter(id => { const d = getDoc(id); return d && d.pdf && !d.pdf.repo && !d.original; });
     for (let i = 0; i < pdfIds.length; i++) {
       const id = pdfIds[i], doc = getDoc(id);
       if (!doc || !doc.pdf) continue;
@@ -274,6 +276,133 @@
     emit();
     return { written: files.length, deleted: deletions.length, pdfs: pdfIds.length, commitSha: r.commitSha };
   }
+
+  // ---------- 원본 파일 창고(연도별 저장소) ----------
+  /**
+   * 반영 대기 중인 원본 파일을 창고에 배정한다(아직 올리지 않음). 반환 { repos, ids }
+   */
+  function planPendingStorage() {
+    const ids = [...pendingPdfs.keys()].filter(id => getDoc(id));
+    const r = root.SAS.planStorage(state.docs, ids, { prefix: (state.github && state.github.storagePrefix) || root.SAS.STORAGE_PREFIX });
+    if (ids.length) markChanged();
+    return { repos: r.repos, ids };
+  }
+  /** 창고 저장소마다 있는지·비었는지·Pages가 켜졌는지 확인. 반환 [{repo, ok, problem, pages}] */
+  async function checkStorage(repos) {
+    const cfg = state.github, out = [];
+    for (const repo of repos) {
+      const c = GH.client(Object.assign({}, cfg, { repo, branch: 'main' }));
+      const it = { repo, ok: true, problem: '', pages: 'unknown', empty: false };
+      try { const info = await c.api(''); it.branch = info.default_branch || 'main'; }
+      catch (e) { it.ok = false; it.problem = e.status === 404 ? 'missing' : e.kind || 'other'; out.push(it); continue; }
+      try { await c.getHead(); } catch (e) { if (e.status === 409 || e.kind === 'empty') it.empty = true; else { it.ok = false; it.problem = e.kind || 'other'; } }
+      it.pages = await c.pagesStatus();
+      out.push(it);
+    }
+    return out;
+  }
+  /**
+   * 창고에 원본 파일을 올린다. 창고마다 약 200MB씩 나눠 커밋(중간에 끊겨도 올린 것은 남는다).
+   * 올린 파일은 반영 대기에서 빠진다. 창고에서 더 이상 쓰지 않는 파일(교체·삭제된 자료)은 지운다.
+   * onProgress(done, total, label)
+   */
+  async function publishStorage(onProgress) {
+    const cfg = state.github;
+    if (!cfg || !cfg.token) throw new GH.GitHubError('GitHub 출입증을 먼저 연결해 주세요.', 'auth', 0);
+    const ids = [...pendingPdfs.keys()].filter(id => { const d = getDoc(id); return d && d.original && d.original.repo; });
+    const byRepo = new Map();
+    ids.forEach(id => { const r = getDoc(id).original.repo; if (!byRepo.has(r)) byRepo.set(r, []); byRepo.get(r).push(id); });
+    // 지금 자료가 쓰는 창고 + 예전에 쓰던 창고(정리할 파일이 있을 수 있음)
+    const known = new Set([...(await kvGet('storageRepos') || []), ...state.docs.filter(d => d.original && d.original.repo).map(d => d.original.repo)]);
+    byRepo.forEach((_, r) => known.add(r));
+    const total = ids.length; let done = 0, uploaded = 0;
+    const pagesWarn = [];
+    const BATCH = 200 * 1024 * 1024;
+    for (const repo of [...known].sort()) {
+      const c = GH.client(Object.assign({}, cfg, { repo, branch: 'main' }));
+      let info;
+      try { info = await c.api(''); }
+      catch (e) {
+        if (!byRepo.has(repo)) continue; // 예전 창고를 지웠으면 정리할 것도 없다
+        if (e.status === 404) throw new GH.GitHubError(`창고 저장소 「${repo}」를 찾을 수 없습니다. GitHub에서 ${cfg.owner} 아래에 Public 저장소 「${repo}」를 만들고, 출입증이 이 저장소도 쓸 수 있게 해 주세요(출입증 설정 → Repository access).`, 'storage-missing', 404);
+        throw e;
+      }
+      c.branch = info.default_branch || 'main';
+      const cc = GH.client(Object.assign({}, cfg, { repo, branch: info.default_branch || 'main' }));
+      let head;
+      try { head = await cc.getHead(); }
+      catch (e) {
+        if (!(e.status === 409 || e.kind === 'empty')) throw e;
+        await cc.initEmpty('.nojekyll', '', '창고 시작(관리자 도구)');
+        head = await cc.getHead();
+      }
+      if (byRepo.has(repo) && (await cc.enablePages(info.default_branch || 'main')) === 'unknown' && (await cc.pagesStatus()) !== 'on') pagesWarn.push(repo);
+      // 이 창고를 쓰는 자료의 파일 목록(지우면 안 되는 것)
+      const keep = new Set(state.docs.filter(d => d.original && d.original.repo === repo).map(d => d.original.path));
+      const deletions = [...head.files.keys()].filter(p => /^files\//.test(p) && !keep.has(p));
+      const mine = byRepo.get(repo) || [];
+      let batch = [], size = 0, batchIds = [];
+      const flush = async (dels) => {
+        if (!batch.length && !(dels && dels.length)) return;
+        const r = await cc.commit({ files: batch, deletions: dels || [], message: `원본 파일 ${batch.length}개 올림${dels && dels.length ? `, ${dels.length}개 정리` : ''} (관리자 도구)`, parent: head });
+        head = { commitSha: r.commitSha, treeSha: r.treeSha, files: head.files };
+        for (const id of batchIds) await dropPendingPdf(id);
+        batch = []; size = 0; batchIds = [];
+      };
+      if (!head.files.has('.nojekyll')) batch.push({ path: '.nojekyll', content: '' });
+      for (const id of mine) {
+        const doc = getDoc(id), o = doc.original;
+        const blob = pendingPdfs.get(id);
+        const bytes = new Uint8Array(await blob.arrayBuffer());
+        if (bytes.length > root.SAS.FILE_MAX) throw new GH.GitHubError(`「${doc.title}」 원본 파일이 ${(bytes.length / 1048576).toFixed(0)}MB라 올릴 수 없습니다(파일 하나 38MB까지). 용량을 줄인 파일로 바꿔 넣어 주세요.`, 'too-big', 0);
+        o.bytes = bytes.length;
+        if (onProgress) onProgress(done, total, `${repo} · ${o.name}`);
+        const sha = await GH.gitBlobSha(bytes);
+        if (head.files.get(o.path) !== sha) { await cc.createBlob(bytes); batch.push({ path: o.path, sha }); size += bytes.length; uploaded++; }
+        batchIds.push(id); done++;
+        if (size >= BATCH) await flush();
+      }
+      await flush(deletions);
+    }
+    await kvSet('storageRepos', [...known]);
+    if (onProgress) onProgress(total, total, '');
+    return { uploaded, total, pagesWarn };
+  }
+  /**
+   * 원본 파일 다시 연결: 이름이 같은 파일을 자료에 붙인다. files: [File] → { attached, replaced }
+   * - 원본이 없는 자료: 붙인다(같은 이름이 여럿이면 가장 작은 것).
+   * - 반영 대기 중인 자료: 고른 파일이 더 작으면 바꾼다(용량을 줄인 PDF로 바꿔 넣기). 이미 창고에 올라간 자료는 건드리지 않는다.
+   */
+  async function attachOriginals(files) {
+    const byName = new Map();
+    files.forEach(f => { const k = root.SAS.norm(f.name); if (!byName.has(k)) byName.set(k, []); byName.get(k).push(f); });
+    byName.forEach(list => list.sort((a, b) => a.size - b.size));
+    let attached = 0, replaced = 0;
+    for (const d of state.docs) {
+      if (!d.filename) continue;
+      const list = byName.get(root.SAS.norm(d.filename)); if (!list) continue;
+      const f = list[0];
+      const pending = pendingPdfs.get(d.id);
+      if (pending) {
+        if (f.size >= pending.size) continue;
+        await setPendingPdf(d.id, f);
+        if (d.original) d.original.bytes = f.size;
+        if (d.pdf) d.pdf.bytes = f.size;
+        replaced++; continue;
+      }
+      if (d.original || d.pdf) continue;   // 이미 사이트·창고에 있는 자료
+      d.original = root.SAS.makeOriginal(d.id, f.name, f.size, d.format === 'pdf' ? 'pdf' : root.SAS.formatOf(f.name));
+      if (d.format === 'pdf') d.pdf = { repo: null, path: d.original.path, bytes: f.size };
+      await setPendingPdf(d.id, f); attached++;
+    }
+    return { attached, replaced };
+  }
+  /** 반영 대기 중인데 너무 커서 올릴 수 없는 파일 */
+  function pendingTooBig() {
+    return [...pendingPdfs].filter(([id, b]) => getDoc(id) && b.size > root.SAS.FILE_MAX).map(([id, b]) => ({ id, name: getDoc(id).filename || getDoc(id).title, bytes: b.size }));
+  }
+  /** 원본 파일이 없는(내려받을 수 없는) 자료 */
+  function docsWithoutOriginal() { return state.docs.filter(d => !d.works_url && !d.original && !d.pdf); }
 
   // ---------- 변경 감시 ----------
   // 이 브라우저(관리자 도구)가 만든 커밋을 기억해 두고, 그 밖의 커밋이 생기면 알린다.
@@ -437,7 +566,7 @@
   }
 
   root.SASStore = {
-    setPendingPdf, dropPendingPdf, pendingPdfIds, pdfPath, orphanPdfs,
+    setPendingPdf, dropPendingPdf, pendingPdfIds, pdfPath, orphanPdfs, planPendingStorage, checkStorage, publishStorage, attachOriginals, pendingTooBig, docsWithoutOriginal,
     STATUS, state, onChange, dataDigest, markChanged, getDoc, addDocs, replaceDoc, removeDoc, touch, allIds, diffOutputs,
     kvGet, kvSet, loadGithubConfig, connectGithub, setExpiry, forgetToken, checkActivity, acknowledgeActivity, recentActivity, loadFromGithub, publishToGithub,
     fsSupported, pickFolder, reopenLastFolder, saveToFolder, buildZip, markExported, markPublished, loadZip,

@@ -224,6 +224,37 @@ test('일괄 등록: 공통·부서 폴더 이름으로 짐작', () => {
   eq(SAS.guessMeta('자료_분류/공통/유아교육복지과/2026 교육복지 계획.pdf').department, '유아교육복지과');
 });
 
+console.log('\n[7-2] 원본 파일 창고(연도별 저장소)');
+test('창고 주소: 창고면 ../창고/경로, 예전 본 저장소 PDF는 경로 그대로', () => { eq(SAS.fileUrl({ repo: 'cne_files_2026_1', path: 'files/doc-a.hwp' }), '../cne_files_2026_1/files/doc-a.hwp'); eq(SAS.fileUrl({ path: 'pdf/doc-a.pdf' }), 'pdf/doc-a.pdf'); eq(SAS.fileUrl(null), ''); });
+test('올리는 해 창고에 배정 · 900MB 넘으면 다음 번호 창고 · PDF는 쪽 보기 경로도 같이', () => {
+  const MB = 1048576, mk = (id, y, mb, fmt) => ({ id, year: y, original: SAS.makeOriginal(id, `${id}.${fmt}`, mb * MB, fmt) });
+  const docs = [mk('doc-1', 2026, 500, 'pdf'), mk('doc-2', 2026, 300, 'hwp'), mk('doc-3', 2026, 200, 'pdf'), mk('doc-4', 2027, 10, 'xlsx')];
+  const r = SAS.planStorage(docs, docs.map(d => d.id), { year: 2026 });
+  eq(docs.map(d => d.original.repo), ['cne_files_2026_1', 'cne_files_2026_1', 'cne_files_2026_2', 'cne_files_2026_1'], '자료 연도와 관계없이 올리는 해 창고, 빈자리 먼저');
+  eq(r.repos, ['cne_files_2026_1', 'cne_files_2026_2']);
+  eq(docs[0].pdf, { repo: 'cne_files_2026_1', path: 'files/doc-1.pdf', bytes: 500 * MB }); ok(!docs[1].pdf);
+});
+test('다음 해에 새 판으로 바꾸면 그 해 창고로 · 같은 연도면 같은 자리에 덮어쓰기', () => {
+  const d = { id: 'doc-9', year: 2027, original: Object.assign(SAS.makeOriginal('doc-9', 'a.pdf', 1000, 'pdf'), { repo: 'cne_files_2026_1' }) };
+  SAS.planStorage([d], ['doc-9'], { year: 2027 }); eq(d.original.repo, 'cne_files_2027_1');
+  const e = { id: 'doc-8', year: 2026, original: Object.assign(SAS.makeOriginal('doc-8', 'b.hwp', 1000, 'hwp'), { repo: 'cne_files_2026_3' }) };
+  SAS.planStorage([e], ['doc-8'], { year: 2026 }); eq(e.original.repo, 'cne_files_2026_3');
+});
+test('예전 방식 PDF(원본 정보 없음)도 창고로 옮김 · 사이트 색인에 내려받기 주소', () => {
+  const d = JSON.parse(JSON.stringify(doc)); d.id = 'doc-2026-legacy'; d.pdf = { path: 'pdf/doc-2026-legacy.pdf', bytes: 100 }; d.filename = '2026+유치원.pdf';
+  SAS.planStorage([d], [d.id], { year: 2026 });
+  eq(d.pdf.path, 'files/doc-2026-legacy.pdf'); eq(d.original.name, '2026 유치원.pdf');
+  const out = SAS.buildOutputs([d]); const ix = JSON.parse(out.files.get('data/indexes/kindergarten.json')).docs[0];
+  eq([ix.p, ix.dl, ix.fn], ['../cne_files_2026_1/files/doc-2026-legacy.pdf', '../cne_files_2026_1/files/doc-2026-legacy.pdf', '2026 유치원.pdf']);
+  ok(SAS.checkConsistency([d], out).ok);
+});
+test('새 파일에 원본이 있으면 교체할 때 예전 PDF를 이어 쓰지 않음', () => { const o = { links: [], pdf: { path: 'pdf/x.pdf' } }, n = { links: [], original: { path: 'files/x.hwp' } }; SAS.carryLinkEdits(o, n); ok(!n.pdf); });
+
+test('웹 주소가 아닌 PDF 링크는 오류가 아니라 확인 권장', () => {
+  const d = JSON.parse(JSON.stringify(doc)); d.links = d.links.concat([{ id: 'x1', text: 'vms@ssmkorea.or.kr', url: 'mailto:vms@ssmkorea.or.kr' }, { id: 'x2', text: '추진 절차.pdf', url: '추진 절차.pdf' }]);
+  const v = SAS.validateDocument(d); ok(!v.errors.some(e => /링크/.test(e)), v.errors.join()); ok(v.warnings.some(w => w.includes('웹 주소가 아닌 링크 2개')));
+});
+
 console.log('\n[8] 사용자 검색 엔진');
 const SS = require(path.join(__dirname, '..', 'assets', 'js', 'site', 'search.js'));
 const fetchOut = async p => { const t = out.files.get(p); if (t == null) throw new Error('없음 ' + p); return JSON.parse(t); };
