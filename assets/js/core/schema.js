@@ -29,6 +29,11 @@
   const ACADEMIC_COMMON = '교무학사 공통자료';
   const OTHER_DEPT = '기타 부서';
   const OTHER_DEPT_MAX = 2;   // 전체 자료가 이 수 이하인 부서는 사용자 화면에서 '기타 부서'로 묶는다
+  // 원본 파일 창고: GitHub Pages는 사이트 하나에 1GB까지라, 원본 파일(PDF·HWP·엑셀…)은 연도별 창고 저장소에 나눠 담는다.
+  // 창고 이름 = <STORAGE_PREFIX>_<연도>_<번호> (예: cne_files_2026_1). 같은 계정(조직) 아래에 만들어 같은 주소로 열린다.
+  const STORAGE_PREFIX = 'cne_files';
+  const STORAGE_MAX = 900 * 1024 * 1024;     // 창고 하나에 담을 최대 크기(1GB 한도보다 여유 있게)
+  const FILE_MAX = 95 * 1024 * 1024;         // 파일 하나 최대(GitHub 한 파일 100MB 한도)
   const DEPARTMENTS = [ACADEMIC_COMMON, '감사관', '교원인사과', '교육과정평가지원부', '미래인재과', '미래학교추진단', '민주시민교육과', '소통담당관',
     '안전총괄과', '예산과', '유아교육복지과', '재무과', '정책기획과', '중등교육과', '진로융합부', '체육건강과', '초등특수교육과', '총무과', '학교지원과']
     .sort((a, b) => a.localeCompare(b, 'ko'));
@@ -38,6 +43,57 @@
 
   function levelSlug(name) { const l = LEVELS.find(x => x.name === name); return l ? l.slug : null; }
   function levelName(slug) { const l = LEVELS.find(x => x.slug === slug); return l ? l.name : null; }
+  /**
+   * 사이트에서 파일을 여는 주소. ref = { repo, path }.
+   * 창고에 있으면 '../<창고>/<경로>'(같은 github.io 주소 아래), 예전처럼 본 저장소에 있으면 그 경로 그대로.
+   */
+  function fileUrl(ref) {
+    if (!ref || !ref.path) return '';
+    return ref.repo ? `../${ref.repo}/${ref.path}` : ref.path;
+  }
+  /** 원본 파일 정보(창고 배정 전): 모든 형식 */
+  function makeOriginal(id, filename, bytes, format) {
+    const ext = String(format || formatOf(filename) || 'bin').toLowerCase();
+    return { name: String(filename || '').replace(/\+/g, ' ').trim(), bytes: bytes || 0, format: ext, repo: null, path: `files/${id}.${ext}` };
+  }
+  /**
+   * 반영할 원본 파일을 연도별 창고에 배정한다(문서 객체를 고친다).
+   * docs: 전체 자료, ids: 이번에 올릴 자료 ID, opts: { prefix, max, year(기본 연도) }
+   * 반환 { repos: [이번에 쓰는 창고 이름], assigned: Map(id → repo) }
+   * - 올리는 해(opts.year, 기본 올해)의 창고에 담는다(자료 연도가 아니라 올리는 해: 2025·2018년판 자료도 올해 창고에).
+   *   이미 같은 해 창고에 있으면 그 자리를 그대로 쓴다(덮어쓰기). 다음 해에 새 판으로 바꾸면 다음 해 창고로 간다.
+   * - 창고가 차면(max) 다음 번호 창고로.
+   */
+  function planStorage(docs, ids, opts) {
+    opts = opts || {};
+    const prefix = opts.prefix || STORAGE_PREFIX, max = opts.max || STORAGE_MAX, thisYear = opts.year || new Date().getFullYear();
+    const want = new Set(ids);
+    const used = new Map();
+    const add = (repo, n) => used.set(repo, (used.get(repo) || 0) + n);
+    docs.forEach(d => { if (!want.has(d.id) && d.original && d.original.repo) add(d.original.repo, d.original.bytes || 0); });
+    const assigned = new Map(), repos = new Set();
+    const yearOf = repo => (String(repo).match(/_(\d{4})_\d+$/) || [])[1];
+    docs.filter(d => want.has(d.id)).forEach(d => {
+      if (!d.original) {
+        if (!d.pdf) return;
+        d.original = makeOriginal(d.id, d.filename || `${d.id}.pdf`, d.pdf.bytes, 'pdf');
+      }
+      const o = d.original, y = String(thisYear), bytes = o.bytes || 0;
+      let repo = o.repo && yearOf(o.repo) === y && (used.get(o.repo) || 0) + bytes <= max ? o.repo : null;
+      for (let n = 1; !repo; n++) { const name = `${prefix}_${y}_${n}`; if ((used.get(name) || 0) + bytes <= max || n > 50) repo = name; }
+      o.repo = repo; o.path = `files/${d.id}.${o.format}`;
+      if (o.format === 'pdf') d.pdf = { repo, path: o.path, bytes };
+      add(repo, bytes); assigned.set(d.id, repo); repos.add(repo);
+    });
+    return { repos: [...repos].sort(), assigned };
+  }
+  /** 창고별로 지금 쓰고 있는 크기 */
+  function storageUsage(docs) {
+    const m = new Map();
+    docs.forEach(d => { if (d.original && d.original.repo) m.set(d.original.repo, (m.get(d.original.repo) || 0) + (d.original.bytes || 0)); });
+    return m;
+  }
+
   /** 학교급 정리: 목록에 있는 값만, 공통은 다른 학교급과 함께 쓰지 않는다(공통이 있으면 공통만) */
   function cleanLevels(list) {
     const v = [...new Set((list || []).filter(levelSlug))];
@@ -336,11 +392,16 @@
     if (!doc.department && (doc.school_levels || []).includes(COMMON_LEVEL)) warnings.push('부서가 비어 있습니다. 사용자 화면에서 「기타 부서」로 묶입니다');
     if (doc.works_url && !/^https?:\/\//i.test(doc.works_url)) errors.push('원본 내려받기 링크가 http(s)로 시작하지 않습니다');
     if (doc.format === 'pdf' && !doc.pdf) warnings.push('원본 PDF가 사이트에 없습니다. 「파일 교체」로 PDF를 다시 넣으면 쪽 보기가 됩니다');
-    if (doc.pdf && !/^pdf\/[a-z0-9-]+\.pdf$/.test(doc.pdf.path || '')) errors.push('원본 PDF 경로 형식 오류');
+    if (doc.pdf && !/^(pdf|files)\/[a-z0-9-]+\.pdf$/.test(doc.pdf.path || '')) errors.push('원본 PDF 경로 형식 오류');
+    if (doc.original && !/^files\/[a-z0-9-]+\.[a-z0-9]+$/.test(doc.original.path || '')) errors.push('원본 파일 경로 형식 오류');
+    if (doc.original && doc.original.repo && !/^[A-Za-z0-9._-]+$/.test(doc.original.repo)) errors.push('원본 파일 창고 이름 오류');
+    if (!doc.works_url && !doc.pdf && !doc.original) warnings.push('사이트에서 내려받을 원본 파일이 없습니다. 「③ 점검·반영 → 원본 파일 다시 연결」로 넣을 수 있습니다');
     if (doc.kind === 'text' && doc.format === 'pdf' && !doc.outline) warnings.push('번호 목차가 없습니다. 「파일 교체」로 PDF를 다시 분석해 주세요');
     const suspect = (doc.links || []).filter(l => N.isSuspectUrl(l.url)).length;
     if (suspect) warnings.push(`주소가 잘린 것으로 보이는 링크 ${suspect}개(누르면 찾을 수 없다고 나올 수 있음) — 「링크 점검」에서 고칠 수 있습니다`);
-    (doc.links || []).forEach(l => { if (l.url && !/^https?:\/\//i.test(l.url)) errors.push(`링크 주소 형식 오류: ${l.text}`); });
+    // PDF 안 링크 중 웹 주소가 아닌 것(이메일·작성자 PC의 파일·글자만 있는 링크)은 사용자 화면에서 열리지 않을 뿐이라 반영은 막지 않는다
+    const badLinks = (doc.links || []).filter(l => l.url && !/^https?:\/\//i.test(String(l.url).trim()));
+    if (badLinks.length) warnings.push(`웹 주소가 아닌 링크 ${badLinks.length}개는 사용자 화면에서 열리지 않습니다(예: ${badLinks.slice(0, 2).map(l => l.text).join(', ')}) — 「링크 점검」에서 올바른 주소로 고칠 수 있습니다`);
     const nb = (doc.blocks || []).length;
     (doc.sections || []).forEach(s => {
       if (!s.heading) errors.push(`${s.id}: 업무명이 비어 있습니다`);
@@ -385,7 +446,8 @@
       if (o.type_set) { l.type = o.type; l.type_set = true; }
       n++;
     });
-    if (oldDoc.pdf && !newDoc.pdf) newDoc.pdf = oldDoc.pdf;
+    // 새 파일의 원본이 따로 있으면(창고 방식) 예전 PDF를 이어 쓰지 않는다
+    if (oldDoc.pdf && !newDoc.pdf && !newDoc.original) newDoc.pdf = oldDoc.pdf;
     return n;
   }
   /** 업무명을 고치면 목차의 업무 제목도 같이 */
@@ -395,5 +457,5 @@
     doc.outline.nodes.forEach(n => { if (n.k === 'task' && n.s && byId.has(n.s)) n.t = byId.get(n.s).heading; });
   }
 
-  return { COMMON_LEVEL, ACADEMIC_COMMON, OTHER_DEPT, OTHER_DEPT_MAX, DEPARTMENTS, cleanLevels, defaultDepartment, deptGroup, setLinkUrl, setLinkInfo, carryLinkEdits, syncOutline, SCHEMA_VERSION, LEVELS, TEXT_FORMATS, ORIGIN_SITES, CATEGORIES, levelSlug, levelName, formatOf, kindOf, newDocId, titleFromFilename, createDocument, finalizeDocument, carryKeywords, carryForms, numberForms, addManualForms, removeManualForm, formList, matchBundle, migrateV1, validateDocument };
+  return { STORAGE_PREFIX, STORAGE_MAX, FILE_MAX, fileUrl, makeOriginal, planStorage, storageUsage, COMMON_LEVEL, ACADEMIC_COMMON, OTHER_DEPT, OTHER_DEPT_MAX, DEPARTMENTS, cleanLevels, defaultDepartment, deptGroup, setLinkUrl, setLinkInfo, carryLinkEdits, syncOutline, SCHEMA_VERSION, LEVELS, TEXT_FORMATS, ORIGIN_SITES, CATEGORIES, levelSlug, levelName, formatOf, kindOf, newDocId, titleFromFilename, createDocument, finalizeDocument, carryKeywords, carryForms, numberForms, addManualForms, removeManualForm, formList, matchBundle, migrateV1, validateDocument };
 });
