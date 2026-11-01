@@ -156,7 +156,7 @@
     $('docsLabel').href = r.slug === ALL ? '#/' : `#/${r.slug}`;
     V.q = r.q; V.t = r.t;
     if ($('q').value !== r.q) $('q').value = r.q;
-    $('q').placeholder = `${scopeName()} 자료에서 업무·서식·법령 검색 (예: 현장체험학습, 서] 기안문, 법] 유아교육법)`;
+    $('q').placeholder = `${scopeName()} 자료에서 업무·서식·법령 검색 (예: 졸업식, 현장체험학습)`;
     // 검색 중에는 왼쪽 자료 칸을 숨긴다(가운데 결과 목록이 자료별로 묶여 있음)
     $('cols').classList.toggle('searching', !!(r.q || r.t));
     // 다른 학교급 자료(검색 결과에서 연 자료)는 전체 목록에서 찾는다
