@@ -447,8 +447,9 @@
       if (o.type_set) { l.type = o.type; l.type_set = true; }
       n++;
     });
-    // 새 파일의 원본이 따로 있으면(창고 방식) 예전 PDF를 이어 쓰지 않는다
-    if (oldDoc.pdf && !newDoc.pdf && !newDoc.original) newDoc.pdf = oldDoc.pdf;
+    // 새 파일의 원본이 따로 있으면(창고 방식) 예전 PDF를 이어 쓰지 않는다.
+    // 새 파일이 PDF가 아니면(예: PDF → HWPX 교체) 예전 PDF를 이어 쓰지 않는다 — 쪽이 맞지 않아 본문이 빈 쪽으로 보인다
+    if (oldDoc.pdf && !newDoc.pdf && !newDoc.original && (newDoc.format || 'pdf') === 'pdf') newDoc.pdf = oldDoc.pdf;
     return n;
   }
   /** 업무명을 고치면 목차의 업무 제목도 같이 */

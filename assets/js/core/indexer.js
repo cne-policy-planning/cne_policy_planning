@@ -7,6 +7,7 @@
  *   documents/<id>.json           자료별 상세(본문 블록·업무·서식 링크)
  *   indexes/<slug>.json           학교급별 목록 색인(업무명·검색어·서식명·업무 시작 문장)
  *   search/<slug>/<nn>.json       학교급별 본문 색인 조각(2글자 → 업무 번호 목록)
+ *   toc/<slug>.json               학교급별 목차 검색 색인(목차 제목만 모은 가벼운 파일 — 사용자 화면 검색용)
  */
 (function (root, factory) {
   const deps = root.SAS || (typeof require === 'function'
@@ -42,6 +43,27 @@
     return s.split(',').map(x => (acc += parseInt(x, 36)));
   }
 
+  /**
+   * 목차 검색용 줄: [번호, 종류 한 글자, 제목, 쪽 표시, (자료 종류, 주소)]
+   * 종류: c 단원 · t 업무 · p 부분 · g 묶음 · i 항목 · l 자료(서식 등). ▸ 세부 줄(bullet)은 검색하지 않으므로 뺀다
+   */
+  const TOC_KIND = { ch: 'c', task: 't', part: 'p', group: 'g', item: 'i', link: 'l' };
+  function tocRows(d) {
+    const nodes = d.outline && d.outline.nodes ? d.outline.nodes : [];
+    const links = new Map((d.links || []).map(l => [l.id, l]));
+    const blocks = d.blocks || [];
+    const page = b => { const bl = blocks[b]; return !bl ? '' : bl.printed_page != null ? bl.printed_page + 'p' : bl.pdf_page ? bl.pdf_page + '쪽' : ''; };
+    const rows = [];
+    nodes.forEach(n => {
+      const k = TOC_KIND[n.k]; if (!k) return;
+      const row = [n.c, k, n.t || '', page(n.b)];
+      const l = n.l && links.get(n.l);
+      if (l) { row[2] = l.text || row[2]; row.push(l.type || (l.kind === 'law' ? '법령' : l.kind === 'site' ? '사이트' : '서식'), l.url || ''); }
+      rows.push(row);
+    });
+    return rows;
+  }
+
   /** 학교급 하나의 목록 색인과 본문 조각 */
   function buildLevel(docs, level, shardCount, generatedAt) {
     const list = docs.filter(d => (d.school_levels || []).includes(level.name))
@@ -71,7 +93,8 @@
       [...m.keys()].sort().forEach(k => { b[k] = encodeList(m.get(k)); });
       return { v: N.SCHEMA_VERSION, b };
     });
-    return { index, shardFiles, docCount: list.length };
+    const toc = { v: N.SCHEMA_VERSION, slug: level.slug, generated_at: generatedAt, docs: list.map(d => [d.id, tocRows(d)]) };
+    return { index, shardFiles, toc, docCount: list.length };
   }
 
   /**
@@ -98,6 +121,7 @@
       const r = buildLevel(sorted, level, shardCount, generatedAt);
       const idxText = JSON.stringify(r.index);
       files.set(`data/indexes/${level.slug}.json`, idxText);
+      files.set(`data/toc/${level.slug}.json`, JSON.stringify(r.toc));
       let shardBytes = 0;
       r.shardFiles.forEach((sf, i) => {
         const t = JSON.stringify(sf);
@@ -144,10 +168,10 @@
     }
     const deletions = [];
     if (outputs && existingPaths) {
-      existingPaths.forEach(p => { if (/^data\/(documents|indexes|search)\//.test(p) && !outputs.files.has(p)) deletions.push(p); });
+      existingPaths.forEach(p => { if (/^data\/(documents|indexes|search|toc)\//.test(p) && !outputs.files.has(p)) deletions.push(p); });
     }
     return { errors, warnings, deletions, ok: errors.length === 0 };
   }
 
-  return { buildOutputs, checkConsistency, encodeList, decodeList, SEC_BASE, DEFAULT_SHARDS };
+  return { buildOutputs, checkConsistency, tocRows, encodeList, decodeList, SEC_BASE, DEFAULT_SHARDS };
 });

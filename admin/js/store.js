@@ -12,7 +12,7 @@
   'use strict';
   const GH = root.SASGitHub;
   const DB_NAME = 'sas-admin', DB_VER = 1;
-  const DATA_RE = /^data\/(documents|indexes|search)\/|^data\/(documents|manifest)\.json$/;
+  const DATA_RE = /^data\/(documents|indexes|search|toc)\/|^data\/(documents|manifest)\.json$/;
 
   // ---------- IndexedDB ----------
   let dbPromise = null;

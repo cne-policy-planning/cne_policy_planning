@@ -337,3 +337,22 @@ details.lv-dept > summary i { font-style: normal; font-size: 13px; color: var(--
 .v-filecard b { font-size: 15px; word-break: keep-all; }
 .v-filecard p { margin: 0; color: var(--muted); font-size: 13.5px; }
 .v-fileicon { width: 64px; height: 76px; border-radius: 8px; background: var(--blue-soft); color: var(--blue-text); font-weight: 800; font-size: 14px; display: grid; place-items: center; border: 1px solid #c7d9f6; }
+
+/* 첫 화면 검색창 · 전체 검색 */
+.home-search { position: relative; z-index: 1; width: 100%; box-sizing: border-box; max-width: 760px; margin: 0 auto; padding: 7px; border-radius: 16px; border-width: 2px; border-color: #c7d9f6; box-shadow: 0 6px 20px #1f5fbf14; }
+.home-search input { font-size: 18px; padding: 10px 12px; }
+.home-search button { padding: 10px 24px; font-size: 16px; }
+.home-or { position: relative; z-index: 1; display: flex; align-items: center; gap: 12px; max-width: 760px; margin: clamp(14px, 3.2vh, 30px) auto clamp(8px, 2vh, 18px); color: var(--muted); font-size: 13.5px; }
+.home-or::before, .home-or::after { content: ""; flex: 1; height: 1px; background: #d6deea; }
+@media (max-width: 640px) { .home-search input { font-size: 16px; } .home-search button { padding: 8px 16px; } }
+.v-doc .lvt { display: inline-block; margin-right: 5px; font-size: 11px; font-weight: 700; padding: 0 6px; border-radius: 5px; background: #eef2f7; color: #475467; vertical-align: 1px; }
+.v-doc .lvt.com { background: #f1ecfd; color: #5b3fb8; }
+.v-doc .hits { color: var(--blue-text); font-weight: 700; }
+.v-label-q { color: var(--blue-text); }
+.lv-grp { margin: 12px 0 0; padding: 8px 12px; font-size: 12px; font-weight: 800; color: #475467; background: #f4f7fb; border-top: 1px solid var(--line2); }
+.doc-grp.row-doc { cursor: pointer; }
+.doc-grp.row-doc:hover { color: var(--blue-text); }
+.doc-grp .cnt { font-weight: 600; color: var(--muted); margin-left: 4px; }
+.doc-only { padding: 2px 12px 8px 26px; font-size: 12.5px; color: var(--muted); }
+.res-more { padding: 6px 12px 10px 26px; font-size: 12.5px; color: var(--muted); }
+.v-note.v-note-err { position: sticky; top: 0; z-index: 3; background: #fdecea; color: #b42318; box-shadow: 0 2px 6px #0002; }

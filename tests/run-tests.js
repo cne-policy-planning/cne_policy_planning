@@ -249,6 +249,17 @@ test('예전 방식 PDF(원본 정보 없음)도 창고로 옮김 · 사이트 �
   ok(SAS.checkConsistency([d], out).ok);
 });
 test('새 파일에 원본이 있으면 교체할 때 예전 PDF를 이어 쓰지 않음', () => { const o = { links: [], pdf: { path: 'pdf/x.pdf' } }, n = { links: [], original: { path: 'files/x.hwp' } }; SAS.carryLinkEdits(o, n); ok(!n.pdf); });
+test('PDF → HWPX로 교체하면 예전 PDF를 이어 쓰지 않음(쪽 보기 어긋남 방지)', () => { const o = { links: [], pdf: { path: 'pdf/x.pdf' } }, n = { links: [], format: 'hwpx' }; SAS.carryLinkEdits(o, n); ok(!n.pdf); const n2 = { links: [], format: 'pdf' }; SAS.carryLinkEdits(o, n2); ok(n2.pdf); });
+test('목차 검색 색인(data/toc): 학교급별 생성 · 세부 줄 제외 · 서식 이름과 주소', () => {
+  const o = SAS.buildOutputs([doc], { generatedAt: 'x' });
+  const t = JSON.parse(o.files.get('data/toc/kindergarten.json'));
+  eq(t.docs.length, 1); eq(t.docs[0][0], doc.id);
+  const rows = t.docs[0][1];
+  ok(rows.length > 0 && rows.every(r => 'ctpgil'.includes(r[1])), '종류 한 글자');
+  ok(rows.length < doc.outline.nodes.length, '세부 줄 제외');
+  const link = rows.find(r => r[1] === 'l'); ok(link && link[4] && /^https?:/.test(link[5]), '서식 줄에 종류·주소');
+  ok(o.files.has('data/toc/common.json'));
+});
 
 test('웹 주소가 아닌 PDF 링크는 오류가 아니라 확인 권장', () => {
   const d = JSON.parse(JSON.stringify(doc)); d.links = d.links.concat([{ id: 'x1', text: 'vms@ssmkorea.or.kr', url: 'mailto:vms@ssmkorea.or.kr' }, { id: 'x2', text: '추진 절차.pdf', url: '추진 절차.pdf' }]);
