@@ -3,8 +3,9 @@
  *  - 첫 화면: 학교급 카드 5개(유아 · 초등 · 중등 · 특수 · 공통)
  *  - 학교급 첫 화면: 그 학교급 자료 + 공통 자료(부서별 묶음, 가나다순). 공통은 공통 자료만 부서별로
  *  - 자료 화면(충교위키식 3단): 왼쪽 자료 목록 · 가운데 번호 목차(또는 검색 결과) · 오른쪽 원문 쪽 보기
- *  - 검색: 첫 화면·학교급 화면 어디서 찾든 모든 학교급(유아·초등·중등·특수·공통) 자료의 목차에서 찾는다.
- *          학교급 화면에서는 그 학교급 → 공통 → 다른 학교급 순서로 보여 준다. 왼쪽 칸에는 찾은 자료만 나온다
+ *  - 검색: 첫 화면에서 찾으면 모든 학교급(유아·초등·중등·특수·공통) 자료에서,
+ *          학교급 화면에서 찾으면 그 학교급과 공통 자료에서(공통 화면은 공통 자료만) 찾는다.
+ *          검색 중에는 왼쪽 자료 칸을 숨기고 가운데 칸의 결과 목록(자료별 묶음)으로 고른다
  *          목차 검색은 data/toc/<학교급>.json(목차 제목만 모은 가벼운 색인)을 쓴다. 없으면 자료 상세를 받아 찾는다
  *  - 주소: #/학교급  ·  #/학교급/자료ID  ·  #/학교급/자료ID/목차번호  ·  #/학교급?q=검색어&t=서식  ·  #/all?q=검색어(첫 화면 검색)
  */
@@ -155,6 +156,9 @@
     $('docsLabel').href = r.slug === ALL ? '#/' : `#/${r.slug}`;
     V.q = r.q; V.t = r.t;
     if ($('q').value !== r.q) $('q').value = r.q;
+    $('q').placeholder = `${scopeName()} 자료에서 업무·서식·법령 검색 (예: 현장체험학습, 서] 기안문, 법] 유아교육법)`;
+    // 검색 중에는 왼쪽 자료 칸을 숨긴다(가운데 결과 목록이 자료별로 묶여 있음)
+    $('cols').classList.toggle('searching', !!(r.q || r.t));
     // 다른 학교급 자료(검색 결과에서 연 자료)는 전체 목록에서 찾는다
     if (r.doc && !metaOf(r.doc)) await ensureMeta().catch(() => null);
     if (parseHash().slug !== r.slug) return;
@@ -260,12 +264,19 @@
     if (V.slug && V.slug !== ALL) return [V.slug, COMMON, ...rest];
     return [...rest, COMMON];
   }
-  /** 모든 학교급 자료의 목차 검색 준비물(학교급 순서대로) */
+  /** 검색 범위: 첫 화면 검색은 모든 학교급, 학교급 화면은 그 학교급 + 공통, 공통 화면은 공통만 */
+  function searchScope() {
+    if (!V.slug || V.slug === ALL) return LV.slice();
+    return V.slug === COMMON ? [COMMON] : [V.slug, COMMON];
+  }
+  const scopeName = () => (!V.slug || V.slug === ALL ? '모든 학교급' : V.slug === COMMON ? '공통' : `${SAS.levelName(V.slug)}·공통`);
+  /** 검색 범위 자료의 목차 검색 준비물(학교급 순서대로) */
   async function searchPreps() {
     const meta = await ensureMeta();
     const toc = await ensureToc().catch(() => null);
     const order = levelOrder();
-    const list = [...meta.values()].sort((a, b) => order.indexOf(lvOf(a.id)) - order.indexOf(lvOf(b.id)));
+    const scope = new Set(searchScope());
+    const list = [...meta.values()].filter(d => scope.has(lvOf(d.id))).sort((a, b) => order.indexOf(lvOf(a.id)) - order.indexOf(lvOf(b.id)));
     if (toc) return list.map(d => { const p = toc.get(d.id) || { id: d.id, nodes: [], by: {} }; p.title = d.t; return p; });
     return loadMany(list, 8);
   }
@@ -295,13 +306,13 @@
     $('homeHead').replaceChildren(
       h('h1', {}, isCommon ? `공통 자료 ${com.length}건` : `${name} 자료 ${own.length}건` + (com.length ? ` · 공통 자료 ${com.length}건` : '')),
       h('p', {}, isCommon ? '모든 학교급에 해당하는 자료를 부서별로 모았습니다. 위 검색창에서 모든 공통 자료의 목차·서식을 한꺼번에 찾을 수 있습니다.'
-        : `${name} 자료 아래에 모든 학교급에 해당하는 공통 자료를 부서별로 함께 보여 줍니다. 위 검색창은 다른 학교급 자료까지 모두 찾고, ${name}·공통 자료를 먼저 보여 줍니다.`));
+        : `${name} 자료 아래에 모든 학교급에 해당하는 공통 자료를 부서별로 함께 보여 줍니다. 위 검색창은 ${name} 자료와 공통 자료를 함께 찾습니다. 모든 학교급에서 찾으려면 처음 화면의 검색창을 쓰세요.`));
     // 검색하면 3단 화면으로: 찾은 항목이 가장 많은 자료를 열고 가운데에 검색 결과를 보여 준다
     if (V.q || V.t) {
       if (r.slug === ALL) $('homeHead').replaceChildren(h('h1', {}, '모든 학교급에서 찾기'));
       $('homeDocs').classList.add('hidden');
       $('docStats').replaceChildren(); $('typeChips').replaceChildren();
-      $('homeResults').innerHTML = '<div class="v-empty"><span class="spinner"></span> 모든 학교급 자료에서 찾는 중…</div>';
+      $('homeResults').innerHTML = `<div class="v-empty"><span class="spinner"></span> ${scopeName()} 자료에서 찾는 중…</div>`;
       let res;
       try { res = await runSearch(); } catch (e) { $('homeResults').innerHTML = '<div class="v-empty">자료 목록을 불러오지 못했습니다. 새로고침해 주세요.</div>'; return; }
       if (parseHash().doc || V.mode !== 'home' || !(V.q || V.t)) return;
@@ -576,13 +587,11 @@
     });
     const label = (f ? `[${f}] ` : '') + (words.join(' ') || '전체');
     const nDocs = found.length;
-    const head = `<div class="res-h"><span>‘${esc(label)}’ 모든 학교급 자료 <b>${nDocs}</b>개 · 목차 <b>${total}</b>건</span><button type="button" class="linkbtn" id="clearSearch">검색 지우기</button></div>`;
+    const head = `<div class="res-h"><span>‘${esc(label)}’ ${scopeName()} 자료 <b>${nDocs}</b>개 · 목차 <b>${total}</b>건</span><button type="button" class="linkbtn" id="clearSearch">검색 지우기</button></div>`;
     const body = nDocs ? html + (cut ? '<div class="v-empty">결과가 많아 일부만 보여 줍니다. 낱말을 더 넣어 좁혀 보세요.</div>' : '')
-      : '<div class="v-empty">모든 학교급 자료의 목차와 자료 이름에서 찾지 못했습니다. 낱말을 줄이거나 바꿔 보세요(예: 입학식 → 입학). 여러 낱말을 띄어 쓰면 모두 들어 있는 항목만 보여 줍니다.</div>';
-    // 처음 열 자료: 지금 학교급·공통 자료 중 찾은 항목이 가장 많은 자료 → 없으면 전체에서 가장 많은 자료 → 자료 이름만 맞은 첫 자료
-    const near = V.slug && V.slug !== ALL ? new Set(V.slug === COMMON ? [COMMON] : [V.slug, COMMON]) : null;
-    const top = list => list.filter(x => x.hits.length).sort((a, b) => b.hits.length - a.hits.length || order.indexOf(a.lv) - order.indexOf(b.lv))[0];
-    const pick = (near && top(found.filter(x => near.has(x.lv)))) || top(found) || found[0];
+      : '<div class="v-empty">' + scopeName() + ' 자료의 목차와 자료 이름에서 찾지 못했습니다. 낱말을 줄이거나 바꿔 보세요(예: 입학식 → 입학). 여러 낱말을 띄어 쓰면 모두 들어 있는 항목만 보여 줍니다.</div>';
+    // 처음 열 자료: 찾은 항목이 가장 많은 자료(같으면 지금 학교급 먼저) → 없으면 자료 이름만 맞은 첫 자료
+    const pick = found.filter(x => x.hits.length).sort((a, b) => b.hits.length - a.hits.length || order.indexOf(a.lv) - order.indexOf(b.lv))[0] || found[0];
     return { head, body, total, byDoc, docs: found.map(x => ({ id: x.p.id, hits: x.hits.length, lv: x.lv })), best: pick ? pick.p.id : '' };
   }
   /** 지금 검색어로 모든 학교급을 찾는다(같은 검색어는 다시 계산하지 않는다) */
@@ -598,8 +607,7 @@
   async function renderResults() {
     const seq = ++searchSeq;
     const cached = V.res && V.res.key === V.q + '\u0001' + V.t + '\u0001' + V.slug;
-    if (!cached) $('tree').innerHTML = '<div class="v-empty"><span class="spinner"></span> 모든 학교급 자료에서 찾는 중…</div>';
-    // 모든 학교급 자료에서 함께 찾는다(지금 학교급 → 공통 → 다른 학교급 순서)
+    if (!cached) $('tree').innerHTML = `<div class="v-empty"><span class="spinner"></span> ${scopeName()} 자료에서 찾는 중…</div>`;
     let r;
     try { r = await runSearch(); } catch (e) { if (seq === searchSeq) $('tree').innerHTML = '<div class="v-empty">자료 목록을 불러오지 못했습니다. 새로고침해 주세요.</div>'; return; }
     if (seq !== searchSeq || !(V.q || V.t)) return;
