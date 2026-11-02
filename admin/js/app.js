@@ -816,7 +816,8 @@
       (!fCat.value || d.category === fCat.value) &&
       (!$('fNoWorks').checked || (!d.original && !d.pdf && !d.works_url)) &&
       (!$('fWarn').checked || needsCheck(d)))
-      .sort((a, b) => (b.updated_at || '').localeCompare(a.updated_at || ''));
+      // 등록 순서(최근 등록 먼저) → 자료 ID. 자료명·내용을 고쳐도(수정 시각이 바뀌어도) 목록 자리는 그대로
+      .sort((a, b) => (b.created_at || '').localeCompare(a.created_at || '') || a.id.localeCompare(b.id));
     const box = $('docList');
     const keepTop = box.scrollTop;   // 목록을 다시 그려도 보던 위치 그대로
     if (!list.length) { box.replaceChildren(h('p', { class: 'muted small', style: 'padding:8px' }, S.state.docs.length ? '조건에 맞는 자료가 없습니다.' : '등록된 자료가 없습니다.')); return; }
