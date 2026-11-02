@@ -1,18 +1,18 @@
 {
  "schema_version": "2.0",
- "generated_at": "2026-11-02T06:39:00.653Z",
+ "generated_at": "2026-11-02T07:04:11.558Z",
  "shard_count": 128,
  "document_count": 602,
  "levels": {
   "kindergarten": {
    "name": "유아",
    "documents": 97,
-   "sections": 1576
+   "sections": 1837
   },
   "elementary": {
    "name": "초등",
    "documents": 52,
-   "sections": 1556
+   "sections": 1703
   },
   "middle": {
    "name": "중등",
@@ -22,12 +22,12 @@
   "special": {
    "name": "특수",
    "documents": 29,
-   "sections": 686
+   "sections": 962
   },
   "common": {
    "name": "공통",
    "documents": 350,
-   "sections": 7160
+   "sections": 8250
   }
  },
  "departments": {
