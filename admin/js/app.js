@@ -660,8 +660,7 @@
     if (!t) return { doc: SAS.createDocument(meta, q.blocks, ids), carry: null };
     const nd = SAS.createDocument(Object.assign(meta, {
       id: t.id,
-      school_levels: q.levels.length ? q.levels : t.school_levels,
-      category: q.category || t.category || meta.category,
+         school_levels: q.levels.length && (q.levelsFrom !== 'file' || !(t.school_levels || []).length) ? q.levels : t.school_levels,      category: q.category || t.category || meta.category,
       department: q.department || t.department || meta.department,
       works_url: q.works || t.works_url,
       origin: q.originSite ? meta.origin : t.origin,
