@@ -139,10 +139,10 @@
     const out = [];
     if (!keys.length) return out;
     for (const d of docs || []) {
-      if (lv.length && (d.school_levels || []).length && !d.school_levels.some(l => lv.includes(l))) continue;
       const dk = [matchKey(d.filename || ''), matchKey(d.title || '')].filter(k => k.length >= 2);
       let score = 0;
       for (const a of keys) for (const b of dk) score = Math.max(score, dice(a, b));
+      if (score < 1 && lv.length && (d.school_levels || []).length && !d.school_levels.some(l => lv.includes(l))) continue;
       if (score >= SIMILAR_MIN) out.push({ doc: d, score, how: score === 1 ? 'same' : 'similar', sameFile: score === 1 && isSameFile(d, item) });
     }
     return out;
