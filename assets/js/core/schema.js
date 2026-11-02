@@ -485,7 +485,7 @@
   }
   /** 업무명을 고치면 목차의 업무 제목도 같이 */
   function syncOutline(doc) {
-    if (!doc.outline || !doc.outline.nodes) return;
+    if (!doc.outline || !doc.outline.nodes || doc.outline.manual) return;   // 사람이 만든 목차는 업무명을 고쳐도 그대로
     const byId = new Map((doc.sections || []).map(s => [s.id, s]));
     doc.outline.nodes.forEach(n => { if (n.k === 'task' && n.s && byId.has(n.s)) n.t = byId.get(n.s).heading; });
   }

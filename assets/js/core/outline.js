@@ -248,5 +248,137 @@
     return nodes.map(n => edits[n.c] ? Object.assign({}, n, { t: edits[n.c] }) : n);
   }
 
-  return { buildOutline, linkType, isSuspectUrl, suggestUrl, applyOutlineEdits, sortOutline: sortNodes };
+  // ---------- 사람이 만든 목차(엑셀로 내려받기·올리기) ----------
+  // 엑셀 칸: 단계(1 단원 · 2 업무 · 3~6 세부) | 제목 | 쪽 | 종류(서식·참고·법령·사이트, 비우면 목차 줄) | 주소(서식 등의 내려받기 주소)
+  // 번호(1.2.3)는 단계와 순서로 자동으로 붙인다(엑셀이 1.10을 1.1로 바꾸는 문제·줄 끼워 넣기 번호 고침을 피한다).
+  const TOC_COLS = ['단계', '제목', '쪽', '종류', '주소'];
+  const MAX_DEPTH = 6;
+  const LINK_KINDS = ['서식', '참고', '법령', '사이트'];
+  const isPdfDoc = doc => doc.format === 'pdf';
+  /** 블록 번호 → 엑셀에 적을 쪽(PDF는 PDF 쪽, 그 밖은 문단 번호) */
+  function pageOfBlock(doc, b) { const bl = (doc.blocks || [])[b]; return !bl ? '' : isPdfDoc(doc) ? (bl.pdf_page || b + 1) : b + 1; }
+  /** 엑셀 쪽 → 블록 번호(없으면 -1) */
+  function blockOfPage(doc, p) {
+    const n = Number(p); if (!Number.isInteger(n) || n < 1) return -1;
+    const blocks = doc.blocks || [];
+    if (isPdfDoc(doc)) { const i = blocks.findIndex(b => Number(b.pdf_page) === n); return i >= 0 ? i : (n <= blocks.length ? n - 1 : -1); }
+    return n <= blocks.length ? n - 1 : -1;
+  }
+
+  /** 지금 목차 → 엑셀 줄 [{단계, 제목, 쪽, 종류, 주소, 번호}] (▸ 세부 줄은 뺀다, 제목은 정리된 것) */
+  function outlineToRows(doc) {
+    const raw = doc.outline && doc.outline.nodes ? doc.outline.nodes : [];
+    const nodes = N.tidyOutline ? N.tidyOutline(raw) : raw;
+    const links = new Map((doc.links || []).map(l => [l.id, l]));
+    const kept = nodes.filter(n => n.k !== 'bullet');
+    const keptCodes = new Set(kept.map(n => n.c));
+    const depthOf = new Map();
+    const rows = [];
+    kept.forEach(n => {
+      // 가장 가까운 남은 조상의 단계 + 1 (빠진 세부 줄 때문에 단계가 건너뛰지 않게)
+      let p = n.c, pd = 0;
+      while (p.includes('.')) { p = p.slice(0, p.lastIndexOf('.')); if (keptCodes.has(p)) { pd = depthOf.get(p) || 0; break; } }
+      const depth = Math.min(MAX_DEPTH, pd + 1);
+      depthOf.set(n.c, depth);
+      const l = n.l ? links.get(n.l) : null;
+      rows.push({ 단계: depth, 제목: l && !(doc.outline && doc.outline.manual) ? (l.text || n.t) : n.t, 쪽: pageOfBlock(doc, n.b), 종류: l ? (l.type || '서식') : (n.ty || ''), 주소: l ? l.url || '' : '', 번호: n.c });
+    });
+    return rows;
+  }
+
+  /**
+   * 엑셀 줄 → 목차. rows: [[칸, …], …] (첫 줄들 중 '단계'·'제목'이 있는 줄을 머리글로 본다)
+   * 반환 { nodes, newLinks, errors: [{row, msg}], warnings: [{row, msg}], count }
+   */
+  function rowsToOutline(doc, rows) {
+    const errors = [], warnings = [];
+    const hi = (rows || []).findIndex(r => r && r.some(c => String(c).trim() === '단계') && r.some(c => String(c).trim() === '제목'));
+    if (hi < 0) return { nodes: [], newLinks: [], errors: [{ row: 0, msg: '머리글 줄(단계 · 제목 · 쪽 · 종류 · 주소)을 찾지 못했습니다. 내려받은 목차 엑셀 양식을 써 주세요.' }], warnings, count: 0 };
+    const head = rows[hi].map(c => String(c == null ? '' : c).trim());
+    const col = name => head.indexOf(name);
+    const ci = { d: col('단계'), t: col('제목'), p: col('쪽'), k: col('종류'), u: col('주소') };
+    if (ci.p < 0) errors.push({ row: hi + 1, msg: '「쪽」 칸이 없습니다.' });
+    const links = doc.links || [];
+    const byUrl = new Map(links.filter(l => l.url).map(l => [String(l.url).trim(), l]));
+    const byText = new Map(links.map(l => [N.norm(l.text), l]));
+    const counters = [];   // 단계별 번호
+    const codes = [];      // 단계별 현재 번호 문자열
+    const nodes = [], newLinks = [];
+    let prevDepth = 0, prevBlock = 0, mseq = 0;
+    for (let i = hi + 1; i < rows.length; i++) {
+      const r = rows[i] || [], rn = i + 1;
+      const cell = k => (ci[k] >= 0 && r[ci[k]] != null ? String(r[ci[k]]).trim() : '');
+      const title = cell('t'), dRaw = cell('d');
+      if (!title && !dRaw) continue;                           // 빈 줄
+      if (/^#/.test(dRaw)) continue;                          // 메모 줄
+      const depth = Number(dRaw);
+      if (!Number.isInteger(depth) || depth < 1 || depth > MAX_DEPTH) { errors.push({ row: rn, msg: `단계는 1~${MAX_DEPTH} 숫자로 적어 주세요(지금 「${dRaw}」).` }); continue; }
+      if (!title) { errors.push({ row: rn, msg: '제목이 비었습니다.' }); continue; }
+      if (depth > prevDepth + 1) { errors.push({ row: rn, msg: `단계가 ${prevDepth}에서 ${depth}로 건너뜁니다. 한 단계씩만 내려갈 수 있습니다.` }); continue; }
+      let b = prevBlock;
+      const pRaw = cell('p');
+      if (pRaw) { b = blockOfPage(doc, pRaw); if (b < 0) { errors.push({ row: rn, msg: `쪽 「${pRaw}」이(가) 자료에 없습니다(1~${(doc.blocks || []).length}${isPdfDoc(doc) ? '쪽' : '문단'}).` }); continue; } }
+      else warnings.push({ row: rn, msg: '쪽이 비어 앞 줄과 같은 쪽으로 했습니다.' });
+      counters.length = depth; counters[depth - 1] = (counters[depth - 1] || 0) + 1;
+      codes.length = depth; codes[depth - 1] = String(counters[depth - 1]);
+      const c = codes.join('.');
+      const node = { c, k: depth === 1 ? 'ch' : depth === 2 ? 'task' : 'item', t: title, b, y: 0, x: 0 };
+      const kind = cell('k').replace(/\s/g, ''), url = cell('u');
+      if (kind) {
+        if (!LINK_KINDS.includes(kind)) warnings.push({ row: rn, msg: `종류 「${kind}」는 서식·참고·법령·사이트 중 하나여야 합니다. 목차 줄로 넣었습니다.` });
+        else {
+          let l = (url && byUrl.get(url)) || (!url && byText.get(N.norm(title))) || null;
+          if (!l && url) {
+            if (!/^https?:\/\//i.test(url)) warnings.push({ row: rn, msg: '주소가 http로 시작하지 않습니다. 확인해 주세요.' });
+            l = { id: `toc-${Date.now().toString(36)}${++mseq}`, text: title, url, type: kind, kind: N.linkKind ? N.linkKind(url) : (kind === '법령' ? 'law' : kind === '사이트' ? 'site' : 'file'), block: b, section_id: null, manual: true };
+            newLinks.push(l); byUrl.set(url, l);
+          }
+          if (l) { node.k = 'link'; node.l = l.id; node.ty = kind; }
+          else { node.ty = kind; warnings.push({ row: rn, msg: `「${kind}」인데 주소가 없고 같은 이름의 링크도 없습니다. 목차 줄로만 넣었습니다.` }); }
+        }
+      }
+      if (node.k === 'link' && depth < 2) { node.k = 'ch'; delete node.l; warnings.push({ row: rn, msg: '단원(단계 1)은 서식이 될 수 없어 목차 줄로 넣었습니다.' }); }
+      nodes.push(node);
+      prevDepth = depth; prevBlock = b;
+    }
+    if (!nodes.length && !errors.length) errors.push({ row: hi + 1, msg: '목차 줄이 하나도 없습니다.' });
+    return { nodes, newLinks, errors, warnings, count: nodes.length };
+  }
+
+  /** 사람이 만든 목차를 자료에 넣는다(자동 목차는 outline_auto로 보관 → 되돌리기) */
+  function applyManualOutline(doc, result, meta) {
+    if (!doc.outline_auto && doc.outline && !doc.outline.manual) doc.outline_auto = doc.outline;
+    doc.links = (doc.links || []).concat(result.newLinks || []);
+    const nodes = result.nodes;
+    doc.outline = { nodes, manual: true, built_at: new Date().toISOString(), by: (meta && meta.by) || '', file: (meta && meta.file) || '',
+      stats: { tasks: nodes.filter(n => n.k === 'task').length, detailed: 0, items: nodes.length } };
+    return doc;
+  }
+  /** 자동 목차로 되돌리기(사람이 넣은 링크 중 목차에서만 쓰던 것은 뺀다) */
+  function revertManualOutline(doc) {
+    if (!doc.outline || !doc.outline.manual) return false;
+    doc.outline = doc.outline_auto || null;
+    delete doc.outline_auto;
+    doc.links = (doc.links || []).filter(l => !/^toc-/.test(l.id));
+    return true;
+  }
+  /**
+   * 파일 교체 때 사람이 만든 목차를 이어받는다(새 자동 목차는 outline_auto로).
+   * 새 판은 쪽이 달라졌을 수 있어 stale 표시를 남기고, 쪽이 자료 밖이면 마지막 쪽으로 맞춘다. 반환: 이어받았으면 true
+   */
+  function carryManualOutline(oldDoc, newDoc) {
+    if (!oldDoc || !oldDoc.outline || !oldDoc.outline.manual) return false;
+    const last = Math.max(0, (newDoc.blocks || []).length - 1);
+    newDoc.outline_auto = newDoc.outline;
+    newDoc.outline = JSON.parse(JSON.stringify(oldDoc.outline));
+    newDoc.outline.nodes.forEach(n => { if (n.b > last) n.b = last; });
+    newDoc.outline.stale = true;
+    const ids = new Set(newDoc.outline.nodes.filter(n => n.l).map(n => n.l));
+    const have = new Set((newDoc.links || []).map(l => l.id));
+    (oldDoc.links || []).filter(l => l.manual && ids.has(l.id) && !have.has(l.id)).forEach(l => newDoc.links.push(Object.assign({}, l, { block: Math.min(l.block || 0, last) })));
+    return true;
+  }
+
+  return { buildOutline, linkType, isSuspectUrl, suggestUrl, applyOutlineEdits, sortOutline: sortNodes,
+    TOC_COLS, outlineToRows, rowsToOutline, applyManualOutline, revertManualOutline, carryManualOutline, pageOfBlock, blockOfPage };
 });

@@ -693,7 +693,7 @@
       origin: q.originSite ? meta.origin : t.origin,
       search_keywords: t.search_keywords, created_at: t.created_at, forms_bundle: t.forms_bundle
     }), q.blocks, []);
-    const carry = { keywords: SAS.carryKeywords(t, nd), forms: SAS.carryForms(t, nd), links: SAS.carryLinkEdits(t, nd), oldSections: t.sections.length, oldWorks: !q.works && !!t.works_url };
+    const carry = { keywords: SAS.carryKeywords(t, nd), forms: SAS.carryForms(t, nd), links: SAS.carryLinkEdits(t, nd), oldSections: t.sections.length, oldWorks: !q.works && !!t.works_url, manualToc: SAS.carryManualOutline(t, nd) };
     return { doc: nd, carry };
   }
 
@@ -767,6 +767,7 @@
         h('div', {}, '→ ', h('b', {}, b.q.filename), b.match && b.match.sameFile ? h('span', { class: 'tag gray' }, '같은 파일') : null,
           b.q.match && b.q.match.how === 'similar' ? h('span', { class: 'tag warn' }, '이름이 비슷함') : null),
         h('div', { class: 'small muted' }, `업무 ${b.carry.oldSections}→${b.doc.sections.length}개 · 고친 링크 ${b.carry.links}개 유지${t.year !== b.doc.year ? ` · 연도 ${t.year || '-'}→${b.doc.year || '-'}` : ''}${t.title !== b.doc.title ? ` · 자료명 → ${b.doc.title}` : ''}`),
+        b.carry.manualToc ? h('div', { class: 'small warn-text' }, '사람이 만든 목차를 이어 씁니다. 새 판의 쪽이 맞는지 확인하세요.') : null,
         b.keptEdit ? h('div', { class: 'small' }, `편집용 원본 ${String(b.keptEdit.format).toUpperCase()}(${b.keptEdit.name})은 그대로 남아 함께 내려받을 수 있습니다.`) : null,
         b.carry.oldWorks ? h('div', { class: 'small warn-text' }, '따로 넣은 원본 내려받기 링크(웍스)가 예전 판을 가리킬 수 있습니다. 반영 후 자료 관리에서 확인하세요.') : null);
     };
@@ -921,7 +922,8 @@
     const parts = [head, meta];
     if (doc.kind === 'text') {
       parts.push(pdfCard(doc));
-      if (doc.outline) parts.push(outlineCard(doc), linksCard(doc));
+      if (doc.outline || doc.kind === 'text') parts.push(outlineCard(doc));
+      if (doc.outline) parts.push(linksCard(doc));
       parts.push(sectionCard(doc));
       // 예전 방식(서식 모음 웍스 링크)을 이미 쓰고 있는 자료만 서식 모음 칸을 보여 준다
       if (!doc.outline || (doc.forms_bundle && doc.forms_bundle.works_url)) parts.push(formsCard(doc, forms));
@@ -962,7 +964,8 @@
 
   const KIND_LABEL = { ch: '단원', task: '업무', part: '부분', group: '묶음', item: '항목', bullet: '세부', link: '링크' };
   function outlineCard(doc) {
-    const nodes = doc.outline.nodes;
+    const nodes = doc.outline ? doc.outline.nodes : [];
+    const manual = !!(doc.outline && doc.outline.manual);
     const links = new Map((doc.links || []).map(l => [l.id, l]));
     const count = k => nodes.filter(n => n.k === k).length;
     const filter = h('input', { type: 'search', placeholder: '목차에서 찾기 (예: 사전답사)', style: 'max-width:280px' });
@@ -975,21 +978,86 @@
         const depth = n.c.split('.').length - 1;
         return h('div', { class: 'ol-row k-' + n.k, style: `padding-left:${depth * 14}px` },
           h('span', { class: 'ol-code' }, n.c),
-          l ? h('span', { class: 'ltag t-' + l.type }, l.type) : null,
-          h('span', { class: 'ol-t' }, l ? l.text : n.t),
+          l ? h('span', { class: 'ltag t-' + (n.ty || l.type) }, n.ty || l.type) : null,
+          h('span', { class: 'ol-t' }, l && !manual ? l.text : n.t),
           l && SAS.isSuspectUrl(l.url) ? h('span', { class: 'tag warn' }, '잘린 주소') : null,
-          h('span', { class: 'small muted' }, ` ${doc.blocks[n.b] ? doc.blocks[n.b].pdf_page + '쪽' : ''}`));
+          h('span', { class: 'small muted' }, ` ${SAS.pageOfBlock(doc, n.b)}${doc.format === 'pdf' ? '쪽' : '문단'}`));
       }));
     };
     filter.addEventListener('input', render);
     const det = h('details', {}, h('summary', {}, `번호 목차 펼쳐 보기 (${nodes.length}개 항목)`), h('div', { style: 'margin:8px 0' }, filter), list);
     det.addEventListener('toggle', () => { if (det.open && !list.childElementCount) render(); });
+    const tools = h('div', { class: 'actions', style: 'justify-content:flex-start;margin:10px 0' },
+      h('button', { class: 'small', onclick: () => exportToc(doc) }, '⤓ 목차 내려받기(엑셀)'),
+      h('button', { class: 'small primary', onclick: () => importToc(doc) }, '⤒ 목차 올리기'),
+      manual ? h('button', { class: 'small ghost', onclick: async () => {
+        if (!(await confirmBox(`<h2>자동 목차로 되돌리기</h2><p>「${SAS.esc(doc.title)}」의 사람이 만든 목차를 지우고 자동으로 만든 목차로 되돌립니다. 지우기 전에 「목차 내려받기」로 엑셀을 받아 두면 나중에 다시 올릴 수 있습니다.</p>`, '되돌리기', true))) return;
+        SAS.revertManualOutline(doc); S.touch(doc); renderEditor(); renderList(); toast('자동 목차로 되돌렸습니다. 「③ 점검·반영」에서 반영하세요.');
+      } }, '자동 목차로 되돌리기') : null);
     return h('div', { class: 'card' },
-      h('h2', {}, '번호 목차'),
-      h('div', { class: 'kv' }, ...['ch', 'task', 'item', 'bullet', 'link'].map(k => h('span', {}, `${KIND_LABEL[k]} ${count(k)}`)),
-        h('span', { class: 'muted' }, `세부 목차가 있는 업무 ${doc.outline.stats ? doc.outline.stats.detailed : '-'}/${doc.sections.length}`)),
-      h('p', { class: 'muted small' }, 'PDF의 목차·「업무개요 / 업무의 내용 및 방법 / 관련 자료 및 서식」·◆·번호·▸ 표시를 읽어 자동으로 만든 목차입니다. 업무명은 아래 「업무 목록」에서 고치면 목차에도 반영되고, 링크 이름·주소·종류는 「링크 점검」에서 고칩니다.'),
-      det);
+      h('h2', {}, '번호 목차 ', manual ? h('span', { class: 'tag ok' }, '사람이 만든 목차') : h('span', { class: 'tag gray' }, '자동 목차')),
+      manual && doc.outline.stale ? h('div', { class: 'notice warn' }, '파일을 새 판으로 바꾼 뒤에도 예전에 만든 목차를 그대로 쓰고 있습니다. 쪽이 맞는지 확인하고, 다르면 「목차 내려받기」로 고쳐 다시 올려 주세요.') : null,
+      nodes.length ? h('div', { class: 'kv' }, ...['ch', 'task', 'item', 'bullet', 'link'].map(k => h('span', {}, `${KIND_LABEL[k]} ${count(k)}`)),
+        manual ? h('span', { class: 'muted' }, `${doc.outline.file ? doc.outline.file + ' · ' : ''}${new Date(doc.outline.built_at).toLocaleString('ko-KR')} 올림`)
+          : h('span', { class: 'muted' }, `세부 목차가 있는 업무 ${doc.outline.stats ? doc.outline.stats.detailed : '-'}/${doc.sections.length}`)) : h('p', { class: 'muted' }, '아직 목차가 없습니다.'),
+      h('p', { class: 'muted small' }, manual
+        ? '사람이 엑셀로 만들어 올린 목차입니다. 사용자 화면·검색이 이 목차를 씁니다. 고치려면 「목차 내려받기」로 받아 엑셀에서 고친 뒤 다시 올리세요.'
+        : 'PDF의 목차·「업무개요 / 업무의 내용 및 방법 / 관련 자료 및 서식」·◆·번호·▸ 표시를 읽어 자동으로 만든 목차입니다. 더 깔끔하게 하려면 「목차 내려받기」로 엑셀을 받아 고친 뒤 「목차 올리기」로 넣으세요(사람이 만든 목차).'),
+      tools, nodes.length ? det : null);
+  }
+
+  /** 목차 엑셀 내려받기: 「목차」 시트(단계·제목·쪽·종류·주소) + 「안내」 시트 */
+  async function exportToc(doc) {
+    const rows = SAS.outlineToRows(doc);
+    const unit = doc.format === 'pdf' ? 'PDF 쪽 번호(인쇄된 쪽 번호가 아니라 PDF 뷰어의 쪽)' : '문단 번호';
+    const sheetRows = [['단계', '제목', '쪽', '종류', '주소', '(참고) 지금 번호']].concat(rows.map(r => [r.단계, r.제목, r.쪽, r.종류, r.주소, r.번호]));
+    const guide = [['목차 엑셀 쓰는 법'], [''],
+      ['자료', doc.title], ['자료 ID', doc.id], ['쪽 수', `${(doc.blocks || []).length}${doc.format === 'pdf' ? '쪽' : '문단'}`], [''],
+      ['칸', '적는 법'],
+      ['단계', '1 = 단원(편·장), 2 = 업무, 3~6 = 세부. 위 줄보다 한 단계씩만 내려갈 수 있습니다(1 → 3은 안 됨). 번호(1.2.3)는 자동으로 붙습니다.'],
+      ['제목', '목차에 보일 이름. 짧게(40자 안쪽) 적으세요.'],
+      ['쪽', `누르면 열릴 ${unit}. 비우면 바로 위 줄과 같은 쪽.`],
+      ['종류', '서식·참고·법령·사이트 중 하나를 적으면 내려받기·열기 단추가 붙습니다. 보통 목차 줄은 비워 두세요.'],
+      ['주소', '종류를 적은 줄의 내려받기(열기) 주소. 이미 있는 서식이면 그대로 두세요.'],
+      ['(참고) 지금 번호', '읽기만 하는 칸. 올릴 때는 쓰지 않습니다.'], [''],
+      ['줄 넣기·빼기', '줄을 끼워 넣거나 지워도 번호는 다시 매겨집니다. 「#」으로 시작하는 단계 칸은 메모로 보고 건너뜁니다.'],
+      ['올리기', '관리자 도구 ② 자료 관리 → 이 자료 → 「번호 목차」의 「목차 올리기」. 미리 보기에서 확인하고 넣습니다.']];
+    const blob = await SASXlsx.write([
+      { name: '목차', rows: sheetRows, widths: [7, 60, 7, 9, 50, 14], textCols: [1, 4, 5] },
+      { name: '안내', rows: guide, widths: [18, 110] }]);
+    const safe = String(doc.title).replace(/[\\/:*?"<>|]+/g, ' ').slice(0, 60).trim();
+    S.download(blob, `목차_${safe}.xlsx`);
+    toast(`목차 ${rows.length}줄을 엑셀로 내려받았습니다. 고친 뒤 「목차 올리기」로 넣으세요.`, 5000);
+  }
+
+  /** 목차 엑셀 올리기: 읽고 → 미리 보기(오류·주의) → 넣기 */
+  async function importToc(doc) {
+    const file = await pickFile('.xlsx,.csv');
+    if (!file) return;
+    let rows;
+    try { rows = await SASXlsx.read(file, '목차'); }
+    catch (e) { toast('엑셀을 읽지 못했습니다: ' + e.message, 6000); return; }
+    const r = SAS.rowsToOutline(doc, rows);
+    const idCell = rows.find(x => x && String(x[0]).trim() === '자료 ID');
+    const kindName = n => n.k === 'ch' ? '단원' : n.k === 'task' ? '업무' : n.k === 'link' ? (n.ty || '서식') : '세부';
+    const preview = h('div', { class: 'outline-list', style: 'max-height:280px' }, ...r.nodes.slice(0, 400).map(n => h('div', { class: 'ol-row k-' + n.k, style: `padding-left:${(n.c.split('.').length - 1) * 14}px` },
+      h('span', { class: 'ol-code' }, n.c), n.k === 'link' || n.ty ? h('span', { class: 'ltag t-' + n.ty }, kindName(n)) : null, h('span', { class: 'ol-t' }, n.t),
+      h('span', { class: 'small muted' }, ` ${SAS.pageOfBlock(doc, n.b)}${doc.format === 'pdf' ? '쪽' : '문단'}`))));
+    const msgList = (list, cls) => h('ul', { class: 'small ' + cls, style: 'max-height:140px;overflow:auto;margin:4px 0' }, ...list.slice(0, 50).map(m => h('li', {}, `${m.row}번째 줄: ${m.msg}`)), list.length > 50 ? h('li', {}, `… 외 ${list.length - 50}건`) : null);
+    const body = h('div', {}, h('h2', {}, '목차 올리기 미리 보기'),
+      h('p', {}, h('b', {}, doc.title), h('span', { class: 'muted' }, ` · ${file.name}`)),
+      idCell && idCell[1] && String(idCell[1]).trim() !== doc.id ? h('div', { class: 'notice warn' }, `이 엑셀은 다른 자료(${idCell[1]})에서 내려받은 것입니다. 맞는 파일인지 확인하세요.`) : null,
+      h('div', { class: 'kv' }, h('span', {}, `목차 ${r.count}줄`), h('span', {}, `단원 ${r.nodes.filter(n => n.k === 'ch').length}`), h('span', {}, `업무 ${r.nodes.filter(n => n.k === 'task').length}`),
+        h('span', {}, `서식 등 ${r.nodes.filter(n => n.k === 'link').length}`), r.newLinks.length ? h('span', {}, `새 링크 ${r.newLinks.length}`) : null),
+      r.errors.length ? h('div', { class: 'notice err' }, h('b', {}, `고쳐야 할 줄 ${r.errors.length}개`), ' — 엑셀에서 고친 뒤 다시 올려 주세요.', msgList(r.errors, '')) : null,
+      r.warnings.length ? h('details', {}, h('summary', {}, `확인할 점 ${r.warnings.length}개`), msgList(r.warnings, 'muted')) : null,
+      r.nodes.length ? preview : null,
+      h('p', { class: 'small muted' }, doc.outline && doc.outline.manual ? '지금 쓰는 사람이 만든 목차를 이 엑셀로 바꿉니다.' : '자동 목차 대신 이 목차를 씁니다. 자동 목차는 보관되어 「자동 목차로 되돌리기」로 돌아갈 수 있습니다.'));
+    const ok = await modal(body, r.errors.length ? [{ label: '닫기', value: false, primary: true }] : [{ label: '취소', value: false }, { label: `목차 넣기 (${r.count}줄)`, value: true, primary: true }]);
+    if (!ok || r.errors.length) return;
+    SAS.applyManualOutline(doc, r, { file: file.name });
+    S.touch(doc); renderEditor(); renderList();
+    toast(`사람이 만든 목차 ${r.count}줄을 넣었습니다. 「③ 점검·반영」에서 반영하면 사이트에 나옵니다.`, 6000);
   }
 
   const LINK_TYPES = ['서식', '참고', '법령', '사이트'];
@@ -1256,6 +1324,7 @@ ${groups.map(g => `<div class="card"><h2>${e(g.title)}</h2><table>${g.items.map(
     const kept = SAS.carryKeywords(doc, nd);
     const keptForms = SAS.carryForms(doc, nd);
     const keptLinks = SAS.carryLinkEdits(doc, nd);
+    const keptToc = SAS.carryManualOutline(doc, nd);   // 사람이 만든 목차는 새 판에도 이어 쓴다(쪽 확인 필요)
     if (file.size > PDF_MAX) { toast(`파일이 ${fmtBytes(file.size)}로 너무 큽니다(38MB까지). PDF 용량을 줄여 다시 넣어 주세요. 기존 자료를 유지합니다.`, 6000); return; }
     nd.original = SAS.makeOriginal(doc.id, file.name, file.size, r.format);
     if (doc.original && doc.original.repo && doc.original.format === nd.original.format) nd.original.repo = doc.original.repo; // 같은 연도면 같은 창고 자리에 덮어쓰기
@@ -1264,7 +1333,7 @@ ${groups.map(g => `<div class="card"><h2>${e(g.title)}</h2><table>${g.items.map(
     const ok = await confirmBox(`<h2>파일 교체</h2>${keptEdit ? `<p class="small">편집용 원본 <b>${SAS.esc(keptEdit.name || '')}</b>은 그대로 남아 사용자 화면에서 함께 내려받을 수 있습니다.</p>` : ''}<p><b>${SAS.esc(file.name)}</b></p><ul>
       <li>업무: ${doc.sections.length}개 → <b>${nd.sections.length}개</b>${nd.extraction.toc_found ? ' (목차 인식)' : ''}</li>
       <li>업무 검색어 유지: ${kept}개 업무</li><li>링크: ${(doc.links || []).length}개 → <b>${(nd.links || []).length}개</b> (고친 주소·이름 유지 ${keptLinks}개)</li>
-      ${nd.outline ? `<li>번호 목차: <b>${nd.outline.nodes.length}개 항목</b></li>` : ''}<li>사이트의 원본 파일도 새 파일로 바꿉니다 (${fmtBytes(file.size)})</li>
+      ${keptToc ? `<li>사람이 만든 목차는 그대로 이어 씁니다 — 새 판의 쪽이 맞는지 확인하세요</li>` : nd.outline ? `<li>번호 목차: <b>${nd.outline.nodes.length}개 항목</b></li>` : ''}<li>사이트의 원본 파일도 새 파일로 바꿉니다 (${fmtBytes(file.size)})</li>
       ${nd.extraction.warnings.length ? `<li>참고: ${nd.extraction.warnings.map(SAS.esc).join(' / ')}</li>` : ''}</ul>
       <p class="small muted">따로 넣은 원본 내려받기 링크가 있다면 새 판으로 바꿔 주세요.</p>`, '교체 적용');
     if (!ok) return;

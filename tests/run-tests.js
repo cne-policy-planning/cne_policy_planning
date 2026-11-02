@@ -250,6 +250,36 @@ test('예전 방식 PDF(원본 정보 없음)도 창고로 옮김 · 사이트 �
 });
 test('새 파일에 원본이 있으면 교체할 때 예전 PDF를 이어 쓰지 않음', () => { const o = { links: [], pdf: { path: 'pdf/x.pdf' } }, n = { links: [], original: { path: 'files/x.hwp' } }; SAS.carryLinkEdits(o, n); ok(!n.pdf); });
 test('PDF → HWPX로 교체하면 예전 PDF를 이어 쓰지 않음(쪽 보기 어긋남 방지)', () => { const o = { links: [], pdf: { path: 'pdf/x.pdf' } }, n = { links: [], format: 'hwpx' }; SAS.carryLinkEdits(o, n); ok(!n.pdf); const n2 = { links: [], format: 'pdf' }; SAS.carryLinkEdits(o, n2); ok(n2.pdf); });
+test('사람이 만든 목차: 엑셀 줄 → 목차(단계로 번호 자동, 쪽→블록, 서식 연결) → 되돌리기', () => {
+  const d = JSON.parse(JSON.stringify(doc));
+  const rows0 = SAS.outlineToRows(d);
+  ok(rows0.length > 50 && rows0[0].단계 === 1 && rows0.every(r => r.단계 >= 1 && r.단계 <= 6), '내려받기 줄');
+  ok(!rows0.some(r => r.단계 > 1 && false));
+  // 앞 줄보다 두 단계 이상 깊어지지 않음
+  ok(rows0.every((r, i) => i === 0 || r.단계 <= rows0[i - 1].단계 + 1), '단계 건너뜀 없음');
+  const form = d.links.find(l => l.url && l.type === '서식');
+  const rows = [['단계', '제목', '쪽', '종류', '주소'],
+    [1, 'Ⅰ. 교무 업무', 5, '', ''], [2, '학교교육계획', 6, '', ''], [3, '수립 절차', 7, '', ''], [3, form.text, 7, '서식', form.url],
+    [3, '새 서식(직접)', 8, '서식', 'https://example.org/a.hwp'], ['#메모', '무시', '', '', ''], [2, '현장체험학습', '', '', ''], [1, 'Ⅱ. 학사', 20, '', '']];
+  const r = SAS.rowsToOutline(d, rows);
+  eq(r.errors, []); eq(r.nodes.map(n => n.c), ['1', '1.1', '1.1.1', '1.1.2', '1.1.3', '1.2', '2']);
+  eq(r.nodes.map(n => n.k), ['ch', 'task', 'item', 'link', 'link', 'task', 'ch']);
+  eq(r.nodes[0].b, 4, 'PDF 5쪽 → 블록 4'); eq(r.nodes[5].b, r.nodes[4].b, '쪽 비면 앞 줄과 같은 쪽');
+  eq(r.nodes[3].l, form.id, '이미 있는 서식은 그 링크에 연결'); eq(r.newLinks.length, 1);
+  SAS.applyManualOutline(d, r, { file: 't.xlsx' });
+  ok(d.outline.manual && d.outline_auto && d.outline_auto.nodes.length > 50);
+  const toc = JSON.parse(SAS.buildOutputs([d], { generatedAt: 'x' }).files.get('data/toc/kindergarten.json')).docs[0][1];
+  eq(toc.map(x => x[2]).slice(0, 3), ['Ⅰ. 교무 업무', '학교교육계획', '수립 절차']); ok(toc.some(x => x[2] === '새 서식(직접)' && x[5] === 'https://example.org/a.hwp'));
+  // 파일 교체 때 이어받기
+  const nd = JSON.parse(JSON.stringify(doc)); ok(SAS.carryManualOutline(d, nd)); ok(nd.outline.manual && nd.outline.stale && nd.links.some(l => /^toc-/.test(l.id)));
+  // 되돌리기
+  ok(SAS.revertManualOutline(d)); ok(!d.outline.manual && !d.outline_auto && !d.links.some(l => /^toc-/.test(l.id)));
+});
+test('사람이 만든 목차: 잘못된 줄은 오류로(단계 건너뜀·쪽 없음·단계 글자)', () => {
+  const r = SAS.rowsToOutline(doc, [['단계', '제목', '쪽'], [1, '가', 1], [3, '나', 2], [2, '다', 99999], ['x', '라', 1], [2, '', 1]]);
+  eq(r.errors.map(e => e.row), [3, 4, 5, 6]);
+  eq(SAS.rowsToOutline(doc, [['아무', '거나']]).errors.length, 1, '머리글 없음');
+});
 test('띄어쓰기 붙이기: 균등분할 제목은 언제나, OCR 자료는 조사까지', () => {
   eq(SAS.joinSpaced('공 적 조 서(기관)'), '공적조서(기관)');
   eq(SAS.joinSpaced('공 무 원 인 사 기 록 요 약 서'), '공무원인사기록요약서');

@@ -60,7 +60,7 @@
       const k = TOC_KIND[n.k]; if (!k) return;
       const row = [n.c, k, (n.t || '') + (n.cut ? '…' : ''), page(n.b)];
       const l = n.l && links.get(n.l);
-      if (l) { row[2] = l.text || row[2]; row.push(l.type || (l.kind === 'law' ? '법령' : l.kind === 'site' ? '사이트' : '서식'), l.url || ''); }
+      if (l) { row[2] = (d.outline.manual ? row[2] : l.text) || row[2]; row.push(l.type || (l.kind === 'law' ? '법령' : l.kind === 'site' ? '사이트' : '서식'), l.url || ''); }
       rows.push(row);
     });
     return rows;

@@ -390,7 +390,8 @@
     const prep = { id: d.id, title: d.title, raw: d, nodes, by: {}, kids: {} };
     nodes.forEach((n, i) => {
       n.i = i;
-      if (n.l && links.has(n.l)) { const l = links.get(n.l); n.link = l; n.t = l.text || n.t; n.ty = l.type || typeFromKind(l); }
+      // 사람이 만든 목차는 적은 제목을 그대로, 자동 목차는 링크 이름을 쓴다
+      if (n.l && links.has(n.l)) { const l = links.get(n.l); n.link = l; n.t = (d.outline && d.outline.manual ? n.t : l.text) || n.t; n.ty = n.ty || l.type || typeFromKind(l); }
       prep.by[n.c] = n;
       n.p = n.c.includes('.') ? n.c.slice(0, n.c.lastIndexOf('.')) : '';
       (prep.kids[n.p] = prep.kids[n.p] || []).push(n);
