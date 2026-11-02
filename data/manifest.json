@@ -1,22 +1,22 @@
 {
  "schema_version": "2.0",
- "generated_at": "2026-11-02T12:31:16.290Z",
+ "generated_at": "2026-11-02T13:06:57.920Z",
  "shard_count": 128,
- "document_count": 602,
+ "document_count": 575,
  "levels": {
   "kindergarten": {
    "name": "유아",
-   "documents": 97,
-   "sections": 1837
+   "documents": 85,
+   "sections": 1835
   },
   "elementary": {
    "name": "초등",
-   "documents": 52,
+   "documents": 51,
    "sections": 1703
   },
   "middle": {
    "name": "중등",
-   "documents": 74,
+   "documents": 70,
    "sections": 1286
   },
   "special": {
@@ -26,21 +26,21 @@
   },
   "common": {
    "name": "공통",
-   "documents": 350,
-   "sections": 8250
+   "documents": 340,
+   "sections": 8180
   }
  },
  "departments": {
-  "초등특수교육과": 94,
+  "초등특수교육과": 93,
   "학교지원과": 12,
-  "미래인재과": 48,
+  "미래인재과": 45,
   "민주시민교육과": 100,
-  "정책기획과": 49,
+  "정책기획과": 43,
   "체육건강과": 43,
-  "감사관": 24,
-  "중등교육과": 50,
+  "감사관": 20,
+  "중등교육과": 48,
   "교원인사과": 16,
-  "유아교육복지과": 113,
+  "유아교육복지과": 102,
   "교육과정평가지원부": 1,
   "소통담당관": 3,
   "안전총괄과": 6,

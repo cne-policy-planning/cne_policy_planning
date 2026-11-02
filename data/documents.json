@@ -1,7 +1,7 @@
 {
  "schema_version": "2.0",
- "generated_at": "2026-11-02T12:31:16.290Z",
- "count": 602,
+ "generated_at": "2026-11-02T13:06:57.920Z",
+ "count": 575,
  "documents": [
   {
    "id": "doc-2018-9sjbw2",
@@ -170,7 +170,7 @@
   },
   {
    "id": "doc-2024-7pgqt5",
-   "title": "-1. 2024 단위 학교 내 각종 위원회 정비(개요)",
+   "title": "2024 단위 학교 내 각종 위원회 정비(개요)",
    "school_levels": [
     "공통"
    ],
@@ -189,7 +189,7 @@
    "forms_bundle_url": "",
    "section_count": 1,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:06.983Z",
+   "updated_at": "2026-11-02T12:58:29.339Z",
    "pdf": "../cne_files_2026_1/files/doc-2024-7pgqt5.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2024-7pgqt5.pdf",
@@ -203,7 +203,7 @@
   },
   {
    "id": "doc-2024-9pcosg",
-   "title": "--2. 2024 단위 학교 내 각종 위원회 정비 결과(2024. 9.)",
+   "title": "2024 단위 학교 내 각종 위원회 정비 결과(2024. 9.)",
    "school_levels": [
     "공통"
    ],
@@ -222,7 +222,7 @@
    "forms_bundle_url": "",
    "section_count": 0,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:06.982Z",
+   "updated_at": "2026-11-02T12:58:41.202Z",
    "pdf": "",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2024-9pcosg.xlsx",
@@ -236,7 +236,7 @@
   },
   {
    "id": "doc-2024-fwhjd7",
-   "title": "-3. 2024학년도 초중고 학생 교육비지원 나이스프로그램 FAQ",
+   "title": "2024학년도 초중고 학생 교육비지원 나이스프로그램 FAQ",
    "school_levels": [
     "공통"
    ],
@@ -255,7 +255,7 @@
    "forms_bundle_url": "",
    "section_count": 2,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:07.788Z",
+   "updated_at": "2026-11-02T12:53:47.269Z",
    "pdf": "../cne_files_2026_2/files/doc-2024-fwhjd7.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2024-fwhjd7.pdf",
@@ -269,7 +269,7 @@
   },
   {
    "id": "doc-2024-mo4sp7",
-   "title": "-1. 2024학년도 초중고 학생 교육비지원 나이스프로그램 사용자설명서(학교)",
+   "title": "2024학년도 초중고 학생 교육비지원 나이스프로그램 사용자설명서(학교)",
    "school_levels": [
     "공통"
    ],
@@ -288,7 +288,7 @@
    "forms_bundle_url": "",
    "section_count": 18,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:07.776Z",
+   "updated_at": "2026-11-02T12:54:12.666Z",
    "pdf": "../cne_files_2026_2/files/doc-2024-mo4sp7.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2024-mo4sp7.pdf",
@@ -302,7 +302,7 @@
   },
   {
    "id": "doc-2024-ohpqlh",
-   "title": "-2. 2024학년도 초중고 학생 교육비지원 나이스프로그램 사용자설명서(교육청)",
+   "title": "2024학년도 초중고 학생 교육비지원 나이스프로그램 사용자설명서(교육청)",
    "school_levels": [
     "공통"
    ],
@@ -321,7 +321,7 @@
    "forms_bundle_url": "",
    "section_count": 27,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:07.783Z",
+   "updated_at": "2026-11-02T12:54:00.611Z",
    "pdf": "../cne_files_2026_2/files/doc-2024-ohpqlh.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2024-ohpqlh.pdf",
@@ -467,7 +467,7 @@
   },
   {
    "id": "doc-2025-40g5m0",
-   "title": "-2. 2025 학교자율형 종합감사 체크리스트(자율점검표)(행정등)",
+   "title": "2025 학교자율형 종합감사 체크리스트(자율점검표)(행정등)",
    "school_levels": [
     "공통"
    ],
@@ -486,7 +486,7 @@
    "forms_bundle_url": "",
    "section_count": 0,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:05.857Z",
+   "updated_at": "2026-11-02T13:02:48.462Z",
    "pdf": "",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2025-40g5m0.xlsx",
@@ -500,7 +500,7 @@
   },
   {
    "id": "doc-2025-4qm87i",
-   "title": "-2. 2025년 지방교육행정기관 조직분석 종합보고서",
+   "title": "2025년 지방교육행정기관 조직분석 종합보고서",
    "school_levels": [
     "공통"
    ],
@@ -519,7 +519,7 @@
    "forms_bundle_url": "",
    "section_count": 26,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:07.024Z",
+   "updated_at": "2026-11-02T12:57:56.269Z",
    "pdf": "../cne_files_2026_1/files/doc-2025-4qm87i.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2025-4qm87i.pdf",
@@ -533,7 +533,7 @@
   },
   {
    "id": "doc-2025-6wmhnz",
-   "title": "-2. (참고) 2025년 공간혁신 우수사례집",
+   "title": "2025년 공간혁신 우수사례집",
    "school_levels": [
     "공통"
    ],
@@ -552,7 +552,7 @@
    "forms_bundle_url": "",
    "section_count": 34,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:07.020Z",
+   "updated_at": "2026-11-02T12:58:16.119Z",
    "pdf": "../cne_files_2026_1/files/doc-2025-6wmhnz.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2025-6wmhnz.pdf",
@@ -665,7 +665,7 @@
   },
   {
    "id": "doc-2025-ifkmv1",
-   "title": "-1. 2025년 지방교육행정기관 심층기능진단 최종보고서-전체",
+   "title": "2025년 지방교육행정기관 심층기능진단 최종보고서-전체",
    "school_levels": [
     "공통"
    ],
@@ -684,7 +684,7 @@
    "forms_bundle_url": "",
    "section_count": 56,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:06.983Z",
+   "updated_at": "2026-11-02T12:58:37.492Z",
    "pdf": "../cne_files_2026_1/files/doc-2025-ifkmv1.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2025-ifkmv1.pdf",
@@ -830,7 +830,7 @@
   },
   {
    "id": "doc-2025-qb5ehs",
-   "title": "-4. 2025년도 예방감사 연수 교재",
+   "title": "2025년도 예방감사 연수 교재",
    "school_levels": [
     "공통"
    ],
@@ -849,7 +849,7 @@
    "forms_bundle_url": "",
    "section_count": 84,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:05.910Z",
+   "updated_at": "2026-11-02T13:02:29.939Z",
    "pdf": "../cne_files_2026_1/files/doc-2025-qb5ehs.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2025-qb5ehs.pdf",
@@ -863,7 +863,7 @@
   },
   {
    "id": "doc-2025-sn34tn",
-   "title": "-3. 2025 학교자율형 종합감사 운영 길라잡이(인쇄용)",
+   "title": "2025 학교자율형 종합감사 운영 길라잡이(인쇄용)",
    "school_levels": [
     "공통"
    ],
@@ -882,7 +882,7 @@
    "forms_bundle_url": "",
    "section_count": 227,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:05.857Z",
+   "updated_at": "2026-11-02T13:02:54.014Z",
    "pdf": "../cne_files_2026_1/files/doc-2025-sn34tn.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2025-sn34tn.pdf",
@@ -1061,7 +1061,7 @@
   },
   {
    "id": "doc-2025-vqx55y",
-   "title": "-1. 2025 학교자율형 종합감사 체크리스트(자율점검표)(교무학사)",
+   "title": "2025 학교자율형 종합감사 체크리스트(자율점검표)(교무학사)",
    "school_levels": [
     "공통"
    ],
@@ -1080,7 +1080,7 @@
    "forms_bundle_url": "",
    "section_count": 0,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:05.818Z",
+   "updated_at": "2026-11-02T13:03:21.224Z",
    "pdf": "",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2025-vqx55y.xlsx",
@@ -1263,39 +1263,6 @@
    "outline_count": 372
   },
   {
-   "id": "doc-2026-0cy0hc",
-   "title": "서식 1-1. 학교 밖 전문적 학습공동체 현황 및 회원 명단(양식)",
-   "school_levels": [
-    "공통"
-   ],
-   "category": "",
-   "department": "정책기획과",
-   "year": 2026,
-   "format": "xlsx",
-   "kind": "link",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 0,
-   "form_count": 0,
-   "updated_at": "2026-10-31T19:34:07.159Z",
-   "pdf": "",
-   "original": {
-    "url": "../cne_files_2026_1/files/doc-2026-0cy0hc.xlsx",
-    "name": "서식 1-1. 학교 밖 전문적 학습공동체 현황 및 회원 명단(양식).xlsx",
-    "bytes": 22939,
-    "format": "xlsx"
-   },
-   "edit": null,
-   "pages": 0,
-   "outline_count": 0
-  },
-  {
    "id": "doc-2026-0gu7l5",
    "title": "2026 충남형 IB학교 운영 계획(탑재용)",
    "school_levels": [
@@ -1367,41 +1334,8 @@
    "outline_count": 204
   },
   {
-   "id": "doc-2026-0hm87j",
-   "title": "붙임2. (엑셀1) 2026 이음교육 운영 현황(중간보고)",
-   "school_levels": [
-    "유아"
-   ],
-   "category": "",
-   "department": "유아교육복지과",
-   "year": 2026,
-   "format": "xlsx",
-   "kind": "link",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 0,
-   "form_count": 0,
-   "updated_at": "2026-10-31T19:34:08.198Z",
-   "pdf": "",
-   "original": {
-    "url": "../cne_files_2026_2/files/doc-2026-0hm87j.xlsx",
-    "name": "붙임2. (엑셀1) 2026 이음교육 운영 현황(중간보고).xlsx",
-    "bytes": 18604,
-    "format": "xlsx"
-   },
-   "edit": null,
-   "pages": 0,
-   "outline_count": 0
-  },
-  {
    "id": "doc-2026-0ormdw",
-   "title": "-2. 2026학년도 학교자체평가 운영 계획",
+   "title": "2026학년도 학교자체평가 운영 계획",
    "school_levels": [
     "공통"
    ],
@@ -1420,7 +1354,7 @@
    "forms_bundle_url": "",
    "section_count": 8,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:07.062Z",
+   "updated_at": "2026-11-02T12:57:50.046Z",
    "pdf": "",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-0ormdw.hwpx",
@@ -1680,7 +1614,7 @@
   },
   {
    "id": "doc-2026-160tih",
-   "title": "1. 2026년 학업중단숙려제지원교 및 행복드림학교 운영 유공 표창계획",
+   "title": "2026년 학업중단숙려제지원교 및 행복드림학교 운영 유공 표창계획",
    "school_levels": [
     "공통"
    ],
@@ -1699,7 +1633,7 @@
    "forms_bundle_url": "",
    "section_count": 3,
    "form_count": 0,
-   "updated_at": "2026-11-02T06:31:02.374Z",
+   "updated_at": "2026-11-02T13:00:46.385Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-160tih.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-160tih.pdf",
@@ -1751,7 +1685,7 @@
   },
   {
    "id": "doc-2026-1zi359",
-   "title": "1. 2026년 교육복지지원사업 기본 계획",
+   "title": "2026년 교육복지지원사업 기본 계획",
    "school_levels": [
     "공통"
    ],
@@ -1770,7 +1704,7 @@
    "forms_bundle_url": "",
    "section_count": 9,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:06.935Z",
+   "updated_at": "2026-11-02T12:59:26.009Z",
    "pdf": "",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-1zi359.hwpx",
@@ -1931,7 +1865,7 @@
   },
   {
    "id": "doc-2026-2eteig",
-   "title": "1. 2026 혁신(미래)학교 운영 계획(최종)",
+   "title": "2026 혁신(미래)학교 운영 계획(최종)",
    "school_levels": [
     "공통"
    ],
@@ -1950,7 +1884,7 @@
    "forms_bundle_url": "",
    "section_count": 5,
    "form_count": 0,
-   "updated_at": "2026-11-02T06:31:02.574Z",
+   "updated_at": "2026-11-02T12:57:09.658Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-2eteig.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-2eteig.pdf",
@@ -2560,7 +2494,7 @@
   },
   {
    "id": "doc-2026-3lyyx5",
-   "title": "별첨1. 2026 인터넷통신비 지원 신청 명단 서식",
+   "title": "2026 인터넷통신비 지원 신청 명단 서식",
    "school_levels": [
     "공통"
    ],
@@ -2579,7 +2513,7 @@
    "forms_bundle_url": "",
    "section_count": 0,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:06.982Z",
+   "updated_at": "2026-11-02T12:58:51.806Z",
    "pdf": "",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-3lyyx5.xlsx",
@@ -2626,7 +2560,7 @@
   },
   {
    "id": "doc-2026-3s5q6n",
-   "title": "1. 2026 중등 교육과정 운영 지원 유공 표창계획",
+   "title": "2026 중등 교육과정 운영 지원 유공 표창계획",
    "school_levels": [
     "중등"
    ],
@@ -2645,7 +2579,7 @@
    "forms_bundle_url": "",
    "section_count": 3,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:08.519Z",
+   "updated_at": "2026-11-02T12:49:12.194Z",
    "pdf": "",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-3s5q6n.hwpx",
@@ -2900,7 +2834,7 @@
   },
   {
    "id": "doc-2026-4ae8za",
-   "title": "별첨3. 2026 인터넷통신비 지원대상자 전출 명단 서식",
+   "title": "2026 인터넷통신비 지원대상자 전출 명단 서식",
    "school_levels": [
     "공통"
    ],
@@ -2919,7 +2853,7 @@
    "forms_bundle_url": "",
    "section_count": 0,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:06.982Z",
+   "updated_at": "2026-11-02T12:58:58.094Z",
    "pdf": "",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-4ae8za.xlsx",
@@ -3004,7 +2938,7 @@
   },
   {
    "id": "doc-2026-4frk73",
-   "title": "-7. 사립학교(수감서식)",
+   "title": "사립학교(수감서식)",
    "school_levels": [
     "공통"
    ],
@@ -3023,7 +2957,7 @@
    "forms_bundle_url": "",
    "section_count": 0,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:05.965Z",
+   "updated_at": "2026-11-02T13:02:04.276Z",
    "pdf": "",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-4frk73.xlsx",
@@ -3212,7 +3146,7 @@
   },
   {
    "id": "doc-2026-4qazn9",
-   "title": "5. 2026학년도 학교체육주간 및 학교체육한마당 운영 계획(초등)",
+   "title": "2026학년도 학교체육주간 및 학교체육한마당 운영 계획(초등)",
    "school_levels": [
     "공통"
    ],
@@ -3231,7 +3165,7 @@
    "forms_bundle_url": "",
    "section_count": 4,
    "form_count": 0,
-   "updated_at": "2026-11-02T06:31:02.700Z",
+   "updated_at": "2026-11-02T12:55:01.622Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-4qazn9.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-4qazn9.pdf",
@@ -3288,7 +3222,7 @@
   },
   {
    "id": "doc-2026-4sfzde",
-   "title": "-9. (학교회계) 보조금",
+   "title": "(학교회계) 보조금",
    "school_levels": [
     "공통"
    ],
@@ -3307,7 +3241,7 @@
    "forms_bundle_url": "",
    "section_count": 7,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:06.797Z",
+   "updated_at": "2026-11-02T12:59:43.241Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-4sfzde.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-4sfzde.pdf",
@@ -3321,7 +3255,7 @@
   },
   {
    "id": "doc-2026-4ywunz",
-   "title": "2. 2026년도 누리봄교실 유공 교육감 표창 추천 대상(교원, 기관) 명부(양식)",
+   "title": "2026년도 누리봄교실 유공 교육감 표창 추천 대상(교원, 기관) 명부(양식)",
    "school_levels": [
     "공통"
    ],
@@ -3340,7 +3274,7 @@
    "forms_bundle_url": "",
    "section_count": 0,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:06.552Z",
+   "updated_at": "2026-11-02T13:00:52.039Z",
    "pdf": "",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-4ywunz.xlsx",
@@ -3589,77 +3523,6 @@
    "outline_count": 44
   },
   {
-   "id": "doc-2026-5d4pqh",
-   "title": "추천대상자 명부(서식) (2-180)",
-   "school_levels": [
-    "중등"
-   ],
-   "category": "",
-   "department": "미래인재과",
-   "year": 2026,
-   "format": "xls",
-   "kind": "link",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 0,
-   "form_count": 0,
-   "updated_at": "2026-10-31T19:34:08.424Z",
-   "pdf": "",
-   "original": {
-    "url": "../cne_files_2026_2/files/doc-2026-5d4pqh.xls",
-    "name": "추천대상자 명부(서식) (2-180).xls",
-    "bytes": 40960,
-    "format": "xls"
-   },
-   "edit": null,
-   "pages": 0,
-   "outline_count": 0
-  },
-  {
-   "id": "doc-2026-5gwi1a",
-   "title": "1-1. 부록-2026-혁신(미래)학교 현황(최종)-교감미배치 현황 추가",
-   "school_levels": [
-    "공통"
-   ],
-   "category": "",
-   "department": "정책기획과",
-   "year": 2026,
-   "format": "pdf",
-   "kind": "text",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 1,
-   "form_count": 0,
-   "updated_at": "2026-11-02T06:31:02.573Z",
-   "pdf": "../cne_files_2026_3/files/doc-2026-5gwi1a.pdf",
-   "original": {
-    "url": "../cne_files_2026_3/files/doc-2026-5gwi1a.pdf",
-    "name": "1-1. 부록-2026-혁신(미래)학교 현황(최종)-교감미배치 현황 추가.pdf",
-    "bytes": 72433,
-    "format": "pdf"
-   },
-   "edit": {
-    "url": "../cne_files_2026_1/files/doc-2026-5gwi1a.hwp",
-    "name": "1-1. 부록-2026-혁신(미래)학교 현황(최종)-교감미배치 현황 추가.hwp",
-    "bytes": 196096,
-    "format": "hwp"
-   },
-   "pages": 1,
-   "outline_count": 3
-  },
-  {
    "id": "doc-2026-5s2mya",
    "title": "2026 최초 재산신고 안내서(최종본)",
    "school_levels": [
@@ -3764,39 +3627,6 @@
    "outline_count": 3
   },
   {
-   "id": "doc-2026-5vkl98",
-   "title": "추천대상자 명부(서식) (2-182)",
-   "school_levels": [
-    "중등"
-   ],
-   "category": "",
-   "department": "미래인재과",
-   "year": 2026,
-   "format": "xls",
-   "kind": "link",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 0,
-   "form_count": 0,
-   "updated_at": "2026-10-31T19:34:08.424Z",
-   "pdf": "",
-   "original": {
-    "url": "../cne_files_2026_2/files/doc-2026-5vkl98.xls",
-    "name": "추천대상자 명부(서식) (2-182).xls",
-    "bytes": 40960,
-    "format": "xls"
-   },
-   "edit": null,
-   "pages": 0,
-   "outline_count": 0
-  },
-  {
    "id": "doc-2026-5w40po",
    "title": "2026학년도 늘봄·방과후학교 자유수강권 지원 요령",
    "school_levels": [
@@ -3836,7 +3666,7 @@
   },
   {
    "id": "doc-2026-5xaaln",
-   "title": "4. 2026 혁신미래학교와 충남형 2030본보기학교 지원 계획(최종)",
+   "title": "2026 혁신미래학교와 충남형 2030본보기학교 지원 계획(최종)",
    "school_levels": [
     "공통"
    ],
@@ -3855,7 +3685,7 @@
    "forms_bundle_url": "",
    "section_count": 2,
    "form_count": 0,
-   "updated_at": "2026-11-02T06:31:02.599Z",
+   "updated_at": "2026-11-02T12:56:47.247Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-5xaaln.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-5xaaln.pdf",
@@ -3907,7 +3737,7 @@
   },
   {
    "id": "doc-2026-60hg81",
-   "title": "제35회 충청남도학생체육대회 개최 계획(수정)",
+   "title": "제35회 충청남도학생체육대회 개최 계획",
    "school_levels": [
     "공통"
    ],
@@ -3926,7 +3756,7 @@
    "forms_bundle_url": "",
    "section_count": 19,
    "form_count": 0,
-   "updated_at": "2026-11-02T06:31:02.710Z",
+   "updated_at": "2026-11-02T12:54:48.861Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-60hg81.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-60hg81.pdf",
@@ -4087,7 +3917,7 @@
   },
   {
    "id": "doc-2026-648ncf",
-   "title": "★2026 자율형 사립고등학교 저소득층·다자녀 학생 교과서비 및 고교학비 지원 계획",
+   "title": "2026 자율형 사립고등학교 저소득층·다자녀 학생 교과서비 및 고교학비 지원 계획",
    "school_levels": [
     "중등"
    ],
@@ -4106,7 +3936,7 @@
    "forms_bundle_url": "",
    "section_count": 7,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:08.502Z",
+   "updated_at": "2026-11-02T12:49:17.623Z",
    "pdf": "",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-648ncf.hwpx",
@@ -4584,7 +4414,7 @@
   },
   {
    "id": "doc-2026-6xuqta",
-   "title": "3. 2026학년도 학교체육소위원회 구성 및 운영계획",
+   "title": "2026학년도 학교체육소위원회 구성 및 운영계획",
    "school_levels": [
     "공통"
    ],
@@ -4603,7 +4433,7 @@
    "forms_bundle_url": "",
    "section_count": 2,
    "form_count": 0,
-   "updated_at": "2026-11-02T06:31:02.697Z",
+   "updated_at": "2026-11-02T12:55:14.533Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-6xuqta.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-6xuqta.pdf",
@@ -4873,7 +4703,7 @@
   },
   {
    "id": "doc-2026-7ham6w",
-   "title": "2026년 직업교육 추진계획(인쇄본)",
+   "title": "2026년 직업교육 추진계획",
    "school_levels": [
     "중등"
    ],
@@ -4892,7 +4722,7 @@
    "forms_bundle_url": "",
    "section_count": 11,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:08.409Z",
+   "updated_at": "2026-11-02T12:51:32.894Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-7ham6w.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-7ham6w.pdf",
@@ -4977,7 +4807,7 @@
   },
   {
    "id": "doc-2026-7mj874",
-   "title": "-1. 2026 학교자체평가 안내서(컬러)",
+   "title": "2026 학교자체평가 안내서(컬러)",
    "school_levels": [
     "공통"
    ],
@@ -4996,7 +4826,7 @@
    "forms_bundle_url": "",
    "section_count": 42,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:07.004Z",
+   "updated_at": "2026-11-02T12:58:21.692Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-7mj874.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-7mj874.pdf",
@@ -5135,39 +4965,6 @@
     "name": "2026년 학교급식관련 교육감표창 대상자 나이스 인사기록(교원) 영양상담.xlsx",
     "bytes": 12342,
     "format": "xlsx"
-   },
-   "edit": null,
-   "pages": 0,
-   "outline_count": 0
-  },
-  {
-   "id": "doc-2026-81rk61",
-   "title": "3. 추천대상자 명부(서식)",
-   "school_levels": [
-    "중등"
-   ],
-   "category": "",
-   "department": "중등교육과",
-   "year": 2026,
-   "format": "xls",
-   "kind": "link",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 0,
-   "form_count": 0,
-   "updated_at": "2026-10-31T19:34:08.597Z",
-   "pdf": "",
-   "original": {
-    "url": "../cne_files_2026_3/files/doc-2026-81rk61.xls",
-    "name": "3. 추천대상자 명부(서식).xls",
-    "bytes": 31744,
-    "format": "xls"
    },
    "edit": null,
    "pages": 0,
@@ -5667,7 +5464,7 @@
   },
   {
    "id": "doc-2026-8s48k6",
-   "title": "1. 2026년 교육지원청 학업중단 예방프로그램 운영 유공 표창계획",
+   "title": "2026년 교육지원청 학업중단 예방프로그램 운영 유공 표창계획",
    "school_levels": [
     "공통"
    ],
@@ -5686,7 +5483,7 @@
    "forms_bundle_url": "",
    "section_count": 7,
    "form_count": 0,
-   "updated_at": "2026-11-02T06:31:02.371Z",
+   "updated_at": "2026-11-02T13:00:55.862Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-8s48k6.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-8s48k6.pdf",
@@ -6083,7 +5880,7 @@
   },
   {
    "id": "doc-2026-9mtjjd",
-   "title": "-4. 단설 유치원 및 초등학교(수감서식)",
+   "title": "단설 유치원 및 초등학교(수감서식)",
    "school_levels": [
     "공통"
    ],
@@ -6102,7 +5899,7 @@
    "forms_bundle_url": "",
    "section_count": 0,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:05.965Z",
+   "updated_at": "2026-11-02T13:02:13.246Z",
    "pdf": "",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-9mtjjd.xlsx",
@@ -6182,7 +5979,7 @@
   },
   {
    "id": "doc-2026-9y58fq",
-   "title": "-6. 공립 고등학교 특수학교(수감서식)",
+   "title": "공립 고등학교 특수학교(수감서식)",
    "school_levels": [
     "공통"
    ],
@@ -6201,7 +5998,7 @@
    "forms_bundle_url": "",
    "section_count": 0,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:05.965Z",
+   "updated_at": "2026-11-02T13:02:15.965Z",
    "pdf": "",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-9y58fq.xlsx",
@@ -6281,7 +6078,7 @@
   },
   {
    "id": "doc-2026-a0n3ah",
-   "title": "17. 18. 2026 초등영어교육(초등영어교육, 초등영어수업혁신사례발표) 유공 교육감 표창 계획",
+   "title": "2026 초등영어교육(초등영어교육, 초등영어수업혁신사례발표) 유공 교육감 표창 계획",
    "school_levels": [
     "초등"
    ],
@@ -6300,7 +6097,7 @@
    "forms_bundle_url": "",
    "section_count": 2,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:09.002Z",
+   "updated_at": "2026-11-02T12:48:18.622Z",
    "pdf": "",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-a0n3ah.hwpx",
@@ -6311,39 +6108,6 @@
    "edit": null,
    "pages": 379,
    "outline_count": 3
-  },
-  {
-   "id": "doc-2026-a112sc",
-   "title": "(수정 서식3) 2026 유치원 현황 조사서(사립 유치원용)",
-   "school_levels": [
-    "유아"
-   ],
-   "category": "",
-   "department": "유아교육복지과",
-   "year": 2026,
-   "format": "xlsx",
-   "kind": "link",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 0,
-   "form_count": 0,
-   "updated_at": "2026-10-31T19:34:07.983Z",
-   "pdf": "",
-   "original": {
-    "url": "../cne_files_2026_2/files/doc-2026-a112sc.xlsx",
-    "name": "(수정 서식3)_ 2026 유치원 현황 조사서(사립 유치원용).xlsx",
-    "bytes": 95207,
-    "format": "xlsx"
-   },
-   "edit": null,
-   "pages": 0,
-   "outline_count": 0
   },
   {
    "id": "doc-2026-a1p218",
@@ -6413,7 +6177,7 @@
   },
   {
    "id": "doc-2026-a4fi5k",
-   "title": "-2. 사용자매뉴얼(교육복지-교육급여)-교육(지원)청",
+   "title": "사용자매뉴얼(교육복지-교육급여)-교육(지원)청",
    "school_levels": [
     "공통"
    ],
@@ -6432,7 +6196,7 @@
    "forms_bundle_url": "",
    "section_count": 32,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:07.785Z",
+   "updated_at": "2026-11-02T12:53:54.000Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-a4fi5k.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-a4fi5k.pdf",
@@ -7199,7 +6963,7 @@
   },
   {
    "id": "doc-2026-bbl7pb",
-   "title": "-1. 25행동강령예방감사",
+   "title": "25행동강령예방감사",
    "school_levels": [
     "공통"
    ],
@@ -7218,7 +6982,7 @@
    "forms_bundle_url": "",
    "section_count": 15,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:05.818Z",
+   "updated_at": "2026-11-02T13:03:25.430Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-bbl7pb.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-bbl7pb.pdf",
@@ -7402,7 +7166,7 @@
   },
   {
    "id": "doc-2026-br64y1",
-   "title": "-3. (학교회계) 수입관리",
+   "title": "(학교회계) 수입관리",
    "school_levels": [
     "공통"
    ],
@@ -7421,7 +7185,7 @@
    "forms_bundle_url": "",
    "section_count": 10,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:06.749Z",
+   "updated_at": "2026-11-02T13:00:13.651Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-br64y1.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-br64y1.pdf",
@@ -7473,7 +7237,7 @@
   },
   {
    "id": "doc-2026-btx0lb",
-   "title": "2026충남특수교육주요사업계획(안내용)",
+   "title": "2026충남특수교육주요사업계획",
    "school_levels": [
     "특수"
    ],
@@ -7492,7 +7256,7 @@
    "forms_bundle_url": "",
    "section_count": 21,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:09.330Z",
+   "updated_at": "2026-11-02T12:47:32.716Z",
    "pdf": "",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-btx0lb.hwpx",
@@ -7841,7 +7605,7 @@
   },
   {
    "id": "doc-2026-chrggg",
-   "title": "-3. 수감자료(학교-공통)",
+   "title": "수감자료(학교-공통)",
    "school_levels": [
     "공통"
    ],
@@ -7860,7 +7624,7 @@
    "forms_bundle_url": "",
    "section_count": 5,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:05.907Z",
+   "updated_at": "2026-11-02T13:02:34.773Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-chrggg.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-chrggg.pdf",
@@ -7874,7 +7638,7 @@
   },
   {
    "id": "doc-2026-clgsz4",
-   "title": "4. 2026학년도 학교체육주간 및 학교체육한마당 운영 계획(중등)",
+   "title": "2026학년도 학교체육주간 및 학교체육한마당 운영 계획(중등)",
    "school_levels": [
     "공통"
    ],
@@ -7893,7 +7657,7 @@
    "forms_bundle_url": "",
    "section_count": 7,
    "form_count": 0,
-   "updated_at": "2026-11-02T06:31:02.698Z",
+   "updated_at": "2026-11-02T12:55:19.076Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-clgsz4.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-clgsz4.pdf",
@@ -7909,39 +7673,6 @@
    },
    "pages": 15,
    "outline_count": 57
-  },
-  {
-   "id": "doc-2026-cm0xzn",
-   "title": "(수정 서식2) 2026 유치원 현황 조사서(공립 유치원용)",
-   "school_levels": [
-    "유아"
-   ],
-   "category": "",
-   "department": "유아교육복지과",
-   "year": 2026,
-   "format": "xlsx",
-   "kind": "link",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 0,
-   "form_count": 0,
-   "updated_at": "2026-10-31T19:34:07.983Z",
-   "pdf": "",
-   "original": {
-    "url": "../cne_files_2026_2/files/doc-2026-cm0xzn.xlsx",
-    "name": "(수정 서식2)_ 2026 유치원 현황 조사서(공립 유치원용).xlsx",
-    "bytes": 135666,
-    "format": "xlsx"
-   },
-   "edit": null,
-   "pages": 0,
-   "outline_count": 0
   },
   {
    "id": "doc-2026-cmyds2",
@@ -8229,7 +7960,7 @@
   },
   {
    "id": "doc-2026-d6vnad",
-   "title": "-1. 2026년 충청남도교육청 교육공무원 성과상여금 지급 지침",
+   "title": "2026년 충청남도교육청 교육공무원 성과상여금 지급 지침",
    "school_levels": [
     "초등"
    ],
@@ -8248,7 +7979,7 @@
    "forms_bundle_url": "",
    "section_count": 14,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:08.711Z",
+   "updated_at": "2026-11-02T12:48:36.370Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-d6vnad.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-d6vnad.pdf",
@@ -8645,7 +8376,7 @@
   },
   {
    "id": "doc-2026-e2wb9p",
-   "title": "2. 2026년 교육지원청 학업중단 예방 프로그램 유공 교육감 표창 추천 대상(교원, 기관) 명부(양식)",
+   "title": "2026년 교육지원청 학업중단 예방 프로그램 유공 교육감 표창 추천 대상(교원, 기관) 명부(양식)",
    "school_levels": [
     "공통"
    ],
@@ -8664,7 +8395,7 @@
    "forms_bundle_url": "",
    "section_count": 0,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:06.552Z",
+   "updated_at": "2026-11-02T13:01:00.677Z",
    "pdf": "",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-e2wb9p.xlsx",
@@ -8744,7 +8475,7 @@
   },
   {
    "id": "doc-2026-e597w9",
-   "title": "1. 2026학년도 소규모학교 공동교육과정 운영 계획 예시",
+   "title": "2026학년도 소규모학교 공동교육과정 운영 계획 예시",
    "school_levels": [
     "공통"
    ],
@@ -8763,7 +8494,7 @@
    "forms_bundle_url": "",
    "section_count": 9,
    "form_count": 0,
-   "updated_at": "2026-11-02T06:31:02.634Z",
+   "updated_at": "2026-11-02T12:55:37.275Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-e597w9.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-e597w9.pdf",
@@ -8980,7 +8711,7 @@
   },
   {
    "id": "doc-2026-f0m10s",
-   "title": "-1. [초등] 담임교사 업무자료",
+   "title": "[초등] 담임교사 업무자료",
    "school_levels": [
     "공통"
    ],
@@ -8999,7 +8730,7 @@
    "forms_bundle_url": "",
    "section_count": 1,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:06.982Z",
+   "updated_at": "2026-11-02T12:59:04.118Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-f0m10s.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-f0m10s.pdf",
@@ -9185,39 +8916,6 @@
    },
    "pages": 5,
    "outline_count": 42
-  },
-  {
-   "id": "doc-2026-fa1vuw",
-   "title": "탑재용 각종 양식",
-   "school_levels": [
-    "공통"
-   ],
-   "category": "",
-   "department": "정책기획과",
-   "year": 2026,
-   "format": "hwpx",
-   "kind": "text",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 18,
-   "form_count": 0,
-   "updated_at": "2026-10-31T19:34:07.171Z",
-   "pdf": "",
-   "original": {
-    "url": "../cne_files_2026_1/files/doc-2026-fa1vuw.hwpx",
-    "name": "탑재용_각종 양식.hwpx",
-    "bytes": 771996,
-    "format": "hwpx"
-   },
-   "edit": null,
-   "pages": 2400,
-   "outline_count": 19
   },
   {
    "id": "doc-2026-fb0sst",
@@ -9419,7 +9117,7 @@
   },
   {
    "id": "doc-2026-fgbsk8",
-   "title": "6. 학교체육 진흥 조치 점검표(초, 중, 고)",
+   "title": "학교체육 진흥 조치 점검표(초, 중, 고)",
    "school_levels": [
     "공통"
    ],
@@ -9438,7 +9136,7 @@
    "forms_bundle_url": "",
    "section_count": 23,
    "form_count": 0,
-   "updated_at": "2026-11-02T06:31:02.701Z",
+   "updated_at": "2026-11-02T12:55:23.856Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-fgbsk8.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-fgbsk8.pdf",
@@ -9495,7 +9193,7 @@
   },
   {
    "id": "doc-2026-fja85q",
-   "title": "-3. 공무원 범죄",
+   "title": "공무원 범죄",
    "school_levels": [
     "공통"
    ],
@@ -9514,7 +9212,7 @@
    "forms_bundle_url": "",
    "section_count": 16,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:05.905Z",
+   "updated_at": "2026-11-02T13:02:38.613Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-fja85q.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-fja85q.pdf",
@@ -9845,7 +9543,7 @@
   },
   {
    "id": "doc-2026-g37vip",
-   "title": "-5. 공립 중학교(수감서식)",
+   "title": "공립 중학교(수감서식)",
    "school_levels": [
     "공통"
    ],
@@ -9864,7 +9562,7 @@
    "forms_bundle_url": "",
    "section_count": 0,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:05.965Z",
+   "updated_at": "2026-11-02T13:02:19.051Z",
    "pdf": "",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-g37vip.xlsx",
@@ -9878,7 +9576,7 @@
   },
   {
    "id": "doc-2026-g47r87",
-   "title": "-7. (학교회계) 세입세출외현금",
+   "title": "(학교회계) 세입세출외현금",
    "school_levels": [
     "공통"
    ],
@@ -9897,7 +9595,7 @@
    "forms_bundle_url": "",
    "section_count": 8,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:06.793Z",
+   "updated_at": "2026-11-02T12:59:53.929Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-g47r87.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-g47r87.pdf",
@@ -10152,7 +9850,7 @@
   },
   {
    "id": "doc-2026-gs1jww",
-   "title": "1. 공간으로 그리는 미래 임오연",
+   "title": "공간으로 그리는 미래",
    "school_levels": [
     "공통"
    ],
@@ -10171,7 +9869,7 @@
    "forms_bundle_url": "",
    "section_count": 53,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:06.324Z",
+   "updated_at": "2026-11-02T13:01:44.360Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-gs1jww.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-gs1jww.pdf",
@@ -10218,7 +9916,7 @@
   },
   {
    "id": "doc-2026-gtp2kr",
-   "title": "2026년 폭력 예방교육 운영안내(지침)",
+   "title": "2026년 폭력 예방교육 운영안내",
    "school_levels": [
     "특수"
    ],
@@ -10237,7 +9935,7 @@
    "forms_bundle_url": "",
    "section_count": 70,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:09.298Z",
+   "updated_at": "2026-11-02T12:47:38.872Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-gtp2kr.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-gtp2kr.pdf",
@@ -10251,7 +9949,7 @@
   },
   {
    "id": "doc-2026-gvcmo6",
-   "title": "-3. 2026년도 충청남도교육청 시간제기간제교사 성과상여금 지급 안내",
+   "title": "2026년도 충청남도교육청 시간제기간제교사 성과상여금 지급 안내",
    "school_levels": [
     "초등"
    ],
@@ -10270,7 +9968,7 @@
    "forms_bundle_url": "",
    "section_count": 4,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:08.718Z",
+   "updated_at": "2026-11-02T12:48:28.961Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-gvcmo6.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-gvcmo6.pdf",
@@ -10322,7 +10020,7 @@
   },
   {
    "id": "doc-2026-h13uap",
-   "title": "★1. 2026년도 청렴도 향상 종합계획(안내용)",
+   "title": "2026년도 청렴도 향상 종합계획(안내용)",
    "school_levels": [
     "공통"
    ],
@@ -10341,7 +10039,7 @@
    "forms_bundle_url": "",
    "section_count": 19,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:05.965Z",
+   "updated_at": "2026-11-02T13:02:23.648Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-h13uap.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-h13uap.pdf",
@@ -10847,7 +10545,7 @@
   },
   {
    "id": "doc-2026-iboi47",
-   "title": "2026학년도 충남 참학력 특수교육 교육과정 (최종)",
+   "title": "2026학년도 충남 참학력 특수교육 교육과정",
    "school_levels": [
     "특수"
    ],
@@ -10866,7 +10564,7 @@
    "forms_bundle_url": "",
    "section_count": 53,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:09.345Z",
+   "updated_at": "2026-11-02T12:47:18.993Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-iboi47.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-iboi47.pdf",
@@ -11130,7 +10828,7 @@
   },
   {
    "id": "doc-2026-impv17",
-   "title": "-6. (학교회계) 세무관리",
+   "title": "(학교회계) 세무관리",
    "school_levels": [
     "공통"
    ],
@@ -11149,7 +10847,7 @@
    "forms_bundle_url": "",
    "section_count": 6,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:06.791Z",
+   "updated_at": "2026-11-02T12:59:59.274Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-impv17.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-impv17.pdf",
@@ -11409,7 +11107,7 @@
   },
   {
    "id": "doc-2026-j44jam",
-   "title": "별첨2. 2026 인터넷통신비 지원 변동 보고 서식(2026년 00월)",
+   "title": "2026 인터넷통신비 지원 변동 보고 서식(2026년 00월)",
    "school_levels": [
     "공통"
    ],
@@ -11428,7 +11126,7 @@
    "forms_bundle_url": "",
    "section_count": 0,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:06.982Z",
+   "updated_at": "2026-11-02T12:59:11.391Z",
    "pdf": "",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-j44jam.xlsx",
@@ -11442,7 +11140,7 @@
   },
   {
    "id": "doc-2026-j479yy",
-   "title": "-2. (학교회계) 예산 및 결산관리",
+   "title": "(학교회계) 예산 및 결산관리",
    "school_levels": [
     "공통"
    ],
@@ -11461,7 +11159,7 @@
    "forms_bundle_url": "",
    "section_count": 22,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:06.744Z",
+   "updated_at": "2026-11-02T13:00:20.670Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-j479yy.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-j479yy.pdf",
@@ -11848,7 +11546,7 @@
   },
   {
    "id": "doc-2026-jnlasv",
-   "title": "-5. (학교회계) 계약관리",
+   "title": "(학교회계) 계약관리",
    "school_levels": [
     "공통"
    ],
@@ -11867,7 +11565,7 @@
    "forms_bundle_url": "",
    "section_count": 76,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:06.758Z",
+   "updated_at": "2026-11-02T13:00:05.043Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-jnlasv.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-jnlasv.pdf",
@@ -11954,39 +11652,6 @@
    },
    "pages": 6,
    "outline_count": 20
-  },
-  {
-   "id": "doc-2026-jvx9wv",
-   "title": "-1. 교육지원청",
-   "school_levels": [
-    "공통"
-   ],
-   "category": "",
-   "department": "감사관",
-   "year": 2026,
-   "format": "pdf",
-   "kind": "text",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 23,
-   "form_count": 0,
-   "updated_at": "2026-10-31T19:34:05.831Z",
-   "pdf": "../cne_files_2026_1/files/doc-2026-jvx9wv.pdf",
-   "original": {
-    "url": "../cne_files_2026_1/files/doc-2026-jvx9wv.pdf",
-    "name": "-1. 교육지원청.pdf",
-    "bytes": 452415,
-    "format": "pdf"
-   },
-   "edit": null,
-   "pages": 26,
-   "outline_count": 190
   },
   {
    "id": "doc-2026-jwp4oj",
@@ -12329,39 +11994,6 @@
    "outline_count": 90
   },
   {
-   "id": "doc-2026-kcjp8u",
-   "title": "(수정 서식4) 2026 유치원 현황 조사서(교육지원청용-수합용)",
-   "school_levels": [
-    "유아"
-   ],
-   "category": "",
-   "department": "유아교육복지과",
-   "year": 2026,
-   "format": "xlsx",
-   "kind": "link",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 0,
-   "form_count": 0,
-   "updated_at": "2026-10-31T19:34:07.983Z",
-   "pdf": "",
-   "original": {
-    "url": "../cne_files_2026_2/files/doc-2026-kcjp8u.xlsx",
-    "name": "(수정 서식4)_ 2026 유치원 현황 조사서(교육지원청용-수합용).xlsx",
-    "bytes": 101360,
-    "format": "xlsx"
-   },
-   "edit": null,
-   "pages": 0,
-   "outline_count": 0
-  },
-  {
    "id": "doc-2026-kd91ml",
    "title": "학교 내 장애학생 의료지원 가이드북1",
    "school_levels": [
@@ -12393,39 +12025,6 @@
    "edit": null,
    "pages": 112,
    "outline_count": 259
-  },
-  {
-   "id": "doc-2026-klg8tv",
-   "title": "(명부양식) 2026 충남온돌봄 활성화 유공 교육감 표창 추천대상자 명단(탑재용)",
-   "school_levels": [
-    "초등"
-   ],
-   "category": "",
-   "department": "초등특수교육과",
-   "year": 2026,
-   "format": "xlsx",
-   "kind": "link",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 0,
-   "form_count": 0,
-   "updated_at": "2026-10-31T19:34:09.041Z",
-   "pdf": "",
-   "original": {
-    "url": "../cne_files_2026_3/files/doc-2026-klg8tv.xlsx",
-    "name": "(명부양식) 2026 충남온돌봄 활성화 유공 교육감 표창 추천대상자 명단(탑재용).xlsx",
-    "bytes": 17212,
-    "format": "xlsx"
-   },
-   "edit": null,
-   "pages": 0,
-   "outline_count": 0
   },
   {
    "id": "doc-2026-kmqc90",
@@ -12500,7 +12099,7 @@
   },
   {
    "id": "doc-2026-kq2kzn",
-   "title": "★2026 고등학교 저소득층 학생 급식비 지원 계획",
+   "title": "2026 고등학교 저소득층 학생 급식비 지원 계획",
    "school_levels": [
     "중등"
    ],
@@ -12519,7 +12118,7 @@
    "forms_bundle_url": "",
    "section_count": 7,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:08.501Z",
+   "updated_at": "2026-11-02T12:49:21.500Z",
    "pdf": "",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-kq2kzn.hwpx",
@@ -12533,7 +12132,7 @@
   },
   {
    "id": "doc-2026-ksqrd4",
-   "title": "-2. [중등] 담임교사 업무자료",
+   "title": "[중등] 담임교사 업무자료",
    "school_levels": [
     "공통"
    ],
@@ -12552,7 +12151,7 @@
    "forms_bundle_url": "",
    "section_count": 1,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:07.024Z",
+   "updated_at": "2026-11-02T12:58:02.949Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-ksqrd4.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-ksqrd4.pdf",
@@ -12943,44 +12542,6 @@
    "outline_count": 47
   },
   {
-   "id": "doc-2026-lp3qbm",
-   "title": "4. 지출실적 조회 방법",
-   "school_levels": [
-    "유아"
-   ],
-   "category": "",
-   "department": "유아교육복지과",
-   "year": 2026,
-   "format": "pdf",
-   "kind": "text",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 2,
-   "form_count": 0,
-   "updated_at": "2026-11-02T06:31:02.803Z",
-   "pdf": "../cne_files_2026_3/files/doc-2026-lp3qbm.pdf",
-   "original": {
-    "url": "../cne_files_2026_3/files/doc-2026-lp3qbm.pdf",
-    "name": "4. 지출실적 조회 방법.pdf",
-    "bytes": 218465,
-    "format": "pdf"
-   },
-   "edit": {
-    "url": "../cne_files_2026_2/files/doc-2026-lp3qbm.hwp",
-    "name": "4. 지출실적 조회 방법.hwp",
-    "bytes": 550400,
-    "format": "hwp"
-   },
-   "pages": 2,
-   "outline_count": 5
-  },
-  {
    "id": "doc-2026-ltc95a",
    "title": "2026. 9. 1.자 각급학교 현황(게시용)",
    "school_levels": [
@@ -13119,7 +12680,7 @@
   },
   {
    "id": "doc-2026-m49ijr",
-   "title": "3. 2026 혁신동행학교 지원 계획(최종)",
+   "title": "2026 혁신동행학교 지원 계획(최종)",
    "school_levels": [
     "공통"
    ],
@@ -13138,7 +12699,7 @@
    "forms_bundle_url": "",
    "section_count": 2,
    "form_count": 0,
-   "updated_at": "2026-11-02T06:31:02.598Z",
+   "updated_at": "2026-11-02T12:56:52.746Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-m49ijr.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-m49ijr.pdf",
@@ -13223,7 +12784,7 @@
   },
   {
    "id": "doc-2026-m8jsnf",
-   "title": "최종-2026 충남 인성교육 도움자료(중등 누리집)",
+   "title": "2026 충남 인성교육 도움자료(중등 누리집)",
    "school_levels": [
     "중등"
    ],
@@ -13242,7 +12803,7 @@
    "forms_bundle_url": "",
    "section_count": 17,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:08.500Z",
+   "updated_at": "2026-11-02T12:49:28.736Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-m8jsnf.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-m8jsnf.pdf",
@@ -13393,7 +12954,7 @@
   },
   {
    "id": "doc-2026-misny2",
-   "title": "2. 학교복합시설 활성화 방안 박성철",
+   "title": "학교복합시설 활성화 방안",
    "school_levels": [
     "공통"
    ],
@@ -13412,7 +12973,7 @@
    "forms_bundle_url": "",
    "section_count": 29,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:06.329Z",
+   "updated_at": "2026-11-02T13:01:32.678Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-misny2.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-misny2.pdf",
@@ -13936,7 +13497,7 @@
   },
   {
    "id": "doc-2026-nh3phb",
-   "title": "3. 2026년 학업중단숙려제 및 행복드림학교 유공 교육감 표창 추천대상자 명부(양식)",
+   "title": "2026년 학업중단숙려제 및 행복드림학교 유공 교육감 표창 추천대상자 명부(양식)",
    "school_levels": [
     "공통"
    ],
@@ -13955,45 +13516,12 @@
    "forms_bundle_url": "",
    "section_count": 0,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:06.701Z",
+   "updated_at": "2026-11-02T13:00:36.332Z",
    "pdf": "",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-nh3phb.xlsx",
     "name": "3. 2026년 학업중단숙려제 및 행복드림학교 유공 교육감 표창 추천대상자 명부(양식).xlsx",
     "bytes": 13466,
-    "format": "xlsx"
-   },
-   "edit": null,
-   "pages": 0,
-   "outline_count": 0
-  },
-  {
-   "id": "doc-2026-nkl3v8",
-   "title": "서식 4-1. 학교 밖 전문적 학습공동체 운영 보고서 제출 현황",
-   "school_levels": [
-    "공통"
-   ],
-   "category": "",
-   "department": "정책기획과",
-   "year": 2026,
-   "format": "xlsx",
-   "kind": "link",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 0,
-   "form_count": 0,
-   "updated_at": "2026-10-31T19:34:07.159Z",
-   "pdf": "",
-   "original": {
-    "url": "../cne_files_2026_1/files/doc-2026-nkl3v8.xlsx",
-    "name": "서식 4-1. 학교 밖 전문적 학습공동체 운영 보고서 제출 현황.xlsx",
-    "bytes": 18261,
     "format": "xlsx"
    },
    "edit": null,
@@ -14248,7 +13776,7 @@
   },
   {
    "id": "doc-2026-nscqg6",
-   "title": "2026 충남 특수교육 수업 장학 운영 계획(안내용)",
+   "title": "2026 충남 특수교육 수업 장학 운영 계획",
    "school_levels": [
     "특수"
    ],
@@ -14267,7 +13795,7 @@
    "forms_bundle_url": "",
    "section_count": 13,
    "form_count": 0,
-   "updated_at": "2026-11-02T06:31:03.086Z",
+   "updated_at": "2026-11-02T12:47:43.244Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-nscqg6.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-nscqg6.pdf",
@@ -14456,7 +13984,7 @@
   },
   {
    "id": "doc-2026-o5fql0",
-   "title": "-1. (사립유치원) 01. 종합감사 수감자료 및 행정사항 안내",
+   "title": "(사립유치원) 01. 종합감사 수감자료 및 행정사항 안내",
    "school_levels": [
     "유아"
    ],
@@ -14475,7 +14003,7 @@
    "forms_bundle_url": "",
    "section_count": 3,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:07.972Z",
+   "updated_at": "2026-11-02T12:53:32.310Z",
    "pdf": "",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-o5fql0.hwpx",
@@ -14905,7 +14433,7 @@
   },
   {
    "id": "doc-2026-ozgtwk",
-   "title": "-2. 갑질 및 직장 내 괴롭힘 예방감사 연수",
+   "title": "갑질 및 직장 내 괴롭힘 예방감사 연수",
    "school_levels": [
     "공통"
    ],
@@ -14924,7 +14452,7 @@
    "forms_bundle_url": "",
    "section_count": 5,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:05.857Z",
+   "updated_at": "2026-11-02T13:02:58.102Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-ozgtwk.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-ozgtwk.pdf",
@@ -15108,7 +14636,7 @@
   },
   {
    "id": "doc-2026-pgo72o",
-   "title": "붙임 1. 2026 충남 특수교육 운영계획",
+   "title": "2026 충남 특수교육 운영계획",
    "school_levels": [
     "특수"
    ],
@@ -15127,7 +14655,7 @@
    "forms_bundle_url": "",
    "section_count": 20,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:09.395Z",
+   "updated_at": "2026-11-02T12:47:05.642Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-pgo72o.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-pgo72o.pdf",
@@ -15387,7 +14915,7 @@
   },
   {
    "id": "doc-2026-q8fcrk",
-   "title": "붙임 1. 2026충남특수교육주요사업계획",
+   "title": "2026충남특수교육주요사업계획",
    "school_levels": [
     "특수"
    ],
@@ -15406,7 +14934,7 @@
    "forms_bundle_url": "",
    "section_count": 175,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:09.407Z",
+   "updated_at": "2026-11-02T12:46:59.675Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-q8fcrk.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-q8fcrk.pdf",
@@ -15557,7 +15085,7 @@
   },
   {
    "id": "doc-2026-qnr2jj",
-   "title": "(서식6) 2026년 학교급식관련 교육감표창 대상자 작성자료",
+   "title": "2026년 학교급식관련 교육감표창 대상자 작성자료",
    "school_levels": [
     "공통"
    ],
@@ -15576,7 +15104,7 @@
    "forms_bundle_url": "",
    "section_count": 0,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:07.364Z",
+   "updated_at": "2026-11-02T12:55:54.585Z",
    "pdf": "",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-qnr2jj.xlsx",
@@ -15939,39 +15467,6 @@
    "outline_count": 52
   },
   {
-   "id": "doc-2026-r5dtvr",
-   "title": "5. [서식 3] 2026학년도 4분기 유아학비 집행 잔액 발생 보고(유치원용)",
-   "school_levels": [
-    "유아"
-   ],
-   "category": "",
-   "department": "유아교육복지과",
-   "year": 2026,
-   "format": "xlsx",
-   "kind": "link",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 0,
-   "form_count": 0,
-   "updated_at": "2026-10-31T19:34:08.197Z",
-   "pdf": "",
-   "original": {
-    "url": "../cne_files_2026_2/files/doc-2026-r5dtvr.xlsx",
-    "name": "5. [서식 3] 2026학년도 4분기 유아학비 집행 잔액 발생 보고(유치원용).xlsx",
-    "bytes": 13964,
-    "format": "xlsx"
-   },
-   "edit": null,
-   "pages": 0,
-   "outline_count": 0
-  },
-  {
    "id": "doc-2026-r7uusp",
    "title": "2026 초등 교외체험학습 운영 길라잡이",
    "school_levels": [
@@ -16043,41 +15538,8 @@
    "outline_count": 596
   },
   {
-   "id": "doc-2026-rlq6as",
-   "title": "-2-1. 직속기관",
-   "school_levels": [
-    "공통"
-   ],
-   "category": "",
-   "department": "감사관",
-   "year": 2026,
-   "format": "pdf",
-   "kind": "text",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 10,
-   "form_count": 0,
-   "updated_at": "2026-10-31T19:34:05.854Z",
-   "pdf": "../cne_files_2026_1/files/doc-2026-rlq6as.pdf",
-   "original": {
-    "url": "../cne_files_2026_1/files/doc-2026-rlq6as.pdf",
-    "name": "-2-1. 직속기관.pdf",
-    "bytes": 190854,
-    "format": "pdf"
-   },
-   "edit": null,
-   "pages": 13,
-   "outline_count": 114
-  },
-  {
    "id": "doc-2026-rm314t",
-   "title": "-4. (학교회계) 지출관리",
+   "title": "(학교회계) 지출관리",
    "school_levels": [
     "공통"
    ],
@@ -16096,7 +15558,7 @@
    "forms_bundle_url": "",
    "section_count": 17,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:06.753Z",
+   "updated_at": "2026-11-02T13:00:09.897Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-rm314t.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-rm314t.pdf",
@@ -16110,7 +15572,7 @@
   },
   {
    "id": "doc-2026-rm6xiv",
-   "title": "2026 충남온돌봄 활성화 유공 표창 계획(안) 탑재용",
+   "title": "2026 충남온돌봄 활성화 유공 표창 계획(안)",
    "school_levels": [
     "초등"
    ],
@@ -16129,7 +15591,7 @@
    "forms_bundle_url": "",
    "section_count": 7,
    "form_count": 0,
-   "updated_at": "2026-11-02T06:31:03.023Z",
+   "updated_at": "2026-11-02T12:45:31.789Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-rm6xiv.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-rm6xiv.pdf",
@@ -16285,7 +15747,7 @@
   },
   {
    "id": "doc-2026-rqwqz6",
-   "title": "2. 2026년 교육복지지원사업 주요업무계획",
+   "title": "2026년 교육복지지원사업 주요업무계획",
    "school_levels": [
     "공통"
    ],
@@ -16304,7 +15766,7 @@
    "forms_bundle_url": "",
    "section_count": 7,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:06.937Z",
+   "updated_at": "2026-11-02T12:59:21.078Z",
    "pdf": "",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-rqwqz6.hwpx",
@@ -16485,39 +15947,6 @@
    "edit": null,
    "pages": 11,
    "outline_count": 9
-  },
-  {
-   "id": "doc-2026-s35jd0",
-   "title": "(붙임2) 2026 놀이지원 자원봉사자 예산 신청(자료집계 제출 서식)",
-   "school_levels": [
-    "유아"
-   ],
-   "category": "",
-   "department": "유아교육복지과",
-   "year": 2026,
-   "format": "xlsx",
-   "kind": "link",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 0,
-   "form_count": 0,
-   "updated_at": "2026-10-31T19:34:07.982Z",
-   "pdf": "",
-   "original": {
-    "url": "../cne_files_2026_2/files/doc-2026-s35jd0.xlsx",
-    "name": "(붙임2) 2026 놀이지원 자원봉사자 예산 신청(자료집계 제출 서식).xlsx",
-    "bytes": 12464,
-    "format": "xlsx"
-   },
-   "edit": null,
-   "pages": 0,
-   "outline_count": 0
   },
   {
    "id": "doc-2026-s3u0gg",
@@ -16871,7 +16300,7 @@
   },
   {
    "id": "doc-2026-sh8hg6",
-   "title": "-8. (학교회계) 학교발전기금",
+   "title": "(학교회계) 학교발전기금",
    "school_levels": [
     "공통"
    ],
@@ -16890,7 +16319,7 @@
    "forms_bundle_url": "",
    "section_count": 9,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:06.795Z",
+   "updated_at": "2026-11-02T12:59:48.479Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-sh8hg6.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-sh8hg6.pdf",
@@ -17012,39 +16441,6 @@
    "outline_count": 0
   },
   {
-   "id": "doc-2026-sno1g2",
-   "title": "붙임3. (엑셀2)2026 이음교육 운영 현황(최종보고)",
-   "school_levels": [
-    "유아"
-   ],
-   "category": "",
-   "department": "유아교육복지과",
-   "year": 2026,
-   "format": "xlsx",
-   "kind": "link",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 0,
-   "form_count": 0,
-   "updated_at": "2026-10-31T19:34:08.198Z",
-   "pdf": "",
-   "original": {
-    "url": "../cne_files_2026_2/files/doc-2026-sno1g2.xlsx",
-    "name": "붙임3. (엑셀2)2026 이음교육 운영 현황(최종보고).xlsx",
-    "bytes": 18707,
-    "format": "xlsx"
-   },
-   "edit": null,
-   "pages": 0,
-   "outline_count": 0
-  },
-  {
    "id": "doc-2026-snxpnk",
    "title": "2026 생성형 인공지능 활용 맞춤형 자료 안내(48종)",
    "school_levels": [
@@ -17079,7 +16475,7 @@
   },
   {
    "id": "doc-2026-soyumt",
-   "title": "(유아교육복지과-12901 (첨부)) 7. 2026 학생맞춤통합지원 유공 교육감 표창 계획",
+   "title": "2026 학생맞춤통합지원 유공 교육감 표창 계획",
    "school_levels": [
     "공통"
    ],
@@ -17098,7 +16494,7 @@
    "forms_bundle_url": "",
    "section_count": 10,
    "form_count": 0,
-   "updated_at": "2026-11-02T06:31:02.541Z",
+   "updated_at": "2026-11-02T12:59:33.181Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-soyumt.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-soyumt.pdf",
@@ -17221,7 +16617,7 @@
   },
   {
    "id": "doc-2026-t6f8dy",
-   "title": "2. 2026 혁신(미래)학교 평가와 성찰상담(컨설팅) 계획(최종)",
+   "title": "2026 혁신(미래)학교 평가와 성찰상담(컨설팅) 계획(최종)",
    "school_levels": [
     "공통"
    ],
@@ -17240,7 +16636,7 @@
    "forms_bundle_url": "",
    "section_count": 21,
    "form_count": 0,
-   "updated_at": "2026-11-02T06:31:02.576Z",
+   "updated_at": "2026-11-02T12:57:24.219Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-t6f8dy.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-t6f8dy.pdf",
@@ -17259,7 +16655,7 @@
   },
   {
    "id": "doc-2026-t8yqbb",
-   "title": "1. 2026년 누리봄교실 운영 유공 표창계획",
+   "title": "2026년 누리봄교실 운영 유공 표창계획",
    "school_levels": [
     "공통"
    ],
@@ -17278,7 +16674,7 @@
    "forms_bundle_url": "",
    "section_count": 3,
    "form_count": 0,
-   "updated_at": "2026-11-02T06:31:02.373Z",
+   "updated_at": "2026-11-02T13:01:04.507Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-t8yqbb.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-t8yqbb.pdf",
@@ -17297,7 +16693,7 @@
   },
   {
    "id": "doc-2026-tbg1ph",
-   "title": "2-1. 부록-2026-혁신(미래)학교 성찰상담, 평가 한눈에 보기(최종)",
+   "title": "혁신(미래)학교 성찰상담, 평가 한눈에 보기(최종)",
    "school_levels": [
     "공통"
    ],
@@ -17316,7 +16712,7 @@
    "forms_bundle_url": "",
    "section_count": 1,
    "form_count": 0,
-   "updated_at": "2026-11-02T06:31:02.576Z",
+   "updated_at": "2026-11-02T12:57:30.999Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-tbg1ph.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-tbg1ph.pdf",
@@ -17571,7 +16967,7 @@
   },
   {
    "id": "doc-2026-tukl7g",
-   "title": "-1. (학교회계) 학교회계의 이해",
+   "title": "(학교회계) 학교회계의 이해",
    "school_levels": [
     "공통"
    ],
@@ -17590,7 +16986,7 @@
    "forms_bundle_url": "",
    "section_count": 9,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:06.738Z",
+   "updated_at": "2026-11-02T13:00:25.901Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-tukl7g.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-tukl7g.pdf",
@@ -18118,39 +17514,6 @@
    "outline_count": 448
   },
   {
-   "id": "doc-2026-v3rjwb",
-   "title": "-2-2. 직속기관(서식)",
-   "school_levels": [
-    "공통"
-   ],
-   "category": "",
-   "department": "감사관",
-   "year": 2026,
-   "format": "xlsx",
-   "kind": "link",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 0,
-   "form_count": 0,
-   "updated_at": "2026-10-31T19:34:05.857Z",
-   "pdf": "",
-   "original": {
-    "url": "../cne_files_2026_1/files/doc-2026-v3rjwb.xlsx",
-    "name": "-2-2. 직속기관(서식).xlsx",
-    "bytes": 54734,
-    "format": "xlsx"
-   },
-   "edit": null,
-   "pages": 0,
-   "outline_count": 0
-  },
-  {
    "id": "doc-2026-vgncv0",
    "title": "학습지원교육길라잡이",
    "school_levels": [
@@ -18258,39 +17621,6 @@
    },
    "pages": 14,
    "outline_count": 85
-  },
-  {
-   "id": "doc-2026-voszjx",
-   "title": "4. [서식 2] 유치원 유아학비 집행내역 보고 서식(교육지원청용)",
-   "school_levels": [
-    "유아"
-   ],
-   "category": "",
-   "department": "유아교육복지과",
-   "year": 2026,
-   "format": "xlsx",
-   "kind": "link",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 0,
-   "form_count": 0,
-   "updated_at": "2026-10-31T19:34:08.197Z",
-   "pdf": "",
-   "original": {
-    "url": "../cne_files_2026_2/files/doc-2026-voszjx.xlsx",
-    "name": "4. [서식 2] 유치원 유아학비 집행내역 보고 서식(교육지원청용).xlsx",
-    "bytes": 39352,
-    "format": "xlsx"
-   },
-   "edit": null,
-   "pages": 0,
-   "outline_count": 0
   },
   {
    "id": "doc-2026-vs1y8w",
@@ -18595,39 +17925,6 @@
    "outline_count": 124
   },
   {
-   "id": "doc-2026-w6rje0",
-   "title": "(수정 서식1) 2026학년도 학사 일정 현황",
-   "school_levels": [
-    "유아"
-   ],
-   "category": "",
-   "department": "유아교육복지과",
-   "year": 2026,
-   "format": "xlsx",
-   "kind": "link",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 0,
-   "form_count": 0,
-   "updated_at": "2026-10-31T19:34:07.983Z",
-   "pdf": "",
-   "original": {
-    "url": "../cne_files_2026_2/files/doc-2026-w6rje0.xlsx",
-    "name": "(수정 서식1)_ 2026학년도 학사 일정 현황.xlsx",
-    "bytes": 42920,
-    "format": "xlsx"
-   },
-   "edit": null,
-   "pages": 0,
-   "outline_count": 0
-  },
-  {
    "id": "doc-2026-wafphe",
    "title": "2026 중등 학생평가 학교생활기록부 유공 추천대상자 명부(서식)",
    "school_levels": [
@@ -18874,39 +18171,6 @@
    "outline_count": 36
   },
   {
-   "id": "doc-2026-x4rkz2",
-   "title": "추천대상자 명부(서식)",
-   "school_levels": [
-    "중등"
-   ],
-   "category": "",
-   "department": "중등교육과",
-   "year": 2026,
-   "format": "xls",
-   "kind": "link",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 0,
-   "form_count": 0,
-   "updated_at": "2026-10-31T19:34:08.623Z",
-   "pdf": "",
-   "original": {
-    "url": "../cne_files_2026_3/files/doc-2026-x4rkz2.xls",
-    "name": "추천대상자 명부(서식).xls",
-    "bytes": 31744,
-    "format": "xls"
-   },
-   "edit": null,
-   "pages": 0,
-   "outline_count": 0
-  },
-  {
    "id": "doc-2026-x7jcxt",
    "title": "2026 충남 학교협동조합 담당자 연수자료(2024.4.14.)",
    "school_levels": [
@@ -18974,7 +18238,7 @@
   },
   {
    "id": "doc-2026-x85kpa",
-   "title": "2. 2026년 학업중단숙려제 및 행복드림학교 유공 교육감 표창 추천 대상(기관) 명부(양식)",
+   "title": "2026년 학업중단숙려제 및 행복드림학교 유공 교육감 표창 추천 대상(기관) 명부(양식)",
    "school_levels": [
     "공통"
    ],
@@ -18993,7 +18257,7 @@
    "forms_bundle_url": "",
    "section_count": 0,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:06.552Z",
+   "updated_at": "2026-11-02T13:01:08.991Z",
    "pdf": "",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-x85kpa.xlsx",
@@ -19070,39 +18334,6 @@
    "edit": null,
    "pages": 6,
    "outline_count": 48
-  },
-  {
-   "id": "doc-2026-xdx4l4",
-   "title": "추천대상자 명부(서식)",
-   "school_levels": [
-    "공통"
-   ],
-   "category": "",
-   "department": "미래인재과",
-   "year": 2026,
-   "format": "xls",
-   "kind": "link",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 0,
-   "form_count": 0,
-   "updated_at": "2026-10-31T19:34:06.312Z",
-   "pdf": "",
-   "original": {
-    "url": "../cne_files_2026_1/files/doc-2026-xdx4l4.xls",
-    "name": "추천대상자 명부(서식).xls",
-    "bytes": 31744,
-    "format": "xls"
-   },
-   "edit": null,
-   "pages": 0,
-   "outline_count": 0
   },
   {
    "id": "doc-2026-xem87v",
@@ -19215,7 +18446,7 @@
   },
   {
    "id": "doc-2026-xfujul",
-   "title": "(총무과-3317 (첨부) 국가기록원 기록관리정책과) 2026년 기록물관리 지침",
+   "title": "(국가기록원 기록관리정책과) 2026년 기록물관리 지침",
    "school_levels": [
     "공통"
    ],
@@ -19234,7 +18465,7 @@
    "forms_bundle_url": "",
    "section_count": 22,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:07.764Z",
+   "updated_at": "2026-11-02T12:54:33.650Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-xfujul.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-xfujul.pdf",
@@ -19349,39 +18580,6 @@
    },
    "pages": 8,
    "outline_count": 28
-  },
-  {
-   "id": "doc-2026-xmdb9u",
-   "title": "-2.(사립유치원) 02. 사립유치원 종합감사 수감자료(교육지원청, 유치원작성)",
-   "school_levels": [
-    "유아"
-   ],
-   "category": "",
-   "department": "감사관",
-   "year": 2026,
-   "format": "xlsx",
-   "kind": "link",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 0,
-   "form_count": 0,
-   "updated_at": "2026-10-31T19:34:07.973Z",
-   "pdf": "",
-   "original": {
-    "url": "../cne_files_2026_2/files/doc-2026-xmdb9u.xlsx",
-    "name": "-2.(사립유치원) 02. 사립유치원 종합감사 수감자료(교육지원청, 유치원작성).xlsx",
-    "bytes": 161249,
-    "format": "xlsx"
-   },
-   "edit": null,
-   "pages": 0,
-   "outline_count": 0
   },
   {
    "id": "doc-2026-xrdrci",
@@ -19593,7 +18791,7 @@
   },
   {
    "id": "doc-2026-y4g6of",
-   "title": "2026학년도 특수교육대상자 선정배치 업무 추진계획(최종)",
+   "title": "2026학년도 특수교육대상자 선정배치 업무 추진계획",
    "school_levels": [
     "특수"
    ],
@@ -19612,7 +18810,7 @@
    "forms_bundle_url": "",
    "section_count": 37,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:09.387Z",
+   "updated_at": "2026-11-02T12:47:13.324Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-y4g6of.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-y4g6of.pdf",
@@ -19625,41 +18823,8 @@
    "outline_count": 351
   },
   {
-   "id": "doc-2026-y8boaz",
-   "title": "-3. 탑재용 각종 양식",
-   "school_levels": [
-    "공통"
-   ],
-   "category": "",
-   "department": "정책기획과",
-   "year": 2026,
-   "format": "hwpx",
-   "kind": "text",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 18,
-   "form_count": 0,
-   "updated_at": "2026-10-31T19:34:07.063Z",
-   "pdf": "",
-   "original": {
-    "url": "../cne_files_2026_1/files/doc-2026-y8boaz.hwpx",
-    "name": "-3. 탑재용_각종 양식.hwpx",
-    "bytes": 771996,
-    "format": "hwpx"
-   },
-   "edit": null,
-   "pages": 2400,
-   "outline_count": 19
-  },
-  {
    "id": "doc-2026-yatrn4",
-   "title": "-1. 나이스 교육급여 프로그램 사용자매뉴얼(학교)",
+   "title": "나이스 교육급여 프로그램 사용자매뉴얼(학교)",
    "school_levels": [
     "공통"
    ],
@@ -19678,7 +18843,7 @@
    "forms_bundle_url": "",
    "section_count": 19,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:07.779Z",
+   "updated_at": "2026-11-02T12:54:05.298Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-yatrn4.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-yatrn4.pdf",
@@ -19717,39 +18882,6 @@
     "url": "../cne_files_2026_2/files/doc-2026-yay11h.xlsx",
     "name": "2. 2026 마주동행학교 운영 신청 일람표(기관명).xlsx",
     "bytes": 15665,
-    "format": "xlsx"
-   },
-   "edit": null,
-   "pages": 0,
-   "outline_count": 0
-  },
-  {
-   "id": "doc-2026-ygob12",
-   "title": "2026 학교 밖 교과교육연구 전문적 학습공동체 선정 현황",
-   "school_levels": [
-    "공통"
-   ],
-   "category": "",
-   "department": "정책기획과",
-   "year": 2026,
-   "format": "xlsx",
-   "kind": "link",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 0,
-   "form_count": 0,
-   "updated_at": "2026-10-31T19:34:07.081Z",
-   "pdf": "",
-   "original": {
-    "url": "../cne_files_2026_1/files/doc-2026-ygob12.xlsx",
-    "name": "2026 학교 밖 교과교육연구 전문적 학습공동체 선정 현황.xlsx",
-    "bytes": 20848,
     "format": "xlsx"
    },
    "edit": null,
@@ -20103,7 +19235,7 @@
   },
   {
    "id": "doc-2026-zd5sb6",
-   "title": "2. 2026 학교체육 연간운영계획서(초중고)",
+   "title": "2026 학교체육 연간운영계획서(초중고)",
    "school_levels": [
     "공통"
    ],
@@ -20122,7 +19254,7 @@
    "forms_bundle_url": "",
    "section_count": 4,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:07.395Z",
+   "updated_at": "2026-11-02T12:55:43.893Z",
    "pdf": "",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-zd5sb6.hwpx",
@@ -20133,39 +19265,6 @@
    "edit": null,
    "pages": 2261,
    "outline_count": 6
-  },
-  {
-   "id": "doc-2026-zdj7f5",
-   "title": "3. [서식 1] 분기별 유아학비 재배정 신청서(교육지원청용)",
-   "school_levels": [
-    "유아"
-   ],
-   "category": "",
-   "department": "유아교육복지과",
-   "year": 2026,
-   "format": "xlsx",
-   "kind": "link",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 0,
-   "form_count": 0,
-   "updated_at": "2026-10-31T19:34:08.197Z",
-   "pdf": "",
-   "original": {
-    "url": "../cne_files_2026_2/files/doc-2026-zdj7f5.xlsx",
-    "name": "3. [서식 1] 분기별 유아학비 재배정 신청서(교육지원청용).xlsx",
-    "bytes": 50315,
-    "format": "xlsx"
-   },
-   "edit": null,
-   "pages": 0,
-   "outline_count": 0
   },
   {
    "id": "doc-2026-zdq428",
@@ -20481,7 +19580,7 @@
   },
   {
    "id": "doc-2027-05ykxz",
-   "title": "-1. 2027학년도 중학교 교복 개별구매 운영 요령",
+   "title": "2027학년도 중학교 교복 개별구매 운영 요령",
    "school_levels": [
     "중등"
    ],
@@ -20500,7 +19599,7 @@
    "forms_bundle_url": "",
    "section_count": 16,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:08.425Z",
+   "updated_at": "2026-11-02T12:51:07.235Z",
    "pdf": "../cne_files_2026_2/files/doc-2027-05ykxz.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2027-05ykxz.pdf",
@@ -20717,7 +19816,7 @@
   },
   {
    "id": "doc-2027-vz0a2b",
-   "title": "-3. 2027학년도 고등학교 교복 학교주관구매제도 운영 요령",
+   "title": "2027학년도 고등학교 교복 학교주관구매제도 운영 요령",
    "school_levels": [
     "중등"
    ],
@@ -20736,7 +19835,7 @@
    "forms_bundle_url": "",
    "section_count": 5,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:08.432Z",
+   "updated_at": "2026-11-02T12:50:11.672Z",
    "pdf": "../cne_files_2026_2/files/doc-2027-vz0a2b.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2027-vz0a2b.pdf",
