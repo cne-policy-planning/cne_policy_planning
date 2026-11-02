@@ -269,21 +269,44 @@
    * 새로 생긴 중복은 다시 알린다. 자료 이름을 누르면 ② 자료 관리에서 그 자료를 연다(거기서 삭제).
    */
   async function alertDuplicates(force) {
-    const groups = SAS.findDuplicates(S.state.docs);
-    const sig = groups.map(g => g.map(d => d.id).join('+')).sort().join('|');
-    if (!groups.length) { if (force) toast('이름이 같은 자료가 없습니다.'); return; }
-    if (!force && sig && (await S.kvGet('dupDismissed')) === sig) return;
-    const fmt = d => [d.year ? d.year + '년' : '', String(d.format || '').toUpperCase(), (d.blocks || []).length && d.format === 'pdf' ? (d.blocks || []).length + '쪽' : '',
-      d.original && d.original.bytes ? fmtBytes(d.original.bytes) : '', d.created_at ? '등록 ' + new Date(d.created_at).toLocaleDateString('ko-KR') : ''].filter(Boolean).join(' · ');
-    const body = h('div', {}, h('h2', {}, `⚠ 이름이 같은 자료가 ${groups.length}묶음 있습니다`),
-      h('p', {}, '같은 자료가 두 번 등록된 것으로 보입니다. 사용자 화면에서 같은 자료가 두 번 나오고, 일괄 등록으로 교체할 때 하나만 바뀝니다. 자료 이름을 눌러 열어 보고 남길 것 하나만 두고 「자료 삭제」하세요.'),
-      ...groups.map(g => h('div', { class: 'dup-group', style: 'margin:10px 0;padding:8px 10px;border:1px solid #e1e6ed;border-radius:10px' },
-        h('b', {}, g[0].title, ' ', h('span', { class: 'tag warn' }, g.length + '건')),
-        h('ul', { style: 'margin:6px 0 0;padding-left:18px' }, ...g.map(d => h('li', {},
-          h('a', { href: '#', onclick: e => { e.preventDefault(); const ok = $('modalBody').querySelector('.actions button.primary'); if (ok) ok.click(); setTimeout(() => { showTab('manage'); selectDoc(d.id); }, 0); } }, (d.original && d.original.name) || d.filename || d.id),
-          h('span', { class: 'small muted' }, ' — ' + fmt(d) + ' · ' + (d.school_levels || []).join('·'))))))));
-    const v = await modal(body, [{ label: '다시 알리지 않기', value: 'mute' }, { label: '확인', value: true, primary: true }]);
-    if (v === 'mute') { await S.kvSet('dupDismissed', sig); toast('이 묶음은 다시 알리지 않습니다. 새로 생긴 중복은 다시 알립니다.', 5000); }
+    let deleted = 0;
+    for (;;) {
+      const groups = SAS.findDuplicates(S.state.docs);
+      const sig = groups.map(g => g.map(d => d.id).join('+')).sort().join('|');
+      if (!groups.length) {
+        if (deleted) { renderList(); toast(`중복 자료 ${deleted}건을 삭제했습니다. 「③ 점검·반영」에서 반영하면 사이트에서도 사라집니다.`, 6000); }
+        else if (force) toast('이름이 같은 자료가 없습니다.');
+        return;
+      }
+      if (!force && !deleted && sig && (await S.kvGet('dupDismissed')) === sig) return;
+      const fmt = d => [d.year ? d.year + '년' : '', String(d.format || '').toUpperCase(), (d.blocks || []).length && d.format === 'pdf' ? (d.blocks || []).length + '쪽' : '',
+        d.original && d.original.bytes ? fmtBytes(d.original.bytes) : '', (d.sections || []).length ? `업무 ${(d.sections || []).length}개` : '',
+        d.created_at ? '등록 ' + new Date(d.created_at).toLocaleDateString('ko-KR') : ''].filter(Boolean).join(' · ');
+      let action = null;   // { del: id } 또는 { open: id }
+      const pick = act => { action = act; const ok = $('modalBody').querySelector('.actions button.primary'); if (ok) ok.click(); };
+      const body = h('div', {}, h('h2', {}, `⚠ 이름이 같은 자료가 ${groups.length}묶음 있습니다`),
+        h('p', {}, '같은 자료가 두 번 등록된 것으로 보입니다. 사용자 화면에서 같은 자료가 두 번 나오고, 일괄 등록으로 교체할 때 하나만 바뀝니다. 묶음마다 남길 것 하나만 두고 나머지는 「삭제」하세요. 파일 이름을 누르면 ② 자료 관리에서 열어 볼 수 있습니다.'),
+        ...groups.map(g => h('div', { class: 'dup-group', style: 'margin:10px 0;padding:8px 10px;border:1px solid #e1e6ed;border-radius:10px' },
+          h('b', {}, g[0].title, ' ', h('span', { class: 'tag warn' }, g.length + '건')),
+          h('ul', { style: 'margin:6px 0 0;padding-left:18px' }, ...g.map((d, i) => h('li', { style: 'margin:4px 0' },
+            h('a', { href: '#', onclick: e => { e.preventDefault(); pick({ open: d.id }); } }, (d.original && d.original.name) || d.filename || d.id),
+            h('span', { class: 'small muted' }, ' — ' + fmt(d) + ' · ' + (d.school_levels || []).join('·')), ' ',
+            i === 0 ? h('span', { class: 'tag gray', title: '먼저 등록된 자료' }, '먼저 등록') : null, ' ',
+            h('button', { type: 'button', class: 'small danger', style: 'padding:2px 10px', onclick: () => pick({ del: d.id }) }, '삭제')))))));
+      const v = await modal(body, [{ label: '다시 알리지 않기', value: 'mute' }, { label: deleted ? '닫기' : '확인', value: true, primary: true }]);
+      if (action && action.open) { renderList(); showTab('manage'); selectDoc(action.open); return; }
+      if (action && action.del) {
+        const d = S.getDoc(action.del); if (!d) continue;
+        if (await confirmBox(`<h2>자료 삭제</h2><p>「${SAS.esc(d.title)}」 (${SAS.esc((d.original && d.original.name) || d.filename || d.id)})을(를) 지웁니다. 같은 이름의 다른 자료는 그대로 남습니다.</p><p class="small muted">「③ 점검·반영」에서 「사이트에 반영」해야 사이트에서 사라집니다. 반영 전에는 GitHub에서 다시 불러와 되돌릴 수 있습니다.</p>`, '삭제', true)) {
+          S.removeDoc(d.id); deleted++;
+          if (selectedId === d.id) selectedId = null;
+        }
+        continue;   // 남은 중복을 다시 보여 준다
+      }
+      if (deleted) { renderList(); renderEditor(); toast(`중복 자료 ${deleted}건을 삭제했습니다. 「③ 점검·반영」에서 반영하면 사이트에서도 사라집니다.`, 6000); }
+      if (v === 'mute') { await S.kvSet('dupDismissed', sig); toast('이 묶음은 다시 알리지 않습니다. 새로 생긴 중복은 다시 알립니다.', 5000); }
+      return;
+    }
   }
 
   function openTokenDialog() {
@@ -660,7 +683,9 @@
     if (!t) return { doc: SAS.createDocument(meta, q.blocks, ids), carry: null };
     const nd = SAS.createDocument(Object.assign(meta, {
       id: t.id,
-         school_levels: q.levels.length && (q.levelsFrom !== 'file' || !(t.school_levels || []).length) ? q.levels : t.school_levels,      category: q.category || t.category || meta.category,
+      // 교체할 때 파일 이름에서 짐작한 학교급은 쓰지 않는다(기존 자료의 학교급 유지). 폴더 이름·직접 고른 학교급만 바꾼다
+      school_levels: q.levels.length && (q.levelsFrom !== 'file' || !(t.school_levels || []).length) ? q.levels : t.school_levels,
+      category: q.category || t.category || meta.category,
       department: q.department || t.department || meta.department,
       works_url: q.works || t.works_url,
       origin: q.originSite ? meta.origin : t.origin,
