@@ -806,6 +806,21 @@
 
   function needsCheck(d) { const v = SAS.validateDocument(d); return v.errors.length > 0 || v.warnings.length > 0; }
 
+  /** 목록 위: 관리 중인 전체 자료 수 + 학교급별 수 + (조건이 있으면) 조건에 맞는 수 */
+  function renderCount(shown) {
+    const box = $('docTotal'); if (!box) return;
+    const all = S.state.docs;
+    const levels = [...new Set(all.flatMap(d => d.school_levels || []))];
+    const order = ['유아', '초등', '중등', '특수', '공통'];
+    levels.sort((a, b) => (order.indexOf(a) + 1 || 99) - (order.indexOf(b) + 1 || 99) || a.localeCompare(b, 'ko'));
+    const per = levels.map(l => `${l} ${all.filter(d => d.school_levels.includes(l)).length}`).join(' · ');
+    const filtered = shown !== all.length;
+    box.replaceChildren(...[
+      h('b', {}, `관리 중인 자료 ${all.length.toLocaleString()}건`),
+      filtered ? h('span', { class: 'tag warn', style: 'margin-left:6px' }, `조건에 맞는 자료 ${shown.toLocaleString()}건`) : null,
+      per ? h('div', { class: 'muted', title: '여러 학교급에 걸친 자료는 학교급마다 셉니다' }, per) : null].filter(Boolean));
+  }
+
   function renderList() {
     const cats = [...new Set(S.state.docs.map(d => d.category).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'ko'));
     const curCat = fCat.value;
@@ -819,6 +834,7 @@
       (!$('fWarn').checked || needsCheck(d)))
       // 등록 순서(최근 등록 먼저) → 자료 ID. 자료명·내용을 고쳐도(수정 시각이 바뀌어도) 목록 자리는 그대로
       .sort((a, b) => (b.created_at || '').localeCompare(a.created_at || '') || a.id.localeCompare(b.id));
+    renderCount(list.length);
     const box = $('docList');
     const keepTop = box.scrollTop;   // 목록을 다시 그려도 보던 위치 그대로
     if (!list.length) { box.replaceChildren(h('p', { class: 'muted small', style: 'padding:8px' }, S.state.docs.length ? '조건에 맞는 자료가 없습니다.' : '등록된 자료가 없습니다.')); return; }
@@ -1028,6 +1044,66 @@
     const safe = String(doc.title).replace(/[\\/:*?"<>|]+/g, ' ').slice(0, 60).trim();
     S.download(blob, `목차_${safe}.xlsx`);
     toast(`목차 ${rows.length}줄을 엑셀로 내려받았습니다. 고친 뒤 「목차 올리기」로 넣으세요.`, 5000);
+  }
+
+  // ---------- 목차 여러 개 한꺼번에 올리기 ----------
+  // 엑셀마다 「안내」 시트의 자료 ID로 짝짓는다(없으면 파일 이름 「목차_자료명.xlsx」의 자료명으로)
+  $('btnBulkToc').onclick = () => $('bulkTocInput').click();
+  $('btnBulkTocDir').onclick = () => $('bulkTocDirInput').click();
+  $('bulkTocInput').onchange = e => { const fs = [...e.target.files]; e.target.value = ''; if (fs.length) bulkImportToc(fs); };
+  $('bulkTocDirInput').onchange = e => { const fs = [...e.target.files].filter(f => /\.(xlsx|csv)$/i.test(f.name) && !/^~\$/.test(f.name)); e.target.value = ''; if (fs.length) bulkImportToc(fs); else toast('폴더에 목차 엑셀(.xlsx)이 없습니다.'); };
+
+  async function bulkImportToc(files) {
+    if (!S.state.docs.length) { toast('먼저 자료를 불러와 주세요.'); return; }
+    const byId = new Map(S.state.docs.map(d => [d.id, d]));
+    const byTitle = new Map(S.state.docs.map(d => [SAS.norm(d.title), d]));
+    const items = [];
+    await withProgress(`목차 엑셀 ${files.length}개를 읽는 중…`, async p => {
+      for (let i = 0; i < files.length; i++) {
+        const f = files[i];
+        if (p) p(i, files.length);
+        const it = { file: f, doc: null, how: '', r: null, err: '' };
+        try {
+          const guide = await SASXlsx.read(f, '안내');
+          const idRow = guide.find(x => x && String(x[0]).trim() === '자료 ID');
+          const id = idRow && String(idRow[1] || '').trim();
+          if (id && byId.has(id)) { it.doc = byId.get(id); it.how = '자료 ID'; }
+          else {
+            const t = f.name.replace(/\.(xlsx|csv)$/i, '').replace(/^목차[_\s-]*/, '');
+            const d = byTitle.get(SAS.norm(t));
+            if (d) { it.doc = d; it.how = '파일 이름'; }
+            else it.err = id ? `자료 ID ${id}인 자료가 없습니다(지워졌거나 다른 저장소).` : '어느 자료의 목차인지 알 수 없습니다(안내 시트의 자료 ID 또는 파일 이름 「목차_자료명」 필요).';
+          }
+          if (it.doc) it.r = SAS.rowsToOutline(it.doc, await SASXlsx.read(f, '목차'));
+        } catch (e) { it.err = '읽기 실패: ' + e.message; }
+        items.push(it);
+      }
+    });
+    // 같은 자료에 엑셀이 둘 이상이면 나중 것(이름순 마지막)만
+    const seen = new Map(); items.forEach(it => { if (it.doc) { if (seen.has(it.doc.id)) seen.get(it.doc.id).err = '같은 자료의 다른 엑셀이 있어 건너뜁니다.'; seen.set(it.doc.id, it); } });
+    const good = it => it.doc && it.r && !it.r.errors.length && !it.err;
+    const checks = new Map();
+    const rows = items.map(it => {
+      const cb = h('input', { type: 'checkbox', checked: good(it), disabled: !good(it) });
+      checks.set(it, cb);
+      const st = it.err ? h('span', { class: 'tag err' }, it.err)
+        : it.r.errors.length ? h('span', { class: 'tag err', title: it.r.errors.slice(0, 5).map(e => `${e.row}번째 줄: ${e.msg}`).join('\n') }, `고칠 줄 ${it.r.errors.length}`)
+        : h('span', {}, h('span', { class: 'tag ok' }, '넣을 수 있음'), it.r.warnings.length ? h('span', { class: 'tag gray', title: it.r.warnings.slice(0, 8).map(e => `${e.row}번째 줄: ${e.msg}`).join('\n') }, ` 확인 ${it.r.warnings.length}`) : null,
+          it.doc.outline && it.doc.outline.manual ? h('span', { class: 'tag warn' }, ' 사람 목차 덮어씀') : null);
+      return h('tr', {}, h('td', {}, cb), h('td', { class: 'small' }, it.file.webkitRelativePath || it.file.name),
+        h('td', { class: 'small' }, it.doc ? it.doc.title : '-', it.how ? h('span', { class: 'muted' }, ` (${it.how})`) : null),
+        h('td', { class: 'small', style: 'text-align:right' }, it.r ? String(it.r.count) : '-'), h('td', {}, st));
+    });
+    const n = items.filter(good).length;
+    const body = h('div', {}, h('h2', {}, `목차 여러 개 올리기 (${items.length}개)`),
+      h('p', { class: 'small muted' }, '넣을 수 있는 엑셀만 체크되어 있습니다. 「고칠 줄」에 마우스를 올리면 어느 줄이 문제인지 보입니다. 넣은 뒤 「③ 점검·반영」에서 한 번에 반영하세요. 넣은 목차는 자료마다 「자동 목차로 되돌리기」로 되돌릴 수 있습니다.'),
+      h('div', { style: 'max-height:52vh;overflow:auto' }, h('table', { class: 'table' }, h('thead', {}, h('tr', {}, h('th', {}, ''), h('th', {}, '엑셀'), h('th', {}, '자료'), h('th', {}, '줄'), h('th', {}, '상태'))), h('tbody', {}, ...rows))));
+    const ok = await modal(body, n ? [{ label: '취소', value: false }, { label: `체크한 목차 넣기`, value: true, primary: true }] : [{ label: '닫기', value: false, primary: true }]);
+    if (!ok) return;
+    let done = 0;
+    items.forEach(it => { if (good(it) && checks.get(it).checked) { SAS.applyManualOutline(it.doc, it.r, { file: it.file.name }); S.touch(it.doc); done++; } });
+    renderList(); renderEditor();
+    toast(`목차 ${done}개를 넣었습니다. 「③ 점검·반영」에서 반영하면 사이트에 나옵니다.`, 7000);
   }
 
   /** 목차 엑셀 올리기: 읽고 → 미리 보기(오류·주의) → 넣기 */
@@ -1525,5 +1601,5 @@ ${groups.map(g => `<div class="card"><h2>${e(g.title)}</h2><table>${g.items.map(
 
   // ---------- 시작 ----------
   renderHeader(); renderQueue(); initStart();
-  window.SASAdmin = { showTab, selectDoc, renderEditor, makeOutputs, openTokenDialog }; // 점검용
+  window.SASAdmin = { showTab, selectDoc, renderEditor, makeOutputs, openTokenDialog, bulkImportToc }; // 점검용
 })();

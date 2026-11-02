@@ -142,6 +142,7 @@
       const dk = [matchKey(d.filename || ''), matchKey(d.title || '')].filter(k => k.length >= 2);
       let score = 0;
       for (const a of keys) for (const b of dk) score = Math.max(score, dice(a, b));
+      // 학교급이 다르면 다른 자료로 본다. 단, 이름이 완전히 같으면 학교급 짐작(예: 「통합유치원」 → 유아)이 틀렸을 수 있으므로 짝을 지어 준다
       if (score < 1 && lv.length && (d.school_levels || []).length && !d.school_levels.some(l => lv.includes(l))) continue;
       if (score >= SIMILAR_MIN) out.push({ doc: d, score, how: score === 1 ? 'same' : 'similar', sameFile: score === 1 && isSameFile(d, item) });
     }
