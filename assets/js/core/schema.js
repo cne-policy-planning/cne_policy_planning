@@ -71,7 +71,7 @@
     const want = new Set(ids);
     const used = new Map();
     const add = (repo, n) => used.set(repo, (used.get(repo) || 0) + n);
-    docs.forEach(d => { if (!want.has(d.id) && d.original && d.original.repo) add(d.original.repo, d.original.bytes || 0); });
+    docs.forEach(d => { if (!want.has(d.id) && d.original && d.original.repo) add(d.original.repo, d.original.bytes || 0); if (d.edit && d.edit.repo) add(d.edit.repo, d.edit.bytes || 0); });
     const assigned = new Map(), repos = new Set();
     const yearOf = repo => (String(repo).match(/_(\d{4})_\d+$/) || [])[1];
     docs.filter(d => want.has(d.id)).forEach(d => {
@@ -88,11 +88,32 @@
     });
     return { repos: [...repos].sort(), assigned };
   }
-  /** 창고별로 지금 쓰고 있는 크기 */
+  /** 창고별로 지금 쓰고 있는 크기(편집용 원본 포함) */
   function storageUsage(docs) {
     const m = new Map();
-    docs.forEach(d => { if (d.original && d.original.repo) m.set(d.original.repo, (m.get(d.original.repo) || 0) + (d.original.bytes || 0)); });
+    docs.forEach(d => [d.original, d.edit].forEach(o => { if (o && o.repo) m.set(o.repo, (m.get(o.repo) || 0) + (o.bytes || 0)); }));
     return m;
+  }
+
+  /**
+   * 편집용 원본(HWP 등) 남기기: PDF로 바꿔 올려도, 예전에 창고에 올라간 HWP·HWPX·워드·엑셀 원본을
+   * 「편집용 원본」(doc.edit)으로 남겨 사용자 화면에서 함께 내려받게 한다. 파일은 이미 창고에 있으므로 새로 올리지 않는다.
+   * - 새 파일이 PDF가 아니면 새 파일이 곧 편집용 원본이므로 남기지 않는다.
+   * - 예전 자료에 이미 편집용 원본이 있으면 같은 연도 판일 때만 이어받는다(새 연도 판에 지난해 HWP가 붙지 않게).
+   * 반환: 남긴 편집용 원본(없으면 null)
+   */
+  const EDIT_FORMATS = ['hwp', 'hwpx', 'doc', 'docx', 'xls', 'xlsx', 'xlsm', 'ppt', 'pptx', 'odt'];
+  function keepEditOriginal(oldDoc, newDoc) {
+    delete newDoc.edit;
+    const fmt = (newDoc.original && newDoc.original.format) || newDoc.format;
+    if (!oldDoc || fmt !== 'pdf') return null;
+    const o = oldDoc.original;
+    let keep = null;
+    if (o && o.repo && o.path && EDIT_FORMATS.includes(o.format)) keep = o;
+    else if (oldDoc.edit && oldDoc.edit.repo && (!newDoc.year || !oldDoc.year || Number(newDoc.year) === Number(oldDoc.year))) keep = oldDoc.edit;
+    if (!keep) return null;
+    newDoc.edit = { repo: keep.repo, path: keep.path, name: keep.name, bytes: keep.bytes || 0, format: keep.format };
+    return newDoc.edit;
   }
 
   /** 학교급 정리: 목록에 있는 값만, 공통은 다른 학교급과 함께 쓰지 않는다(공통이 있으면 공통만) */
@@ -396,6 +417,7 @@
     if (doc.pdf && !/^(pdf|files)\/[a-z0-9-]+\.pdf$/.test(doc.pdf.path || '')) errors.push('원본 PDF 경로 형식 오류');
     if (doc.original && !/^files\/[a-z0-9-]+\.[a-z0-9]+$/.test(doc.original.path || '')) errors.push('원본 파일 경로 형식 오류');
     if (doc.original && doc.original.repo && !/^[A-Za-z0-9._-]+$/.test(doc.original.repo)) errors.push('원본 파일 창고 이름 오류');
+    if (doc.edit && (!/^files\/[a-z0-9-]+\.[a-z0-9]+$/.test(doc.edit.path || '') || !/^[A-Za-z0-9._-]+$/.test(doc.edit.repo || ''))) errors.push('편집용 원본 경로 형식 오류');
     if (!doc.works_url && !doc.pdf && !doc.original) warnings.push('사이트에서 내려받을 원본 파일이 없습니다. 「③ 점검·반영 → 원본 파일 다시 연결」로 넣을 수 있습니다');
     if (doc.kind === 'text' && doc.format === 'pdf' && !doc.outline) warnings.push('번호 목차가 없습니다. 「파일 교체」로 PDF를 다시 분석해 주세요');
     const suspect = (doc.links || []).filter(l => N.isSuspectUrl(l.url)).length;
@@ -459,5 +481,5 @@
     doc.outline.nodes.forEach(n => { if (n.k === 'task' && n.s && byId.has(n.s)) n.t = byId.get(n.s).heading; });
   }
 
-  return { STORAGE_PREFIX, STORAGE_MAX, FILE_MAX, fileUrl, makeOriginal, planStorage, storageUsage, COMMON_LEVEL, ACADEMIC_COMMON, OTHER_DEPT, OTHER_DEPT_MAX, DEPARTMENTS, cleanLevels, defaultDepartment, deptGroup, setLinkUrl, setLinkInfo, carryLinkEdits, syncOutline, SCHEMA_VERSION, LEVELS, TEXT_FORMATS, ORIGIN_SITES, CATEGORIES, levelSlug, levelName, formatOf, kindOf, newDocId, titleFromFilename, createDocument, finalizeDocument, carryKeywords, carryForms, numberForms, addManualForms, removeManualForm, formList, matchBundle, migrateV1, validateDocument };
+  return { EDIT_FORMATS, keepEditOriginal, STORAGE_PREFIX, STORAGE_MAX, FILE_MAX, fileUrl, makeOriginal, planStorage, storageUsage, COMMON_LEVEL, ACADEMIC_COMMON, OTHER_DEPT, OTHER_DEPT_MAX, DEPARTMENTS, cleanLevels, defaultDepartment, deptGroup, setLinkUrl, setLinkInfo, carryLinkEdits, syncOutline, SCHEMA_VERSION, LEVELS, TEXT_FORMATS, ORIGIN_SITES, CATEGORIES, levelSlug, levelName, formatOf, kindOf, newDocId, titleFromFilename, createDocument, finalizeDocument, carryKeywords, carryForms, numberForms, addManualForms, removeManualForm, formList, matchBundle, migrateV1, validateDocument };
 });

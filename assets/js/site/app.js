@@ -662,6 +662,17 @@
       // 같은 주소 아래(github.io)라 원래 파일 이름으로 저장된다
       if (raw.works_url) btn.removeAttribute('download'); else btn.setAttribute('download', (raw.original && raw.original.name) || '');
     }
+    // 편집용 원본(PDF로 바꾸기 전 HWP 등): 서식을 고쳐 쓰려는 선생님을 위해 함께 내려받게 한다
+    const editUrl = raw.edit && raw.edit.path ? SAS.fileUrl(raw.edit) : '';
+    const eb = $('btnDownEdit');
+    eb.classList.toggle('hidden', !editUrl);
+    if (editUrl) {
+      const ef = String(raw.edit.format || '').toUpperCase();
+      eb.href = editUrl; eb.setAttribute('download', raw.edit.name || '');
+      eb.textContent = `${ef} 원본 내려받기`;
+      eb.title = `고쳐 쓸 수 있는 ${ef} 파일${raw.edit.name ? ' · ' + raw.edit.name : ''}`;
+      btn.textContent = 'PDF 내려받기';
+    }
     // PDF 쪽 보기는 PDF 자료만: HWPX 등은 블록이 쪽이 아니라 문단이라 PDF와 맞지 않는다(예전 PDF가 남아 있어도 글자로 보여 준다)
     const hasPdf = !!pdfUrl && raw.format === 'pdf';
     const linksBy = new Map();

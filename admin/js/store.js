@@ -338,7 +338,8 @@
       }
       if (byRepo.has(repo) && (await cc.enablePages(info.default_branch || 'main')) === 'unknown' && (await cc.pagesStatus()) !== 'on') pagesWarn.push(repo);
       // 이 창고를 쓰는 자료의 파일 목록(지우면 안 되는 것)
-      const keep = new Set(state.docs.filter(d => d.original && d.original.repo === repo).map(d => d.original.path));
+      // 편집용 원본(PDF로 바꾸기 전 HWP 등)도 남긴다
+      const keep = new Set(state.docs.flatMap(d => [d.original, d.edit]).filter(o => o && o.repo === repo).map(o => o.path));
       const deletions = [...head.files.keys()].filter(p => /^files\//.test(p) && !keep.has(p));
       const mine = byRepo.get(repo) || [];
       let batch = [], size = 0, batchIds = [];

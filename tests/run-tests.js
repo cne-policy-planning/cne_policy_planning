@@ -250,6 +250,33 @@ test('예전 방식 PDF(원본 정보 없음)도 창고로 옮김 · 사이트 �
 });
 test('새 파일에 원본이 있으면 교체할 때 예전 PDF를 이어 쓰지 않음', () => { const o = { links: [], pdf: { path: 'pdf/x.pdf' } }, n = { links: [], original: { path: 'files/x.hwp' } }; SAS.carryLinkEdits(o, n); ok(!n.pdf); });
 test('PDF → HWPX로 교체하면 예전 PDF를 이어 쓰지 않음(쪽 보기 어긋남 방지)', () => { const o = { links: [], pdf: { path: 'pdf/x.pdf' } }, n = { links: [], format: 'hwpx' }; SAS.carryLinkEdits(o, n); ok(!n.pdf); const n2 = { links: [], format: 'pdf' }; SAS.carryLinkEdits(o, n2); ok(n2.pdf); });
+test('편집용 원본: HWP → PDF 교체 시 예전 HWP를 남김, 색인·창고 사용량에 반영', () => {
+  const old = { id: 'doc-2026-aaaaaa', year: 2026, format: 'hwp', original: { repo: 'cne_files_2026_1', path: 'files/doc-2026-aaaaaa.hwp', name: '계획.hwp', bytes: 1000, format: 'hwp' } };
+  const nd = { id: old.id, year: 2026, format: 'pdf', original: { repo: null, path: 'files/doc-2026-aaaaaa.pdf', name: '계획.pdf', bytes: 2000, format: 'pdf' } };
+  const e = SAS.keepEditOriginal(old, nd);
+  ok(e && nd.edit.path === 'files/doc-2026-aaaaaa.hwp' && nd.edit.repo === 'cne_files_2026_1', '편집용 원본 남김');
+  eq(SAS.storageUsage([nd]).get('cne_files_2026_1'), 1000);
+  // 같은 해에 PDF를 다시 바꾸면 이어받고, 다음 해 판이면 버린다
+  const n2 = { id: old.id, year: 2026, format: 'pdf', original: { format: 'pdf' } }; SAS.keepEditOriginal(nd, n2); ok(n2.edit, '같은 해 이어받기');
+  const n3 = { id: old.id, year: 2027, format: 'pdf', original: { format: 'pdf' } }; SAS.keepEditOriginal(nd, n3); ok(!n3.edit, '다음 해 판은 버림');
+  // 새 파일이 HWP면 남기지 않는다(새 파일이 곧 편집용 원본)
+  const n4 = { id: old.id, year: 2026, format: 'hwpx', original: { format: 'hwpx' } }; SAS.keepEditOriginal(nd, n4); ok(!n4.edit, 'HWPX로 교체');
+  // 예전이 PDF였으면 남길 것이 없다
+  const n5 = { id: old.id, year: 2026, format: 'pdf', original: { format: 'pdf' } }; ok(!SAS.keepEditOriginal({ original: { repo: 'r', path: 'files/x.pdf', format: 'pdf' } }, n5));
+  // 색인과 자료 목록에 내려받기 주소
+  const d = JSON.parse(JSON.stringify(doc)); d.edit = { repo: 'cne_files_2026_1', path: 'files/x-1.hwp', name: '원본.hwp', bytes: 10, format: 'hwp' };
+  const o = SAS.buildOutputs([d], { generatedAt: 'x' });
+  const ix = JSON.parse(o.files.get('data/indexes/kindergarten.json')).docs[0];
+  eq([ix.ed, ix.en], ['../cne_files_2026_1/files/x-1.hwp', '원본.hwp']);
+  ok(JSON.parse(o.files.get('data/documents.json')).documents[0].edit.url === '../cne_files_2026_1/files/x-1.hwp');
+  eq(SAS.validateDocument(d).errors, []);
+});
+test('이름이 같은 자료 찾기: 띄어쓰기만 달라도 같은 묶음, 연도·학교급이 다르면 제외', () => {
+  const D = (id, title, lv) => ({ id, title, school_levels: lv, created_at: id });
+  const g = SAS.findDuplicates([D('a', '2026 원비 안정화 계획', ['유아']), D('b', '2026  원비 안정화  계획', ['유아']), D('c', '2025 원비 안정화 계획', ['유아']),
+    D('d', '설명회 자료', ['중등']), D('e', '설명회 자료', ['초등']), D('f', '혼자인 자료', ['유아'])]);
+  eq(g.map(x => x.map(d => d.id)), [['a', 'b']]);
+});
 test('목차 검색 색인(data/toc): 학교급별 생성 · 세부 줄 제외 · 서식 이름과 주소', () => {
   const o = SAS.buildOutputs([doc], { generatedAt: 'x' });
   const t = JSON.parse(o.files.get('data/toc/kindergarten.json'));

@@ -254,6 +254,7 @@
       if (S.state.docs.length) showTab('manage');
       await runActivityCheck();
       await offerDraft();
+      await alertDuplicates();
       await maybeAlertExpiry();
     } catch (e) {
       if (e.kind === 'auth') { toast(e.message, 7000); renderConnectBox(); openTokenDialog(); return; }
@@ -261,6 +262,28 @@
       // 불러오지 못했어도 무엇이 바뀌었는지는 확인할 수 있게 한다
       await runActivityCheck();
     }
+  }
+
+  /**
+   * 이름이 같은 자료가 있으면 불러온 뒤 알린다. 「다시 알리지 않기」는 지금 그 묶음에만 적용되고,
+   * 새로 생긴 중복은 다시 알린다. 자료 이름을 누르면 ② 자료 관리에서 그 자료를 연다(거기서 삭제).
+   */
+  async function alertDuplicates(force) {
+    const groups = SAS.findDuplicates(S.state.docs);
+    const sig = groups.map(g => g.map(d => d.id).join('+')).sort().join('|');
+    if (!groups.length) { if (force) toast('이름이 같은 자료가 없습니다.'); return; }
+    if (!force && sig && (await S.kvGet('dupDismissed')) === sig) return;
+    const fmt = d => [d.year ? d.year + '년' : '', String(d.format || '').toUpperCase(), (d.blocks || []).length && d.format === 'pdf' ? (d.blocks || []).length + '쪽' : '',
+      d.original && d.original.bytes ? fmtBytes(d.original.bytes) : '', d.created_at ? '등록 ' + new Date(d.created_at).toLocaleDateString('ko-KR') : ''].filter(Boolean).join(' · ');
+    const body = h('div', {}, h('h2', {}, `⚠ 이름이 같은 자료가 ${groups.length}묶음 있습니다`),
+      h('p', {}, '같은 자료가 두 번 등록된 것으로 보입니다. 사용자 화면에서 같은 자료가 두 번 나오고, 일괄 등록으로 교체할 때 하나만 바뀝니다. 자료 이름을 눌러 열어 보고 남길 것 하나만 두고 「자료 삭제」하세요.'),
+      ...groups.map(g => h('div', { class: 'dup-group', style: 'margin:10px 0;padding:8px 10px;border:1px solid #e1e6ed;border-radius:10px' },
+        h('b', {}, g[0].title, ' ', h('span', { class: 'tag warn' }, g.length + '건')),
+        h('ul', { style: 'margin:6px 0 0;padding-left:18px' }, ...g.map(d => h('li', {},
+          h('a', { href: '#', onclick: e => { e.preventDefault(); const ok = $('modalBody').querySelector('.actions button.primary'); if (ok) ok.click(); setTimeout(() => { showTab('manage'); selectDoc(d.id); }, 0); } }, (d.original && d.original.name) || d.filename || d.id),
+          h('span', { class: 'small muted' }, ' — ' + fmt(d) + ' · ' + (d.school_levels || []).join('·'))))))));
+    const v = await modal(body, [{ label: '다시 알리지 않기', value: 'mute' }, { label: '확인', value: true, primary: true }]);
+    if (v === 'mute') { await S.kvSet('dupDismissed', sig); toast('이 묶음은 다시 알리지 않습니다. 새로 생긴 중복은 다시 알립니다.', 5000); }
   }
 
   function openTokenDialog() {
@@ -320,13 +343,14 @@
       }
       toast(msg, 5000);
       if (S.state.docs.length) showTab('manage');
+      await alertDuplicates();
     } catch (e) { if (e.name !== 'AbortError') toast(e.message, 5000); }
   }
   $('btnOpenFolder').onclick = () => openFolderFlow(false);
   $('btnReopen').onclick = () => openFolderFlow(true);
   $('zipInput').onchange = async e => {
     const f = e.target.files[0]; if (!f) return;
-    try { const n = await S.loadZip(f); toast(`자료 ${n}건을 불러왔습니다.`); showTab('manage'); } catch (err) { toast('불러오기 실패: ' + err.message, 5000); }
+    try { const n = await S.loadZip(f); toast(`자료 ${n}건을 불러왔습니다.`); showTab('manage'); await alertDuplicates(); } catch (err) { toast('불러오기 실패: ' + err.message, 5000); }
     e.target.value = '';
   };
   $('v1Input').onchange = async e => {
@@ -703,6 +727,8 @@
       try {
         const b = buildRowDoc(q, ids.concat(built.map(x => x.doc.id)));
         attachPdf(q, b.doc);
+        // 교체: HWP 등을 PDF로 바꾸면 예전 원본을 「편집용 원본」으로 남겨 함께 내려받게 한다
+        if (b.carry) b.keptEdit = SAS.keepEditOriginal(S.getDoc(b.doc.id), b.doc);
         built.push(Object.assign(b, { q, match: q.match }));
       } catch (e) { q.status = 'error'; q.message = e.message; }
     }
@@ -715,6 +741,7 @@
         h('div', {}, '→ ', h('b', {}, b.q.filename), b.match && b.match.sameFile ? h('span', { class: 'tag gray' }, '같은 파일') : null,
           b.q.match && b.q.match.how === 'similar' ? h('span', { class: 'tag warn' }, '이름이 비슷함') : null),
         h('div', { class: 'small muted' }, `업무 ${b.carry.oldSections}→${b.doc.sections.length}개 · 고친 링크 ${b.carry.links}개 유지${t.year !== b.doc.year ? ` · 연도 ${t.year || '-'}→${b.doc.year || '-'}` : ''}${t.title !== b.doc.title ? ` · 자료명 → ${b.doc.title}` : ''}`),
+        b.keptEdit ? h('div', { class: 'small' }, `편집용 원본 ${String(b.keptEdit.format).toUpperCase()}(${b.keptEdit.name})은 그대로 남아 함께 내려받을 수 있습니다.`) : null,
         b.carry.oldWorks ? h('div', { class: 'small warn-text' }, '따로 넣은 원본 내려받기 링크(웍스)가 예전 판을 가리킬 수 있습니다. 반영 후 자료 관리에서 확인하세요.') : null);
     };
     const addList = adds.length ? h('details', {}, h('summary', {}, `새 자료 ${adds.length}건 추가`), h('ul', { class: 'small-list' }, adds.map(b => h('li', {}, b.doc.title, h('span', { class: 'small muted' }, ` · ${b.doc.school_levels.join('·')}${b.doc.year ? ' · ' + b.doc.year : ''}`))))) : null;
@@ -889,6 +916,12 @@
       h('div', { class: 'editor-head' }, h('h2', {}, '원본 파일 · 쪽 보기'),
         doc.pdf && !pending ? h('a', { class: 'btn small', href: siteUrl(doc), target: '_blank', rel: 'noopener noreferrer' }, '사용자 화면에서 보기 ↗') : null),
       state, orig,
+      doc.edit ? h('div', { class: 'kv', style: 'margin-top:8px' }, h('span', {}, '편집용 원본'), h('span', {}, doc.edit.name || ''), h('span', {}, fmtBytes(doc.edit.bytes || 0)),
+        h('span', {}, `창고 ${doc.edit.repo}`),
+        h('button', { class: 'small ghost', onclick: async () => {
+          if (!(await confirmBox(`편집용 원본 「${SAS.esc(doc.edit.name || '')}」을 이 자료에서 뺄까요? 반영하면 창고에서도 지워지고, 사용자 화면에는 PDF만 남습니다.`, '빼기', true))) return;
+          delete doc.edit; S.touch(doc); renderEditor(); renderList();
+        } }, '빼기')) : null,
       pending ? h('p', { class: 'small muted' }, '「③ 점검·반영」에서 반영하면 원본 파일이 창고에 올라가 사이트에서 바로 내려받을 수 있습니다.') : null);
   }
 
@@ -1192,7 +1225,8 @@ ${groups.map(g => `<div class="card"><h2>${e(g.title)}</h2><table>${g.items.map(
     nd.original = SAS.makeOriginal(doc.id, file.name, file.size, r.format);
     if (doc.original && doc.original.repo && doc.original.format === nd.original.format) nd.original.repo = doc.original.repo; // 같은 연도면 같은 창고 자리에 덮어쓰기
     if (r.format === 'pdf') nd.pdf = { repo: null, path: nd.original.path, bytes: file.size };
-    const ok = await confirmBox(`<h2>파일 교체</h2><p><b>${SAS.esc(file.name)}</b></p><ul>
+    const keptEdit = SAS.keepEditOriginal(doc, nd);
+    const ok = await confirmBox(`<h2>파일 교체</h2>${keptEdit ? `<p class="small">편집용 원본 <b>${SAS.esc(keptEdit.name || '')}</b>은 그대로 남아 사용자 화면에서 함께 내려받을 수 있습니다.</p>` : ''}<p><b>${SAS.esc(file.name)}</b></p><ul>
       <li>업무: ${doc.sections.length}개 → <b>${nd.sections.length}개</b>${nd.extraction.toc_found ? ' (목차 인식)' : ''}</li>
       <li>업무 검색어 유지: ${kept}개 업무</li><li>링크: ${(doc.links || []).length}개 → <b>${(nd.links || []).length}개</b> (고친 주소·이름 유지 ${keptLinks}개)</li>
       ${nd.outline ? `<li>번호 목차: <b>${nd.outline.nodes.length}개 항목</b></li>` : ''}<li>사이트의 원본 파일도 새 파일로 바꿉니다 (${fmtBytes(file.size)})</li>

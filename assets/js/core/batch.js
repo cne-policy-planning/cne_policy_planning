@@ -203,5 +203,23 @@
     }).sort((a, b) => b.score - a.score);
   }
 
-  return { LEVEL_WORDS, shouldIgnore, guessLevels, guessYear, guessMeta, matchKey, dice, findMatch, candidates, rankDocs, isSameFile, renewTitle, planBatch };
+  /**
+   * 이름이 같은 자료 묶음(띄어쓰기·기호만 다른 것 포함, 연도는 그대로 비교). 학교급이 하나라도 겹쳐야 같은 자료로 본다.
+   * 반환: [[doc, doc, …], …] — 묶음 안은 등록 순서(created_at)
+   */
+  function findDuplicates(docs) {
+    const key = t => N.norm(nfc(t || '')).replace(/[^\p{L}\p{N}]+/gu, '');
+    const m = new Map();
+    (docs || []).forEach(d => { const k = key(d.title); if (k.length < 2) return; if (!m.has(k)) m.set(k, []); m.get(k).push(d); });
+    const out = [];
+    m.forEach(list => {
+      if (list.length < 2) return;
+      const lv = d => d.school_levels || [];
+      const shared = list.filter(a => list.some(b => b !== a && (!lv(a).length || !lv(b).length || lv(a).some(x => lv(b).includes(x)))));
+      if (shared.length > 1) out.push(shared.slice().sort((a, b) => String(a.created_at || '').localeCompare(String(b.created_at || '')) || a.id.localeCompare(b.id)));
+    });
+    return out.sort((a, b) => a[0].title.localeCompare(b[0].title, 'ko'));
+  }
+
+  return { findDuplicates, LEVEL_WORDS, shouldIgnore, guessLevels, guessYear, guessMeta, matchKey, dice, findMatch, candidates, rankDocs, isSameFile, renewTitle, planBatch };
 });
