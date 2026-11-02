@@ -322,10 +322,11 @@
       $('homeResults').innerHTML = res.head + res.body;
       return;
     }
-    // 이 학교급 자료는 카드에 목차 요약을 보여 주려고 미리 불러온다(공통 자료는 목록 정보만)
-    const preps = await loadMany(own);
+    // 목록에 업무·서식 수를 보여 주려고 가벼운 목차 색인을 쓴다(자료 상세를 하나하나 받지 않는다)
+    const toc = await ensureToc().catch(() => null);
     if (parseHash().doc || V.mode !== 'home' || V.q || V.t) return;
-    const all = preps.flatMap(p => p.nodes);
+    const nodesOf = id => (toc && toc.get(id) ? toc.get(id).nodes : []);
+    const all = own.flatMap(d => nodesOf(d.id));
     const count = (list, f) => list.filter(f).length;
     $('docStats').replaceChildren(...[
       !isCommon ? [`${name} 자료`, own.length + '건'] : null,
@@ -339,7 +340,7 @@
     const parts = [];
     if (!isCommon) {
       parts.push(h('div', { class: 'lv-sec' }, h('h2', {}, `${name} 자료`, h('i', {}, own.length + '건'))));
-      parts.push(own.length ? h('div', { class: 'lv-docs' }, ...own.map(d => docCard(r.slug, d, preps.find(x => x.id === d.id))))
+      parts.push(own.length ? h('div', { class: 'lv-list' }, ...own.map(d => docRow(r.slug, d, nodesOf(d.id))))
         : h('div', { class: 'v-empty lv-none' }, `${name} 자료는 아직 준비 중입니다. 아래 공통 자료를 확인해 보세요.`));
     }
     if (com.length) {
@@ -353,26 +354,21 @@
           h('button', { type: 'button', class: 'small', onclick: () => document.querySelectorAll('#homeDocs details.lv-dept').forEach(x => { x.open = false; }) }, '모두 접기')) : null));
       parts.push(h('div', { class: 'lv-depts' }, ...groups.map(([g, list]) => h('details', { class: 'lv-dept', open: open || groups.length === 1 },
         h('summary', {}, h('b', {}, g), h('i', {}, list.length + '건')),
-        h('div', { class: 'lv-rows' }, ...list.map(d => h('a', { class: 'lv-row', href: hashFor({ slug: r.slug, doc: d.id }) },
-          h('b', {}, d.t),
-          h('span', {}, [d.y ? d.y + '년' : '', (d.f || '').toUpperCase(), d.f === 'pdf' && d.n ? d.n + '쪽' : '', g === SAS.OTHER_DEPT && d.dp ? d.dp : '', d.o ? '출처 ' + d.o : ''].filter(Boolean).join(' · ')))))))));
+        h('div', { class: 'lv-list in-dept' }, ...list.map(d => docRow(r.slug, d, nodesOf(d.id), g === SAS.OTHER_DEPT)))))));
     } else if (isCommon) parts.push(h('div', { class: 'v-empty' }, '공통 자료는 아직 준비 중입니다.'));
     $('homeDocs').replaceChildren(...parts);
   }
-  /** 이 학교급 자료 카드(목차 요약 포함) */
-  function docCard(slug, d, p) {
-    const n = p ? p.nodes : [];
-    const count = f => n.filter(f).length;
-    const chs = n.filter(x => x.k === 'ch').map(x => x.t).slice(0, 6);
-    const raw = p ? p.raw : {};
-    return h('a', { class: 'lv-doc', href: hashFor({ slug, doc: d.id }) },
-      h('div', { class: 'lv-doc-top' }, h('span', { class: 'lv-fmt' }, (d.f || '').toUpperCase()), d.c ? h('span', { class: 'lv-cat' }, d.c) : null),
-      h('h2', {}, d.t),
-      h('div', { class: 'lv-meta' }, [d.y ? d.y + '년' : '', d.f === 'pdf' && d.n ? d.n + '쪽' : '', raw.origin && raw.origin.site ? '출처 ' + raw.origin.site : ''].filter(Boolean).join(' · ')),
-      n.length ? h('div', { class: 'lv-counts' }, ...[['업무', count(x => x.k === 'task')], ['서식', count(x => x.ty === '서식')], ['참고', count(x => x.ty === '참고')], ['법령', count(x => x.ty === '법령')]]
-        .filter(([, v]) => v).map(([a, v]) => h('span', {}, a, ' ', h('b', {}, v)))) : null,
-      chs.length ? h('div', { class: 'lv-chs' }, ...chs.map(c => h('span', {}, c))) : null,
-      h('span', { class: 'lv-open' }, '목차와 원문 보기 →'));
+  /** 자료 한 줄(목록형): 형식 · 자료명 · 연도·쪽수·업무·서식 수 */
+  function docRow(slug, d, nodes, showDept) {
+    const n = nodes || [];
+    const tasks = n.filter(x => x.k === 'task').length, forms = n.filter(x => x.ty === '서식').length;
+    const fmt = (d.f || '').toUpperCase();
+    const meta = [d.y ? d.y + '년' : '', d.f === 'pdf' && d.n ? d.n + '쪽' : '', tasks ? `업무 ${tasks}` : '', forms ? `서식 ${forms}` : '',
+      showDept && d.dp ? d.dp : '', d.o ? '출처 ' + d.o : ''].filter(Boolean).join(' · ');
+    return h('a', { class: 'lv-item', href: hashFor({ slug, doc: d.id }) },
+      h('span', { class: 'lv-fmt f-' + (d.f || 'etc') }, fmt || '자료'),
+      h('span', { class: 'lv-main' }, h('b', {}, d.t), meta ? h('span', { class: 'lv-sub' }, meta) : null),
+      h('span', { class: 'lv-go', 'aria-hidden': 'true' }, '›'));
   }
   // 첫 화면 검색 결과에서 고르면 그 자료의 그 위치로 연다
   $('homeResults').addEventListener('click', e => {

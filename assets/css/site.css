@@ -361,3 +361,20 @@ details.lv-dept > summary i { font-style: normal; font-size: 13px; color: var(--
 @media (min-width: 901px) { .v-cols.searching { grid-template-columns: minmax(340px, 460px) 1fr; } }
 
 .ttl .more { color: var(--muted); margin-left: 1px; }
+
+/* 학교급 첫 화면: 자료 목록(한 줄에 하나) */
+.lv-list { background: #fff; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.lv-list.in-dept { border: 0; border-top: 1px solid var(--line2); border-radius: 0; }
+.lv-item { display: flex; align-items: center; gap: 12px; padding: 11px 16px; text-decoration: none; color: var(--text); border-top: 1px solid var(--line2); }
+.lv-list > .lv-item:first-child { border-top: 0; }
+.lv-item:hover, .lv-item:focus-visible { background: var(--blue-soft); }
+.lv-item .lv-fmt { flex: none; min-width: 46px; text-align: center; font-size: 11px; font-weight: 700; padding: 2px 6px; border-radius: 6px; background: #eef2f7; color: #475467; }
+.lv-item .lv-fmt.f-pdf { background: #fdecea; color: #b42318; }
+.lv-item .lv-fmt.f-hwpx, .lv-item .lv-fmt.f-hwp { background: #e8f0fc; color: #2462b3; }
+.lv-item .lv-fmt.f-xlsx, .lv-item .lv-fmt.f-xls, .lv-item .lv-fmt.f-xlsm { background: #e7f6ec; color: #1e7b45; }
+.lv-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.lv-main b { font-size: 15px; font-weight: 600; line-height: 1.4; word-break: keep-all; }
+.lv-item:hover .lv-main b { color: var(--blue-text); }
+.lv-sub { font-size: 12.5px; color: var(--muted); }
+.lv-go { flex: none; color: #98a2b3; font-size: 20px; line-height: 1; }
+@media (max-width: 640px) { .lv-item { padding: 10px 12px; gap: 10px; } .lv-item .lv-fmt { min-width: 40px; } }
