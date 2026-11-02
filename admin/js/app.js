@@ -285,14 +285,16 @@
       let action = null;   // { del: id } 또는 { open: id }
       const pick = act => { action = act; const ok = $('modalBody').querySelector('.actions button.primary'); if (ok) ok.click(); };
       const body = h('div', {}, h('h2', {}, `⚠ 이름이 같은 자료가 ${groups.length}묶음 있습니다`),
-        h('p', {}, '같은 자료가 두 번 등록된 것으로 보입니다. 사용자 화면에서 같은 자료가 두 번 나오고, 일괄 등록으로 교체할 때 하나만 바뀝니다. 묶음마다 남길 것 하나만 두고 나머지는 「삭제」하세요. 파일 이름을 누르면 ② 자료 관리에서 열어 볼 수 있습니다.'),
+        h('p', {}, '같은 자료가 두 번 등록된 것으로 보입니다. 사용자 화면에서 같은 자료가 두 번 나오고, 일괄 등록으로 교체할 때 하나만 바뀝니다. 묶음마다 남길 것 하나만 두고 나머지는 옆의 ✕를 눌러 지우세요. 파일 이름을 누르면 ② 자료 관리에서 열어 볼 수 있습니다.'),
         ...groups.map(g => h('div', { class: 'dup-group', style: 'margin:10px 0;padding:8px 10px;border:1px solid #e1e6ed;border-radius:10px' },
           h('b', {}, g[0].title, ' ', h('span', { class: 'tag warn' }, g.length + '건')),
           h('ul', { style: 'margin:6px 0 0;padding-left:18px' }, ...g.map((d, i) => h('li', { style: 'margin:4px 0' },
             h('a', { href: '#', onclick: e => { e.preventDefault(); pick({ open: d.id }); } }, (d.original && d.original.name) || d.filename || d.id),
             h('span', { class: 'small muted' }, ' — ' + fmt(d) + ' · ' + (d.school_levels || []).join('·')), ' ',
             i === 0 ? h('span', { class: 'tag gray', title: '먼저 등록된 자료' }, '먼저 등록') : null, ' ',
-            h('button', { type: 'button', class: 'small danger', style: 'padding:2px 10px', onclick: () => pick({ del: d.id }) }, '삭제')))))));
+            h('button', { type: 'button', class: 'dup-x', title: '이 파일 삭제', 'aria-label': `${(d.original && d.original.name) || d.title} 삭제`,
+              style: 'display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;padding:0;margin-left:2px;border:1px solid #f1b8b4;border-radius:50%;background:#fff;color:#c0392b;font-size:13px;font-weight:700;line-height:1;cursor:pointer;vertical-align:middle',
+              onclick: () => pick({ del: d.id }) }, '✕')))))));
       const v = await modal(body, [{ label: '다시 알리지 않기', value: 'mute' }, { label: deleted ? '닫기' : '확인', value: true, primary: true }]);
       if (action && action.open) { renderList(); showTab('manage'); selectDoc(action.open); return; }
       if (action && action.del) {
