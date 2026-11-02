@@ -818,10 +818,11 @@
       (!$('fWarn').checked || needsCheck(d)))
       .sort((a, b) => (b.updated_at || '').localeCompare(a.updated_at || ''));
     const box = $('docList');
+    const keepTop = box.scrollTop;   // 목록을 다시 그려도 보던 위치 그대로
     if (!list.length) { box.replaceChildren(h('p', { class: 'muted small', style: 'padding:8px' }, S.state.docs.length ? '조건에 맞는 자료가 없습니다.' : '등록된 자료가 없습니다.')); return; }
     box.replaceChildren(...list.map(d => {
       const v = SAS.validateDocument(d);
-      return h('div', { class: 'doc-item' + (d.id === selectedId ? ' active' : ''), onclick: () => selectDoc(d.id) },
+      return h('div', { class: 'doc-item' + (d.id === selectedId ? ' active' : ''), 'data-id': d.id, onclick: () => selectDoc(d.id) },
         h('div', { class: 't' }, d.title),
         h('div', { class: 'm' },
           d.school_levels.map(l => h('span', { class: 'tag' }, l)),
@@ -831,12 +832,19 @@
           S.state.changedIds.has(d.id) ? h('span', { class: 'tag warn' }, '저장 전') : null,
           ' ', [d.category, d.year].filter(Boolean).join(' · ')));
     }));
+    box.scrollTop = keepTop;
   }
 
+  /** 자료 고르기: 왼쪽 목록과 화면은 움직이지 않고, 고른 자료만 표시해 오른쪽에 연다 */
   function selectDoc(id) {
     selectedId = id;
-    document.querySelectorAll('.doc-item').forEach(el => el.classList.remove('active'));
-    renderList(); renderEditor();
+    const box = $('docList'), listTop = box.scrollTop, pageY = window.scrollY;
+    let found = false;
+    document.querySelectorAll('.doc-item').forEach(el => { const on = el.dataset.id === id; el.classList.toggle('active', on); if (on) found = true; });
+    if (!found) renderList();   // 목록에 없는 자료(검색 조건 밖)를 열 때만 다시 그린다
+    renderEditor();
+    box.scrollTop = listTop;
+    window.scrollTo({ top: pageY, left: window.scrollX, behavior: 'instant' });
   }
 
   // ---------- ② 자료 관리: 편집 ----------
