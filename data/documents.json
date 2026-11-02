@@ -1,6 +1,6 @@
 {
  "schema_version": "2.0",
- "generated_at": "2026-11-02T13:06:57.920Z",
+ "generated_at": "2026-11-02T21:06:01.958Z",
  "count": 575,
  "documents": [
   {
@@ -10585,7 +10585,7 @@
    "category": "교무학사실무",
    "department": "교무학사 공통자료",
    "year": 2026,
-   "format": "hwpx",
+   "format": "pdf",
    "kind": "text",
    "works_url": "https://works.do/xjip3jl",
    "origin": {
@@ -10606,12 +10606,17 @@
    "forms_bundle_url": "",
    "section_count": 27,
    "form_count": 255,
-   "updated_at": "2026-10-31T19:34:07.973Z",
-   "pdf": "pdf/doc-2026-ie5uf6.pdf",
-   "original": null,
+   "updated_at": "2026-11-02T15:45:09.924Z",
+   "pdf": "../cne_files_2026_3/files/doc-2026-ie5uf6.pdf",
+   "original": {
+    "url": "../cne_files_2026_3/files/doc-2026-ie5uf6.pdf",
+    "name": "교무학사 도움자료_유치원.pdf",
+    "bytes": 9072267,
+    "format": "pdf"
+   },
    "edit": null,
-   "pages": 1260,
-   "outline_count": 354
+   "pages": 37,
+   "outline_count": 933
   },
   {
    "id": "doc-2026-igt25e",
