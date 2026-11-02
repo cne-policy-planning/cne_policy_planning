@@ -50,14 +50,15 @@
    */
   const TOC_KIND = { ch: 'c', task: 't', part: 'p', group: 'g', item: 'i', link: 'l' };
   function tocRows(d) {
-    const nodes = d.outline && d.outline.nodes ? d.outline.nodes : [];
+    // 예전에 만든 목차도 정리해서 색인한다(띄어쓰기 붙이기 · 긴 문장은 앞부분만 제목으로)
+    const nodes = d.outline && d.outline.nodes ? (N.tidyOutline ? N.tidyOutline(d.outline.nodes) : d.outline.nodes) : [];
     const links = new Map((d.links || []).map(l => [l.id, l]));
     const blocks = d.blocks || [];
     const page = b => { const bl = blocks[b]; return !bl ? '' : bl.printed_page != null ? bl.printed_page + 'p' : bl.pdf_page ? bl.pdf_page + '쪽' : ''; };
     const rows = [];
     nodes.forEach(n => {
       const k = TOC_KIND[n.k]; if (!k) return;
-      const row = [n.c, k, n.t || '', page(n.b)];
+      const row = [n.c, k, (n.t || '') + (n.cut ? '…' : ''), page(n.b)];
       const l = n.l && links.get(n.l);
       if (l) { row[2] = l.text || row[2]; row.push(l.type || (l.kind === 'law' ? '법령' : l.kind === 'site' ? '사이트' : '서식'), l.url || ''); }
       rows.push(row);

@@ -250,6 +250,34 @@ test('예전 방식 PDF(원본 정보 없음)도 창고로 옮김 · 사이트 �
 });
 test('새 파일에 원본이 있으면 교체할 때 예전 PDF를 이어 쓰지 않음', () => { const o = { links: [], pdf: { path: 'pdf/x.pdf' } }, n = { links: [], original: { path: 'files/x.hwp' } }; SAS.carryLinkEdits(o, n); ok(!n.pdf); });
 test('PDF → HWPX로 교체하면 예전 PDF를 이어 쓰지 않음(쪽 보기 어긋남 방지)', () => { const o = { links: [], pdf: { path: 'pdf/x.pdf' } }, n = { links: [], format: 'hwpx' }; SAS.carryLinkEdits(o, n); ok(!n.pdf); const n2 = { links: [], format: 'pdf' }; SAS.carryLinkEdits(o, n2); ok(n2.pdf); });
+test('띄어쓰기 붙이기: 균등분할 제목은 언제나, OCR 자료는 조사까지', () => {
+  eq(SAS.joinSpaced('공 적 조 서(기관)'), '공적조서(기관)');
+  eq(SAS.joinSpaced('공 무 원 인 사 기 록 요 약 서'), '공무원인사기록요약서');
+  eq(SAS.joinSpaced('그 외 각 호의 경우'), '그 외 각 호의 경우', '보통 글은 그대로');
+  eq(SAS.joinSpaced('학교 및 교육청 업무'), '학교 및 교육청 업무');
+  eq(SAS.joinSpaced('제 5 조 (기 본 사 항)'), '제5조 (기본사항)');
+  eq(SAS.joinSpaced('유 치 원 생 활 기 록부 의 법적 근거', true), '유치원생활기록부의 법적 근거');
+  eq(SAS.joinSpaced('개 념 및 기 본 방침', true), '개념 및 기본방침');
+  eq(SAS.joinSpaced('기 재 기준 한 눈 에 보기', true), '기재기준 한눈에 보기');
+});
+test('목차 정리: 문장처럼 긴 제목은 앞부분만, 나머지는 설명으로 · 여러 번 해도 같음 · 서식 이름은 그대로', () => {
+  const long = '교육과정설명회 계획 수립: 학교교육과정 설명회는 학기별 최소 1회 실시하며 직장인 보호자 참여를 위한 일정을 반영한다.';
+  const link = '2026 외국어교육(외국어교육 추진 실적, 국제교육 활성화, 올해의 영어교사상) 유공 교육감 표창 계획 서식';
+  const a = SAS.tidyOutline([{ c: '1.1', k: 'item', t: long }, { c: '1.2', k: 'link', t: link }, { c: '1', k: 'ch', t: long }]);
+  eq(a[0].t, '교육과정설명회 계획 수립'); ok(a[0].cut && /^학교교육과정 설명회는/.test(a[0].d[0]));
+  eq(a[1].t, link); eq(a[2].t, long, '단원 이름은 줄이지 않음');
+  eq(SAS.tidyOutline(a), a, '다시 해도 같음');
+  ok(SAS.tidyOutline([{ c: '1', k: 'item', t: 'x'.repeat(100) }])[0].t.length <= SAS.TITLE_MAX);
+});
+test('일괄 등록: 이름이 같으면 파일 이름에서 짐작한 학교급이 달라도 교체로 짝짓기', () => {
+  const docs = [{ id: 'doc-2025-u879gt', title: '2025 통합유치원 운영 도움자료', filename: '2025+통합유치원+운영+도움자료.pdf', school_levels: ['특수'] },
+    { id: 'doc-x', title: '학교교육과정 설명회 초등', filename: 'a.pdf', school_levels: ['초등'] }];
+  const items = [{ key: 1, filename: '2025 통합유치원 운영 도움자료.pdf', title: '2025 통합유치원 운영 도움자료', format: 'pdf', levels: ['유아'], levelsFrom: 'file' },
+    { key: 2, filename: '학교교육과정 설명회 특수.pdf', title: '학교교육과정 설명회 특수', format: 'pdf', levels: ['특수'], levelsFrom: 'file' }];
+  SAS.planBatch(items, docs);
+  eq([items[0].action, items[0].targetId], ['replace', 'doc-2025-u879gt']);
+  eq(items[1].action, 'add', '이름이 비슷할 뿐이고 학교급이 다르면 새 자료');
+});
 test('편집용 원본: HWP → PDF 교체 시 예전 HWP를 남김, 색인·창고 사용량에 반영', () => {
   const old = { id: 'doc-2026-aaaaaa', year: 2026, format: 'hwp', original: { repo: 'cne_files_2026_1', path: 'files/doc-2026-aaaaaa.hwp', name: '계획.hwp', bytes: 1000, format: 'hwp' } };
   const nd = { id: old.id, year: 2026, format: 'pdf', original: { repo: null, path: 'files/doc-2026-aaaaaa.pdf', name: '계획.pdf', bytes: 2000, format: 'pdf' } };

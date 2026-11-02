@@ -163,7 +163,8 @@
       });
     });
     // 업무에 속하지 않은 링크(목차 앞 등)는 넣지 않는다
-    return { nodes: sortNodes(nodes), stats: { tasks: secs.length, detailed, items } };
+    // 글자 사이 띄어쓰기 붙이기 · 문장처럼 긴 제목 줄이기(나머지는 설명으로)
+    return { nodes: N.tidyOutline ? N.tidyOutline(sortNodes(nodes)) : sortNodes(nodes), stats: { tasks: secs.length, detailed, items } };
   }
 
   function findTitle(pages, heading) {

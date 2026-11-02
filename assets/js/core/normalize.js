@@ -103,5 +103,91 @@
     return h % count;
   }
 
-  return { clean, repairSpacing, norm, bigrams, esc, looseRegex, snippet, highlight, splitList, shardOf };
+  // ---------- 글자 사이 띄어쓰기(균등분할·OCR) 붙이기 ----------
+  const HANGUL_TOKEN = /^[가-힣]+$/;
+  /** 한글 낱말 중 한 글자짜리 비율(0~1). 낱말이 적으면 0 */
+  function spacedRatio(texts) {
+    let all = 0, single = 0;
+    (texts || []).forEach(t => String(t || '').split(/\s+/).forEach(w => { if (HANGUL_TOKEN.test(w)) { all++; if (w.length === 1) single++; } }));
+    return all >= 30 ? single / all : 0;
+  }
+  /** 글자 사이가 벌어진 자료(OCR·균등분할 위주)로 볼 기준 */
+  const SPACED_DOC = 0.5;
+  /**
+   * 띄어쓰기 붙이기
+   * - 언제나: 한 글자 한글이 셋 이상 이어지면 붙인다("공 적 조 서" → "공적조서"), "제 5 조" → "제5조"
+   * - aggressive(글자 사이가 벌어진 자료): 한 글자 한글은 옆 한글 낱말과 붙인다("유 치 원 생 활 기 록부 의" → "유치원생활기록부의")
+   */
+  const MAYBE_SPACED = /(?:^|\s)[(\[「『"']?[가-힣][)\]」』"',.]?(?=\s|$)|제\s+\d/;
+  function joinSpaced(s, aggressive) {
+    let t = String(s == null ? '' : s);
+    if (!MAYBE_SPACED.test(t)) return t;   // 한 글자 낱말이 없으면 그대로(빠르게)
+    t = t.replace(/제\s+(\d+)\s*(조|항|호|장|절|편)/g, '제$1$2');
+    const words = t.split(/( +)/);   // 낱말과 공백을 번갈아
+    const tok = [];
+    for (let i = 0; i < words.length; i += 2) tok.push(words[i]);
+    const H = /[가-힣]/;
+    const head = w => { let n = 0; while (n < w.length && H.test(w[n])) n++; return n; };          // 앞쪽 한글 글자 수
+    const tail = w => { let n = 0; while (n < w.length && H.test(w[w.length - 1 - n])) n++; return n; }; // 뒤쪽 한글 글자 수
+    const pure = w => w.length === 1 && H.test(w);
+    const PARTICLE = /^(?:의|은|는|을|를|에|와|과|도|로|이|가|으로|에서|에게|까지|부터|하여|한다|된다|하는|하고)$/;
+    const n = tok.length;
+    const glue = new Array(n).fill(false);   // glue[i]: tok[i]와 tok[i+1] 사이를 붙임
+    // 한 글자씩 벌어진 구간(넷 이상): "공 적 조 서(기관)" → "공적조서(기관)". "그 외 각 호"처럼 셋은 보통 글이라 두고, '및'은 끼우지 않는다
+    const STAND = /^및$/;
+    const pairOk = i => tail(tok[i]) === 1 && head(tok[i + 1]) === 1 && (pure(tok[i]) || pure(tok[i + 1])) && !STAND.test(tok[i]) && !STAND.test(tok[i + 1]);
+    for (let i = 0; i < n - 1;) {
+      let j = i; while (j < n - 1 && pairOk(j)) j++;
+      if (j - i >= 3) for (let k = i; k < j; k++) glue[k] = true;
+      i = j > i ? j : i + 1;
+    }
+    if (aggressive) {
+      // 한 글자는 뒷말에 붙이고(앞글자 조각), 조사는 앞말에 붙인다: "유 치 원 생 활 기 록부 의 법적" → "유치원생활기록부의 법적"
+      for (let i = 0; i < n - 1; i++) {
+        const a = tok[i], b = tok[i + 1];
+        if (!tail(a) || !head(b) || STAND.test(a) || STAND.test(b)) continue;
+        if (PARTICLE.test(b) && b.length <= 2) { glue[i] = true; continue; }
+        if (PARTICLE.test(a)) continue;
+        if (pure(a) || (tail(a) === 1 && !H.test(a[0]))) glue[i] = true;   // "기" + "록부", "(기" + "본"
+      }
+    }
+    let out = tok[0] || '';
+    for (let i = 1; i < n; i++) out += (glue[i - 1] ? '' : (words[2 * i - 1] || ' ')) + tok[i];
+    return repairSpacing(out);
+  }
+
+  // ---------- 목차 제목 정리 ----------
+  const TITLE_MAX = 40;
+  /**
+   * 목차 정리: 글자 사이 띄어쓰기를 붙이고, 문장처럼 긴 제목은 앞부분만 제목으로 두고 나머지는 설명(d)으로 옮긴다.
+   * 번호(c)·종류(k)·위치는 바꾸지 않으므로 여러 번 해도 결과가 같다. 반환: 새 노드 배열
+   * 단원(ch)·자료 링크(link)는 줄이지 않는다(서식 이름은 길어도 그대로).
+   */
+  function tidyOutline(nodes) {
+    const list = nodes || [];
+    const aggressive = spacedRatio(list.filter(n => n.k !== 'link').map(n => n.t)) > SPACED_DOC;
+    return list.map(n => {
+      if (n.k === 'link') return n;
+      const raw = String(n.t == null ? '' : n.t);
+      if (raw.length <= TITLE_MAX && !MAYBE_SPACED.test(raw) && !/\s{2}|[\n\t]/.test(raw)) return n;   // 고칠 것이 없으면 그대로(빠르게)
+      if (/…$/.test(raw) && raw.length <= TITLE_MAX + 1) return n;   // 이미 줄인 제목(색인)은 다시 줄이지 않는다
+      let t = clean(joinSpaced(raw, aggressive)).replace(/\s+/g, ' ');
+      const m = Object.assign({}, n, { t });
+      if (n.k !== 'ch' && t.length > TITLE_MAX) {
+        // 끊을 곳: 문장 끝 → 쌍점·화살표 → 마지막 띄어쓰기 (12~40자 사이)
+        const head = t.slice(0, TITLE_MAX + 1);
+        let cut = -1, mm;
+        const ends = /(?:다|함|음|임|요|됨)\s*[.。]\s|[:：]\s|\s[-–→]\s/g;
+        while ((mm = ends.exec(head))) if (mm.index >= 12) { cut = mm.index + mm[0].trimEnd().length; break; }
+        if (cut < 0) { const sp = head.lastIndexOf(' '); cut = sp >= 12 ? sp : TITLE_MAX; }
+        const rest = t.slice(cut).replace(/^[\s:：.。,-]+/, '').trim();
+        m.t = t.slice(0, cut).replace(/[\s:：,]+$/, '').trim();
+        if (rest) { m.d = [rest].concat(n.d || []); m.cut = 1; }
+      }
+      if (m.d) m.d = m.d.map(x => clean(joinSpaced(x, aggressive)));
+      return m;
+    });
+  }
+
+  return { spacedRatio, SPACED_DOC, joinSpaced, tidyOutline, TITLE_MAX, clean, repairSpacing, norm, bigrams, esc, looseRegex, snippet, highlight, splitList, shardOf };
 });

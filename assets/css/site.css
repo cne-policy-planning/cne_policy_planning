@@ -359,3 +359,5 @@ details.lv-dept > summary i { font-style: normal; font-size: 13px; color: var(--
 /* 검색 중에는 가운데 칸 결과 목록으로 충분하므로 왼쪽 자료 칸을 숨긴다 */
 .v-cols.searching .v-docs { display: none; }
 @media (min-width: 901px) { .v-cols.searching { grid-template-columns: minmax(340px, 460px) 1fr; } }
+
+.ttl .more { color: var(--muted); margin-left: 1px; }

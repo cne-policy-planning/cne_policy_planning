@@ -200,6 +200,14 @@
       extraction: { toc_found: false, warnings: [], extracted_at: now }
     };
     if (doc.kind === 'text') {
+      // OCR·균등분할로 글자 사이가 벌어진 자료는 먼저 띄어쓰기를 붙인다(목차·업무 찾기가 쉬워진다)
+      if (N.spacedRatio && N.spacedRatio(doc.blocks.map(b => b.text)) > N.SPACED_DOC) {
+        doc.blocks.forEach(b => {
+          b.text = String(b.text || '').split('\n').map(l => N.joinSpaced(l, true)).join('\n');
+          (b.lines || []).forEach(l => { l.text = N.joinSpaced(l.text, true); });
+        });
+        doc._spaced = true;
+      }
       const r = N.sectionize(doc);
       doc.sections = r.sections;
       doc.links = N.attachLinks(doc);
@@ -209,6 +217,7 @@
       doc.outline = { nodes: o.nodes, built_at: now, stats: o.stats };
       doc.extraction.toc_found = !!r.toc_found;
       doc.extraction.warnings = r.warnings || [];
+      if (doc._spaced) { doc.extraction.warnings.push('글자 사이가 벌어진 자료(OCR 등)라 띄어쓰기를 붙여 정리했습니다.'); delete doc._spaced; }
       if (!doc.blocks.some(b => N.norm(b.text).length > 20)) doc.extraction.warnings.unshift('추출된 글자가 거의 없습니다. 스캔 PDF(이미지)일 수 있으며 OCR은 지원하지 않습니다.');
     }
     return finalizeDocument(doc);

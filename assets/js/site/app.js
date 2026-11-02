@@ -250,8 +250,10 @@
   }
   function tocPrep(id, rows) {
     const prep = { id, nodes: [], by: {}, toc: true };
-    rows.forEach((r, i) => {
-      const n = { c: r[0], k: TOC_KIND[r[1]] || 'item', t: r[2], pg: r[3] || '', ty: r[4] || '', url: r[5] || '', i };
+    let nodes = rows.map((r, i) => ({ c: r[0], k: TOC_KIND[r[1]] || 'item', t: r[2], pg: r[3] || '', ty: r[4] || '', url: r[5] || '', i }));
+    // 예전에 만든 색인도 정리(띄어쓰기 붙이기 · 긴 문장은 앞부분만). 줄인 제목에는 … 표시
+    if (SAS.tidyOutline) nodes = SAS.tidyOutline(nodes);   // 줄인 제목은 화면에서 … 표시(rowHTML)
+    nodes.forEach(n => {
       n.p = n.c.includes('.') ? n.c.slice(0, n.c.lastIndexOf('.')) : '';
       prep.nodes.push(n); prep.by[n.c] = n;
     });
@@ -386,7 +388,8 @@
   async function loadDoc(id) {
     if (V.docs.has(id)) return V.docs.get(id);
     const d = await loader.doc(id);
-    const nodes = d.outline && d.outline.nodes ? d.outline.nodes.map(n => Object.assign({}, n)) : fallbackOutline(d);
+    // 목차 정리(띄어쓰기 붙이기 · 문장처럼 긴 제목은 앞부분만): 예전에 만든 자료도 화면에서 바로 깔끔하게
+    const nodes = d.outline && d.outline.nodes ? (SAS.tidyOutline ? SAS.tidyOutline(d.outline.nodes) : d.outline.nodes.map(n => Object.assign({}, n))) : fallbackOutline(d);
     const links = new Map((d.links || []).map(l => [l.id, l]));
     const prep = { id: d.id, title: d.title, raw: d, nodes, by: {}, kids: {} };
     nodes.forEach((n, i) => {
@@ -489,13 +492,15 @@
     const badge = n.ty ? `<span class="badge b-${n.ty}">${TYPE_SHORT[n.ty]}</span>` : '';
     const url = SS.safeUrl(n.link ? n.link.url : n.url);
     const open = url ? `<a class="open o-${n.ty}" href="${esc(url)}" target="_blank" rel="noopener noreferrer" title="새 탭에서 열기">${n.ty === '법령' ? '법령 ↗' : n.ty === '사이트' ? '열기 ↗' : '받기 ⤓'}</a>` : '';
-    const t = opts.hl ? opts.hl(n.t) : esc(n.t);
+    // 문장처럼 긴 제목은 앞부분만 보이고(…), 마우스를 올리면 전체를 보여 준다
+    const t = (opts.hl ? opts.hl(n.t) : esc(n.t)) + (n.cut ? '<span class="more">…</span>' : '');
+    const full = n.cut && n.d && n.d[0] ? ` title="${esc(n.t + ' ' + n.d[0])}"` : '';
     const cur = V.cur && V.cur.c === n.c && (!opts.doc || opts.doc === V.doc.id);
     // 번호는 단원(1)과 업무(1.1)까지만 보이고, 그 아래는 들여쓰기 + '-'
     const depth = n.c.split('.').length;
     const label = depth <= 2 ? n.c : '-';
     const ind = depth > 2 && !opts.flat ? `<span class="ind" style="width:${(depth - 3) * 14 + 6}px"></span>` : '';
-    return `<div class="row k-${n.k} d${Math.min(depth, 6)}${cur ? ' cur' : ''}" data-c="${n.c}"${opts.doc ? ` data-d="${opts.doc}"` : ''}><span class="pg">${pgOf(raw, n)}</span><span class="code">${ind}${tg}<span class="num">${label}</span></span><span class="ttl">${badge}${t}${open}</span></div>`;
+    return `<div class="row k-${n.k} d${Math.min(depth, 6)}${cur ? ' cur' : ''}" data-c="${n.c}"${opts.doc ? ` data-d="${opts.doc}"` : ''}${full}><span class="pg">${pgOf(raw, n)}</span><span class="code">${ind}${tg}<span class="num">${label}</span></span><span class="ttl">${badge}${t}${open}</span></div>`;
   }
   function renderToc() {
     if (!V.doc) return;
