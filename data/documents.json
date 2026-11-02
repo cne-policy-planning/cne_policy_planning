@@ -1,6 +1,6 @@
 {
  "schema_version": "2.0",
- "generated_at": "2026-11-02T11:44:02.615Z",
+ "generated_at": "2026-11-02T12:31:16.290Z",
  "count": 602,
  "documents": [
   {
@@ -4404,7 +4404,7 @@
   },
   {
    "id": "doc-2026-6n6wt4",
-   "title": "2026 유치원생활기록부 기재요령 - 최종(웹게시용)",
+   "title": "2026 유치원생활기록부 기재요령",
    "school_levels": [
     "유아"
    ],
@@ -4423,7 +4423,7 @@
    "forms_bundle_url": "",
    "section_count": 129,
    "form_count": 0,
-   "updated_at": "2026-11-02T07:00:10.216Z",
+   "updated_at": "2026-11-02T11:45:45.072Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-6n6wt4.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-6n6wt4.pdf",
@@ -20037,7 +20037,7 @@
   },
   {
    "id": "doc-2026-zbd7rf",
-   "title": "2026 사서교사 직무연수 강의자료(금산고 정다은)",
+   "title": "2026 사서교사 직무연수 강의자료",
    "school_levels": [
     "공통"
    ],
@@ -20056,7 +20056,7 @@
    "forms_bundle_url": "",
    "section_count": 31,
    "form_count": 0,
-   "updated_at": "2026-11-02T07:00:10.178Z",
+   "updated_at": "2026-11-02T12:30:10.415Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-zbd7rf.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-zbd7rf.pdf",
