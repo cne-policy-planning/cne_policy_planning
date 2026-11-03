@@ -1,6 +1,6 @@
 {
  "schema_version": "2.0",
- "generated_at": "2026-11-03T02:43:02.088Z",
+ "generated_at": "2026-11-03T06:04:43.520Z",
  "count": 554,
  "documents": [
   {
@@ -11627,7 +11627,7 @@
   },
   {
    "id": "doc-2026-kd91ml",
-   "title": "학교 내 장애학생 의료지원 가이드북1",
+   "title": "학교 내 장애학생 의료지원 가이드북",
    "school_levels": [
     "특수"
    ],
@@ -11644,9 +11644,9 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 88,
+   "section_count": 84,
    "form_count": 0,
-   "updated_at": "2026-11-02T07:00:10.596Z",
+   "updated_at": "2026-11-03T05:59:48.639Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-kd91ml.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-kd91ml.pdf",
@@ -11656,7 +11656,7 @@
    },
    "edit": null,
    "pages": 112,
-   "outline_count": 259
+   "outline_count": 69
   },
   {
    "id": "doc-2026-kmqc90",
