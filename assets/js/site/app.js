@@ -516,9 +516,8 @@
     const depth = n.dp || n.c.split('.').length;
     const label = depth <= 2 ? (n.lbl || n.c) : '-';
     const ind = depth > 2 && !opts.flat ? `<span class="ind" style="width:${(depth - 3) * 14 + 6}px"></span>` : '';
-    const inner = tr && tr.count ? `<span class="in-cnt">이 안에 ${tr.count}건</span>` : '';
     const state = tr ? (tr.hit ? ' hit' : ' via') : '';
-    return `<div class="row k-${n.k} d${Math.min(depth, 6)}${state}${cur ? ' cur' : ''}" data-c="${n.c}"${opts.doc ? ` data-d="${opts.doc}"` : ''}${full}><span class="pg">${pgOf(raw, n)}</span><span class="code">${ind}${tg}<span class="num">${label}</span></span><span class="ttl">${badge}${t}${open}${inner}</span></div>`;
+    return `<div class="row k-${n.k} d${Math.min(depth, 6)}${state}${cur ? ' cur' : ''}" data-c="${n.c}"${opts.doc ? ` data-d="${opts.doc}"` : ''}${full}><span class="pg">${pgOf(raw, n)}</span><span class="code">${ind}${tg}<span class="num">${label}</span></span><span class="ttl">${badge}${t}${open}</span></div>`;
   }
   function renderToc() {
     if (!V.doc) return;
@@ -575,11 +574,10 @@
       }
     });
     const byI = (a, b) => a.i - b.i;
-    const within = n => (kids.get(n) || []).reduce((sum, k) => sum + (hit.has(k) ? 1 : 0) + within(k), 0);
     const folded = seen.size > FOLD_ROWS && roots.length > 1;
     const walk = (list, top) => list.sort(byI).map(n => {
       const sub = kids.get(n), open = !(folded && top);
-      const row = rowHTML(n, p.raw, { hl: hit.has(n) ? hl : esc, doc: p.id, tree: { has: !!sub, open, hit: hit.has(n), count: sub && (!open || within(n) > 1) ? within(n) : 0 } });
+      const row = rowHTML(n, p.raw, { hl: hit.has(n) ? hl : esc, doc: p.id, tree: { has: !!sub, open, hit: hit.has(n) } });
       return row + (sub ? `<div class="res-kids"${open ? '' : ' hidden'}>${walk(sub, false)}</div>` : '');
     }).join('');
     return { html: walk(roots, true), rows: seen.size };
