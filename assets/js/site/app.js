@@ -321,6 +321,7 @@
       if (parseHash().doc || V.mode !== 'home' || !(V.q || V.t)) return;
       if (res.best) { location.replace(hashFor({ slug: r.slug, doc: res.best, q: V.q, t: V.t })); return; }
       $('homeResults').innerHTML = res.head + res.body;
+      restoreFolds($('homeResults'), res);
       return;
     }
     // 목록에 업무·서식 수를 보여 주려고 가벼운 목차 색인을 쓴다(자료 상세를 하나하나 받지 않는다)
@@ -377,6 +378,8 @@
     if (e.target.id === 'clearSearch') { setRoute({ q: '', t: '' }); return; }
     const rtg = e.target.closest('[data-rtg]');
     if (rtg) { toggleResult(rtg); return; }
+    const fd = e.target.closest('.row-fold');
+    if (fd) { toggleDoc(fd); return; }
     const rd = e.target.closest('.row-doc');
     if (rd) { location.hash = hashFor({ slug: V.slug, doc: rd.dataset.d, q: V.q, t: V.t }); return; }
     const r = e.target.closest('.row, .row-go'); if (!r || !r.dataset.d) return;
@@ -596,7 +599,23 @@
     setFold(row, open);
     if (V.res) (V.res.fold = V.res.fold || new Map()).set(row.dataset.d + '|' + row.dataset.c, open);
   }
+  /** 자료 이름을 누르면 그 자료의 목차 전체를 접고 편다 */
+  function setDocFold(head, open) {
+    const kids = head.nextElementSibling, b = head.querySelector('.df');
+    if (!kids || !b) return;
+    kids.hidden = !open;
+    head.classList.toggle('shut', !open);
+    b.setAttribute('aria-expanded', String(open));
+    b.setAttribute('aria-label', open ? '아래 목차 접기' : '아래 목차 펴기');
+  }
+  function toggleDoc(head) {
+    const open = head.nextElementSibling.hidden;
+    setDocFold(head, open);
+    if (V.res) (V.res.shut = V.res.shut || new Set())[open ? 'delete' : 'add'](head.dataset.fold);
+    markCur();
+  }
   function restoreFolds(box, res) {
+    (res.shut || []).forEach(id => { const head = box.querySelector(`.row-fold[data-fold="${CSS.escape(id)}"]`); if (head) setDocFold(head, false); });
     if (!res.fold) return;
     res.fold.forEach((open, key) => {
       const i = key.indexOf('|');
@@ -637,14 +656,18 @@
         html += `<div class="lv-grp">${esc(SAS.levelName(x.lv) || '')} 자료 ${n}건</div>`;
       }
       const tag = m._c ? `<span class="lv-tag">공통 · ${esc(m._g || '')}</span> ` : '';
-      html += `<div class="doc-grp row-doc" data-d="${esc(p.id)}" title="이 자료 열기">${tag}${hl(p.title || m.t || '')}<span class="cnt">${hits.length ? hits.length + '건' : ''}</span></div>`;
+      // 찾은 목차가 있으면 자료 이름을 눌러 그 아래 목차를 접고 편다. 자료 이름만 맞은 자료는 눌러서 연다
+      const name = `${tag}${hl(p.title || m.t || '')}<span class="cnt">${hits.length ? hits.length + '건' : ''}</span>`;
+      html += hits.length
+        ? `<div class="doc-grp row-fold" data-fold="${esc(p.id)}" title="아래 목차 접기·펴기"><button type="button" class="df" aria-expanded="true" aria-label="아래 목차 접기">▾</button>${name}</div>`
+        : `<div class="doc-grp row-doc" data-d="${esc(p.id)}" title="이 자료 열기">${name}</div>`;
       if (!hits.length) {
         html += `<div class="doc-only">자료 이름에서 찾았습니다${m.f && !['pdf', 'hwpx'].includes(m.f) ? ` · ${esc(String(m.f).toUpperCase())} 원본 파일` : ''}</div>`;
         return;
       }
       if (rows >= MAX_ROWS) { cut = true; html += '<div class="res-more">이 자료를 열면 결과를 볼 수 있습니다.</div>'; return; }
       const tree = resultTree(p, hits, hl);
-      html += tree.html;
+      html += `<div class="res-kids">${tree.html}</div>`;
       rows += tree.rows;
     });
     const label = (f ? `[${f}] ` : '') + (words.join(' ') || '전체');
@@ -907,6 +930,8 @@
     if (e.target.id === 'clearSearch') { setRoute({ q: '', t: '' }); return; }
     const rtg = e.target.closest('[data-rtg]');
     if (rtg) { toggleResult(rtg); return; }
+    const fd = e.target.closest('.row-fold');
+    if (fd) { toggleDoc(fd); return; }
     const tg = e.target.closest('[data-tg]');
     if (tg) { const c = tg.dataset.tg; V.open.has(c) ? V.open.delete(c) : V.open.add(c); renderToc(); return; }
     const rd = e.target.closest('.row-doc');
