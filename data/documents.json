@@ -1,7 +1,7 @@
 {
  "schema_version": "2.0",
- "generated_at": "2026-11-02T21:37:16.940Z",
- "count": 565,
+ "generated_at": "2026-11-03T00:18:46.137Z",
+ "count": 554,
  "documents": [
   {
    "id": "doc-2018-9sjbw2",
@@ -1334,39 +1334,6 @@
    "outline_count": 204
   },
   {
-   "id": "doc-2026-0ormdw",
-   "title": "2026학년도 학교자체평가 운영 계획",
-   "school_levels": [
-    "공통"
-   ],
-   "category": "",
-   "department": "정책기획과",
-   "year": 2026,
-   "format": "hwpx",
-   "kind": "text",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 8,
-   "form_count": 0,
-   "updated_at": "2026-11-02T12:57:50.046Z",
-   "pdf": "",
-   "original": {
-    "url": "../cne_files_2026_1/files/doc-2026-0ormdw.hwpx",
-    "name": "-2. 2026학년도 학교자체평가 운영 계획.hwpx",
-    "bytes": 553257,
-    "format": "hwpx"
-   },
-   "edit": null,
-   "pages": 895,
-   "outline_count": 9
-  },
-  {
    "id": "doc-2026-0pbln9",
    "title": "특수교육 관련서비스 및 정당한 교육편의 지원 강화 계획",
    "school_levels": [
@@ -2349,39 +2316,6 @@
    "edit": null,
    "pages": 37,
    "outline_count": 219
-  },
-  {
-   "id": "doc-2026-3e3tbf",
-   "title": "학생봉사활동 이것이 궁금해요(100문100답)",
-   "school_levels": [
-    "공통"
-   ],
-   "category": "",
-   "department": "민주시민교육과",
-   "year": 2026,
-   "format": "pdf",
-   "kind": "text",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 9,
-   "form_count": 0,
-   "updated_at": "2026-11-02T21:27:16.778Z",
-   "pdf": "../cne_files_2026_1/files/doc-2026-3e3tbf.pdf",
-   "original": {
-    "url": "../cne_files_2026_1/files/doc-2026-3e3tbf.pdf",
-    "name": "-2. 학생봉사활동 이것이 궁금해요(100문100답).pdf",
-    "bytes": 821007,
-    "format": "pdf"
-   },
-   "edit": null,
-   "pages": 72,
-   "outline_count": 302
   },
   {
    "id": "doc-2026-3eets2",
@@ -5468,44 +5402,6 @@
    "outline_count": 2468
   },
   {
-   "id": "doc-2026-92jslx",
-   "title": "2026 사립유치원 재정 지원계획",
-   "school_levels": [
-    "유아"
-   ],
-   "category": "",
-   "department": "유아교육복지과",
-   "year": 2026,
-   "format": "pdf",
-   "kind": "text",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 8,
-   "form_count": 0,
-   "updated_at": "2026-11-02T21:34:45.476Z",
-   "pdf": "../cne_files_2026_3/files/doc-2026-92jslx.pdf",
-   "original": {
-    "url": "../cne_files_2026_3/files/doc-2026-92jslx.pdf",
-    "name": "2. 2026 사립유치원 재정 지원계획★.pdf",
-    "bytes": 367036,
-    "format": "pdf"
-   },
-   "edit": {
-    "url": "../cne_files_2026_2/files/doc-2026-92jslx.hwp",
-    "name": "2. 2026 사립유치원 재정 지원계획★.hwp",
-    "bytes": 266240,
-    "format": "hwp"
-   },
-   "pages": 11,
-   "outline_count": 79
-  },
-  {
    "id": "doc-2026-932wmz",
    "title": "2026학년도 유치원급식 기본방향(배포용) m",
    "school_levels": [
@@ -7135,39 +7031,6 @@
    },
    "pages": 26,
    "outline_count": 139
-  },
-  {
-   "id": "doc-2026-btx0lb",
-   "title": "2026충남특수교육주요사업계획",
-   "school_levels": [
-    "특수"
-   ],
-   "category": "",
-   "department": "초등특수교육과",
-   "year": 2026,
-   "format": "hwpx",
-   "kind": "text",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 21,
-   "form_count": 0,
-   "updated_at": "2026-11-02T12:47:32.716Z",
-   "pdf": "",
-   "original": {
-    "url": "../cne_files_2026_3/files/doc-2026-btx0lb.hwpx",
-    "name": "2026충남특수교육주요사업계획(안내용).hwpx",
-    "bytes": 6324577,
-    "format": "hwpx"
-   },
-   "edit": null,
-   "pages": 11129,
-   "outline_count": 41
   },
   {
    "id": "doc-2026-bwf0qv",
@@ -9476,44 +9339,6 @@
    "outline_count": 39
   },
   {
-   "id": "doc-2026-g5mopq",
-   "title": "2026학년도 계약제교원 운영 지침",
-   "school_levels": [
-    "공통"
-   ],
-   "category": "",
-   "department": "교원인사과",
-   "year": 2026,
-   "format": "pdf",
-   "kind": "text",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 56,
-   "form_count": 0,
-   "updated_at": "2026-11-02T21:24:57.308Z",
-   "pdf": "../cne_files_2026_3/files/doc-2026-g5mopq.pdf",
-   "original": {
-    "url": "../cne_files_2026_3/files/doc-2026-g5mopq.pdf",
-    "name": "2026학년도 계약제교원 운영 지침(한글).pdf",
-    "bytes": 2373723,
-    "format": "pdf"
-   },
-   "edit": {
-    "url": "../cne_files_2026_1/files/doc-2026-g5mopq.hwp",
-    "name": "2026학년도 계약제교원 운영 지침(한글).hwp",
-    "bytes": 4915712,
-    "format": "hwp"
-   },
-   "pages": 133,
-   "outline_count": 571
-  },
-  {
    "id": "doc-2026-gb3ykk",
    "title": "2026년 특성화고 AI역량 강화사업 계획(발송용)",
    "school_levels": [
@@ -10764,39 +10589,6 @@
    "edit": null,
    "pages": 51,
    "outline_count": 316
-  },
-  {
-   "id": "doc-2026-io5372",
-   "title": "2026학년도 학생봉사활동 운영 계획",
-   "school_levels": [
-    "공통"
-   ],
-   "category": "",
-   "department": "민주시민교육과",
-   "year": 2026,
-   "format": "pdf",
-   "kind": "text",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 29,
-   "form_count": 0,
-   "updated_at": "2026-11-02T21:26:33.034Z",
-   "pdf": "../cne_files_2026_1/files/doc-2026-io5372.pdf",
-   "original": {
-    "url": "../cne_files_2026_1/files/doc-2026-io5372.pdf",
-    "name": "-1. 2026학년도 학생봉사활동 운영 계획.pdf",
-    "bytes": 1438660,
-    "format": "pdf"
-   },
-   "edit": null,
-   "pages": 47,
-   "outline_count": 195
   },
   {
    "id": "doc-2026-ip5lpv",
@@ -14097,44 +13889,6 @@
    "outline_count": 4
   },
   {
-   "id": "doc-2026-orxzki",
-   "title": "2026 사립유치원 재정 지원 계획",
-   "school_levels": [
-    "유아"
-   ],
-   "category": "",
-   "department": "유아교육복지과",
-   "year": 2026,
-   "format": "pdf",
-   "kind": "text",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 1,
-   "form_count": 0,
-   "updated_at": "2026-11-02T21:35:21.687Z",
-   "pdf": "../cne_files_2026_3/files/doc-2026-orxzki.pdf",
-   "original": {
-    "url": "../cne_files_2026_3/files/doc-2026-orxzki.pdf",
-    "name": "1. 2026 사립유치원 재정 지원 계획(요약)_안내용.pdf",
-    "bytes": 89737,
-    "format": "pdf"
-   },
-   "edit": {
-    "url": "../cne_files_2026_2/files/doc-2026-orxzki.hwp",
-    "name": "1. 2026 사립유치원 재정 지원 계획(요약)_안내용.hwp",
-    "bytes": 60416,
-    "format": "hwp"
-   },
-   "pages": 2,
-   "outline_count": 19
-  },
-  {
    "id": "doc-2026-ov6hjw",
    "title": "2026 상상이룸교육 계획",
    "school_levels": [
@@ -16844,39 +16598,6 @@
    "outline_count": 258
   },
   {
-   "id": "doc-2026-u0zqw4",
-   "title": "서식 등 참고자료(중 학교주관구매제도)",
-   "school_levels": [
-    "중등"
-   ],
-   "category": "",
-   "department": "민주시민교육과",
-   "year": 2026,
-   "format": "hwpx",
-   "kind": "text",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 12,
-   "form_count": 0,
-   "updated_at": "2026-10-31T19:34:08.449Z",
-   "pdf": "",
-   "original": {
-    "url": "../cne_files_2026_2/files/doc-2026-u0zqw4.hwpx",
-    "name": "서식 등 참고자료(중_학교주관구매제도).hwpx",
-    "bytes": 348169,
-    "format": "hwpx"
-   },
-   "edit": null,
-   "pages": 1392,
-   "outline_count": 13
-  },
-  {
    "id": "doc-2026-u47sw2",
    "title": "결격사유범죄경력 통합조회 업무처리 가이드",
    "school_levels": [
@@ -19254,39 +18975,6 @@
    "outline_count": 23
   },
   {
-   "id": "doc-2027-05ykxz",
-   "title": "2027학년도 중학교 교복 개별구매 운영 요령",
-   "school_levels": [
-    "중등"
-   ],
-   "category": "",
-   "department": "민주시민교육과",
-   "year": 2027,
-   "format": "pdf",
-   "kind": "text",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 16,
-   "form_count": 0,
-   "updated_at": "2026-11-02T12:51:07.235Z",
-   "pdf": "../cne_files_2026_2/files/doc-2027-05ykxz.pdf",
-   "original": {
-    "url": "../cne_files_2026_2/files/doc-2027-05ykxz.pdf",
-    "name": "-1. 2027학년도 중학교 교복 개별구매 운영 요령.pdf",
-    "bytes": 905362,
-    "format": "pdf"
-   },
-   "edit": null,
-   "pages": 23,
-   "outline_count": 110
-  },
-  {
    "id": "doc-2027-8lbjdw",
    "title": "2027학년도 중학교 교복 개별구매 운영 요령",
    "school_levels": [
@@ -19419,39 +19107,6 @@
    "outline_count": 523
   },
   {
-   "id": "doc-2027-dk2dxw",
-   "title": "2027학년도 중학교 교복 학교주관구매제도 운영 요령",
-   "school_levels": [
-    "중등"
-   ],
-   "category": "",
-   "department": "민주시민교육과",
-   "year": 2027,
-   "format": "pdf",
-   "kind": "text",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 6,
-   "form_count": 0,
-   "updated_at": "2026-11-02T21:35:56.547Z",
-   "pdf": "../cne_files_2026_2/files/doc-2027-dk2dxw.pdf",
-   "original": {
-    "url": "../cne_files_2026_2/files/doc-2027-dk2dxw.pdf",
-    "name": "-5. 2027학년도 중학교 교복 학교주관구매제도 운영 요령.pdf",
-    "bytes": 931176,
-    "format": "pdf"
-   },
-   "edit": null,
-   "pages": 25,
-   "outline_count": 126
-  },
-  {
    "id": "doc-2027-lr8d6v",
    "title": "2027 단위학교 사업선택제 운영 계획",
    "school_levels": [
@@ -19488,39 +19143,6 @@
    },
    "pages": 14,
    "outline_count": 125
-  },
-  {
-   "id": "doc-2027-vz0a2b",
-   "title": "2027학년도 고등학교 교복 학교주관구매제도 운영 요령",
-   "school_levels": [
-    "중등"
-   ],
-   "category": "",
-   "department": "민주시민교육과",
-   "year": 2027,
-   "format": "pdf",
-   "kind": "text",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 5,
-   "form_count": 0,
-   "updated_at": "2026-11-02T12:50:11.672Z",
-   "pdf": "../cne_files_2026_2/files/doc-2027-vz0a2b.pdf",
-   "original": {
-    "url": "../cne_files_2026_2/files/doc-2027-vz0a2b.pdf",
-    "name": "-3. 2027학년도 고등학교 교복 학교주관구매제도 운영 요령.pdf",
-    "bytes": 907301,
-    "format": "pdf"
-   },
-   "edit": null,
-   "pages": 25,
-   "outline_count": 122
   }
  ]
 }
