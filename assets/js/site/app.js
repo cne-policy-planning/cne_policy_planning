@@ -375,6 +375,8 @@
   $('homeResults').addEventListener('click', e => {
     if (e.target.closest('a.open')) return;
     if (e.target.id === 'clearSearch') { setRoute({ q: '', t: '' }); return; }
+    const rtg = e.target.closest('[data-rtg]');
+    if (rtg) { toggleResult(rtg); return; }
     const rd = e.target.closest('.row-doc');
     if (rd) { location.hash = hashFor({ slug: V.slug, doc: rd.dataset.d, q: V.q, t: V.t }); return; }
     const r = e.target.closest('.row, .row-go'); if (!r || !r.dataset.d) return;
@@ -496,9 +498,10 @@
 
   function rowHTML(n, raw, opts) {
     opts = opts || {};
-    const has = !opts.flat && !!V.kids[n.c];
-    const isOpen = V.open.has(n.c);
-    const tg = has ? `<button class="tg" data-tg="${n.c}" aria-label="${isOpen ? '접기' : '펼치기'}" aria-expanded="${isOpen}">${isOpen ? '−' : '+'}</button>` : '<span class="tg sp"></span>';
+    const tr = opts.tree;   // 검색 결과 나무: 펼침 상태를 자료 목차와 따로 둔다
+    const has = tr ? tr.has : !opts.flat && !!V.kids[n.c];
+    const isOpen = tr ? tr.open : V.open.has(n.c);
+    const tg = has ? `<button class="tg" ${tr ? 'data-rtg' : 'data-tg'}="${n.c}" aria-label="${isOpen ? '접기' : '펼치기'}" aria-expanded="${isOpen}">${isOpen ? '−' : '+'}</button>` : '<span class="tg sp"></span>';
     const badge = n.ty ? `<span class="badge b-${n.ty}">${TYPE_SHORT[n.ty]}</span>` : '';
     const url = SS.safeUrl(n.link ? n.link.url : n.url);
     const open = url ? `<a class="open o-${n.ty}" href="${esc(url)}" target="_blank" rel="noopener noreferrer" title="새 탭에서 열기">${n.ty === '법령' ? '법령 ↗' : n.ty === '사이트' ? '열기 ↗' : '받기 ⤓'}</a>` : '';
@@ -510,7 +513,9 @@
     const depth = n.dp || n.c.split('.').length;
     const label = depth <= 2 ? (n.lbl || n.c) : '-';
     const ind = depth > 2 && !opts.flat ? `<span class="ind" style="width:${(depth - 3) * 14 + 6}px"></span>` : '';
-    return `<div class="row k-${n.k} d${Math.min(depth, 6)}${cur ? ' cur' : ''}" data-c="${n.c}"${opts.doc ? ` data-d="${opts.doc}"` : ''}${full}><span class="pg">${pgOf(raw, n)}</span><span class="code">${ind}${tg}<span class="num">${label}</span></span><span class="ttl">${badge}${t}${open}</span></div>`;
+    const inner = tr && tr.count ? `<span class="in-cnt">이 안에 ${tr.count}건</span>` : '';
+    const state = tr ? (tr.hit ? ' hit' : ' via') : '';
+    return `<div class="row k-${n.k} d${Math.min(depth, 6)}${state}${cur ? ' cur' : ''}" data-c="${n.c}"${opts.doc ? ` data-d="${opts.doc}"` : ''}${full}><span class="pg">${pgOf(raw, n)}</span><span class="code">${ind}${tg}<span class="num">${label}</span></span><span class="ttl">${badge}${t}${open}${inner}</span></div>`;
   }
   function renderToc() {
     if (!V.doc) return;
@@ -532,7 +537,7 @@
     if (!V.cur) return null;
     for (const a of anc(V.cur).reverse()) {
       const r = document.querySelector(`#tree .row[data-c="${CSS.escape(a.c)}"]:not([data-d]), #tree .row[data-c="${CSS.escape(a.c)}"][data-d="${CSS.escape(V.doc.id)}"]`);
-      if (r) { r.classList.add('cur'); return r; }
+      if (r && !r.closest('.res-kids[hidden]')) { r.classList.add('cur'); return r; }
     }
     return null;
   }
@@ -544,12 +549,61 @@
     return { words: q.split(/\s+/).filter(Boolean), f };
   }
   let searchSeq = 0;
-  const SEARCH_KINDS = new Set(['task', 'part', 'group', 'item', 'link']);
+  const SEARCH_KINDS = new Set(['ch', 'task', 'part', 'group', 'item', 'link']);
+  const FOLD_ROWS = 40;    // 한 자료의 결과 줄이 이보다 많으면 단원만 보이고 접어 둔다
   const MAX_ROWS = 1500;   // 결과가 아주 많을 때 화면이 느려지지 않도록 가운데 칸에 보이는 줄 수 제한
   const normT = n => (n._n != null ? n._n : (n._n = SAS.norm(n.t)));
   /** 위로 올라가며 실제로 있는 부모 목차(▸ 세부 줄은 검색 색인에 없어서 건너뛴다) */
   function parentIn(by, n) { let c = n.p; while (c && !by[c]) c = c.includes('.') ? c.slice(0, c.lastIndexOf('.')) : ''; return c ? by[c] : null; }
   const pgOf = (raw, n) => (n.pg != null ? n.pg : pp(raw, n.b));
+  /**
+   * 찾은 목차를 원래 목차 모양으로 묶는다: 위 단계는 한 번만 나오고 그 아래로 펼쳐진다.
+   * 찾은 줄(hit)은 강조하고, 위치를 알려 주려고 넣은 위 단계(via)는 흐리게 보여 준다.
+   */
+  function resultTree(p, hits, hl) {
+    const hit = new Set(hits), kids = new Map(), roots = [], seen = new Set();
+    // 자동으로 붙은 이름뿐인 '본문' 단원은 위치 설명이 되지 않으므로 건너뛴다
+    const up = n => { const a = parentIn(p.by, n); return a && a.k === 'ch' && a.t === '본문' && !hit.has(a) ? null : a; };
+    hits.forEach(h0 => {
+      for (let n = h0; n && !seen.has(n); n = up(n)) {
+        seen.add(n);
+        const a = up(n);
+        if (a) { if (!kids.has(a)) kids.set(a, []); kids.get(a).push(n); } else roots.push(n);
+      }
+    });
+    const byI = (a, b) => a.i - b.i;
+    const within = n => (kids.get(n) || []).reduce((sum, k) => sum + (hit.has(k) ? 1 : 0) + within(k), 0);
+    const folded = seen.size > FOLD_ROWS && roots.length > 1;
+    const walk = (list, top) => list.sort(byI).map(n => {
+      const sub = kids.get(n), open = !(folded && top);
+      const row = rowHTML(n, p.raw, { hl: hit.has(n) ? hl : esc, doc: p.id, tree: { has: !!sub, open, hit: hit.has(n), count: sub && (!open || within(n) > 1) ? within(n) : 0 } });
+      return row + (sub ? `<div class="res-kids"${open ? '' : ' hidden'}>${walk(sub, false)}</div>` : '');
+    }).join('');
+    return { html: walk(roots, true), rows: seen.size };
+  }
+  /** 검색 결과의 +/− : 펼침 상태는 같은 검색 동안 V.res.fold에 남긴다 */
+  function setFold(row, open) {
+    const kids = row.nextElementSibling, b = row.querySelector('[data-rtg]');
+    if (!kids || !kids.classList.contains('res-kids') || !b) return;
+    kids.hidden = !open;
+    b.textContent = open ? '−' : '+';
+    b.setAttribute('aria-expanded', String(open));
+    b.setAttribute('aria-label', open ? '접기' : '펼치기');
+  }
+  function toggleResult(btn) {
+    const row = btn.closest('.row'), kids = row.nextElementSibling;
+    const open = !!(kids && kids.hidden);
+    setFold(row, open);
+    if (V.res) (V.res.fold = V.res.fold || new Map()).set(row.dataset.d + '|' + row.dataset.c, open);
+  }
+  function restoreFolds(box, res) {
+    if (!res.fold) return;
+    res.fold.forEach((open, key) => {
+      const i = key.indexOf('|');
+      const row = box.querySelector(`.row[data-d="${CSS.escape(key.slice(0, i))}"][data-c="${CSS.escape(key.slice(i + 1))}"]`);
+      if (row) setFold(row, open);
+    });
+  }
   /**
    * 여러 자료에서 목차 제목·자료(서식 등) 이름과 자료명을 찾아 결과 HTML을 만든다
    * 반환: { head, body, total, byDoc, docs: [{id, hits, title}] (보여 줄 순서), best }
@@ -562,7 +616,7 @@
     const order = levelOrder();
     const found = [];
     preps.forEach(p => {
-      // 목차 제목에서만 찾는다: 업무·부분·◆ 묶음·번호 항목·자료(서식 등) 이름. ▸ 세부 줄과 본문은 찾지 않는다
+      // 목차 제목에서만 찾는다: 단원·업무·부분·◆ 묶음·번호 항목·자료(서식 등) 이름. ▸ 세부 줄과 본문은 찾지 않는다
       const hits = p.nodes.filter(n => SEARCH_KINDS.has(n.k) && (!f || n.ty === f) && (!lw.length || lw.every(w => normT(n).includes(w))));
       const m = metaOf(p.id) || {};
       // 자료 이름(과 자료 검색어)이 맞는 자료도 함께: 목차가 없는 HWP·엑셀 자료도 찾을 수 있게
@@ -589,16 +643,9 @@
         return;
       }
       if (rows >= MAX_ROWS) { cut = true; html += '<div class="res-more">이 자료를 열면 결과를 볼 수 있습니다.</div>'; return; }
-      const taskOf = n => { let y = n; while (y && y.k !== 'task') y = parentIn(p.by, y); return y || n; };
-      const rank = n => n.k === 'task' ? 0 : (lw.length && lw.every(w => normT(n).includes(w)) ? 1 : 2);
-      const groups = new Map();
-      hits.forEach(n => { const tk = taskOf(n); if (!groups.has(tk.c)) groups.set(tk.c, { task: tk, list: [], self: false }); if (n === tk) groups.get(tk.c).self = true; else groups.get(tk.c).list.push(n); });
-      [...groups.values()].sort((a, b) => Math.min(a.self ? 0 : 9, ...a.list.map(rank)) - Math.min(b.self ? 0 : 9, ...b.list.map(rank)) || a.task.i - b.task.i).forEach(g => {
-        const ch = parentIn(p.by, g.task);
-        html += `<div class="grp row-go" data-c="${g.task.c}" data-d="${esc(p.id)}"><span>${esc(ch ? ch.t : '')} ›</span> <b>${g.task.c} ${hl(g.task.t)}</b> <span class="pg">${pgOf(p.raw, g.task)}</span></div>`;
-        rows++;
-        g.list.sort((a, b) => rank(a) - rank(b) || a.i - b.i).slice(0, 80).forEach(n => { html += rowHTML(n, p.raw, { hl, flat: true, doc: p.id }); rows++; });
-      });
+      const tree = resultTree(p, hits, hl);
+      html += tree.html;
+      rows += tree.rows;
     });
     const label = (f ? `[${f}] ` : '') + (words.join(' ') || '전체');
     const nDocs = found.length;
@@ -628,13 +675,14 @@
     if (seq !== searchSeq || !(V.q || V.t)) return;
     renderDocList(V.doc && V.doc.id);
     $('tree').innerHTML = r.head + r.body;
-    $('tocScroll').scrollTop = 0;
+    restoreFolds($('tree'), r);
+    if (!cached) $('tocScroll').scrollTop = 0;   // 결과를 누르다 자료가 바뀌어도 보던 자리를 지킨다
     markCur();
     // 새 검색이면 이 자료의 첫 결과를 오른쪽 원문에 바로 보여 준다
     const key = V.doc.id + '|' + V.q + '|' + V.t;
     if (V.autoKey !== key) {
       V.autoKey = key;
-      const first = document.querySelector(`#tree .row[data-d="${CSS.escape(V.doc.id)}"], #tree .row-go[data-d="${CSS.escape(V.doc.id)}"]`);
+      const first = document.querySelector(`#tree .row.hit[data-d="${CSS.escape(V.doc.id)}"]`);
       if (first && V.by[first.dataset.c]) { go(first.dataset.c, { scrollToc: false, toDoc: false }); first.classList.add('cur'); }
     }
   }
@@ -857,6 +905,8 @@
   $('tree').addEventListener('click', async e => {
     if (e.target.closest('a.open')) return;
     if (e.target.id === 'clearSearch') { setRoute({ q: '', t: '' }); return; }
+    const rtg = e.target.closest('[data-rtg]');
+    if (rtg) { toggleResult(rtg); return; }
     const tg = e.target.closest('[data-tg]');
     if (tg) { const c = tg.dataset.tg; V.open.has(c) ? V.open.delete(c) : V.open.add(c); renderToc(); return; }
     const rd = e.target.closest('.row-doc');
