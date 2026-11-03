@@ -196,36 +196,37 @@ button.accent { color: #c2410c; border-color: #f5c9ad; background: #fff7f1; }
 
 /* 가운데 번호 목차 */
 /* 목차는 자료(PDF·HWPX)와 상관없이 글꼴 하나로 보여 준다. 영문·숫자도 같은 글꼴 */
-.v-tree { padding: 4px 0 30px; font-size: 14px; font-family: "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+.v-tree { padding: 4px 0 30px; font-size: 15px; font-family: "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
 .v-tree button { font-family: inherit; }
-.row { display: grid; grid-template-columns: 34px auto 1fr; gap: 0 6px; align-items: start; padding: 3px 10px 3px 0; cursor: pointer; border-left: 3px solid transparent; }
+.row { display: grid; grid-template-columns: 42px auto 1fr; gap: 0 6px; align-items: start; padding: 3px 10px 3px 0; cursor: pointer; border-left: 3px solid transparent; }
 .row:hover { background: #f6f8fc; }
 .row.cur { background: #fff4ea; border-left-color: #ea6a26; }
-.row .pg { font-size: 11px; color: #98a2b3; text-align: right; padding-top: 3px; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.row .code { font-size: 12px; color: #667085; padding-top: 2px; white-space: nowrap; display: flex; gap: 3px; align-items: center; font-variant-numeric: tabular-nums; }
+.row .pg { font-size: 12px; color: #98a2b3; text-align: right; padding-top: 3px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.row .code { font-size: 13px; color: #667085; padding-top: 2px; white-space: nowrap; display: flex; gap: 3px; align-items: center; font-variant-numeric: tabular-nums; }
 .tg { width: 16px; height: 16px; padding: 0; border-radius: 50%; border: 1px solid #98a2b3; background: #fff; color: #475467; font-size: 12px; line-height: 1; display: inline-grid; place-items: center; flex: none; }
 .tg.sp { border-color: transparent; background: none; }
-.row .ttl { min-width: 0; overflow-wrap: anywhere; line-height: 1.5; }
-.row.k-ch { margin-top: 8px; } .row.k-ch .ttl { font-weight: 800; font-size: 14.5px; }
+/* 목차 제목 크기는 자료·단계와 상관없이 .v-tree 크기 하나만 쓴다 */
+.row .ttl { min-width: 0; overflow-wrap: anywhere; line-height: 1.5; font-size: inherit; }
+.row.k-ch { margin-top: 8px; } .row.k-ch .ttl { font-weight: 800; }
 .row.k-task .ttl { font-weight: 700; }
 .row.k-part .ttl { color: var(--muted); font-weight: 600; }
 .row.k-group .ttl { color: var(--blue-text); font-weight: 700; }
 .row.k-item .ttl { font-weight: 500; }
-.row.k-bullet .ttl { color: #475467; font-size: 13.5px; }
-.badge { display: inline-block; font-size: 11px; font-weight: 700; color: #fff; padding: 0 5px; border-radius: 4px; margin-right: 5px; line-height: 17px; vertical-align: 1px; }
+.row.k-bullet .ttl { color: #475467; }
+.badge { display: inline-block; font-size: 12px; font-weight: 700; color: #fff; padding: 0 5px; border-radius: 4px; margin-right: 5px; line-height: 17px; vertical-align: 1px; }
 .b-서식 { background: #2e7a57; } .b-참고 { background: #b26f12; } .b-법령 { background: #2a5ba6; } .b-사이트 { background: #6650b0; }
-.open { margin-left: 6px; font-size: 12px; text-decoration: none; border: 1px solid currentColor; border-radius: 5px; padding: 0 5px; white-space: nowrap; vertical-align: 1px; color: #2e7a57; }
+.open { margin-left: 6px; font-size: 12.5px; text-decoration: none; border: 1px solid currentColor; border-radius: 5px; padding: 0 5px; white-space: nowrap; vertical-align: 1px; color: #2e7a57; }
 .open.o-법령 { color: #2a5ba6; } .open.o-사이트 { color: #6650b0; } .open.o-참고 { color: #b26f12; }
 .open:hover { background: #f6f8fc; }
 .res-h { display: flex; justify-content: space-between; gap: 8px; padding: 10px 12px 6px; font-size: 13px; color: var(--muted); }
 .res-h b { color: var(--text); }
 .linkbtn { border: 0; background: none; color: var(--blue-text); padding: 0; font-size: 13px; }
-.doc-grp { padding: 10px 12px 2px; font-size: 12.5px; font-weight: 800; color: var(--text); border-top: 1px solid var(--line2); margin-top: 6px; }
+.doc-grp { padding: 10px 12px 2px; font-size: 14px; font-weight: 800; color: var(--text); border-top: 1px solid var(--line2); margin-top: 6px; }
 .grp { padding: 8px 12px 2px; font-size: 13px; color: var(--muted); cursor: pointer; }
 .grp b { color: var(--text); }
 .grp:hover b { color: var(--blue-text); }
 .grp .pg { font-size: 11px; color: #98a2b3; }
-.row.k-page .ttl { font-size: 13px; color: #475467; }
+.row.k-page .ttl { color: #475467; }
 
 /* 오른쪽 쪽 보기 */
 .v-crumb { flex: 1 1 240px; min-width: 0; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; font-size: 13.5px; color: var(--muted); }
@@ -332,7 +333,7 @@ details.lv-dept > summary i { font-style: normal; font-size: 13px; color: var(--
 .v-label-com { margin-top: 10px; border-top: 1px solid var(--line2); padding-top: 12px; color: #5b3fb8; }
 .v-dept { font-size: 12px; font-weight: 700; color: #475467; padding: 8px 10px 2px; }
 .v-crumb .src.com { background: #f1ecfd; color: #5b3fb8; }
-.doc-grp .lv-tag { font-size: 11px; vertical-align: 1px; }
+.doc-grp .lv-tag { font-size: 12px; vertical-align: 1px; }
 
 /* 본문 없이 원본 파일로 제공하는 자료(HWP·엑셀 등) */
 .v-filecard { max-width: 420px; margin: 40px auto; background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 28px 24px; text-align: center; display: grid; gap: 10px; justify-items: center; }
@@ -351,12 +352,12 @@ details.lv-dept > summary i { font-style: normal; font-size: 13px; color: var(--
 .v-doc .lvt.com { background: #f1ecfd; color: #5b3fb8; }
 .v-doc .hits { color: var(--blue-text); font-weight: 700; }
 .v-label-q { color: var(--blue-text); }
-.lv-grp { margin: 12px 0 0; padding: 8px 12px; font-size: 12px; font-weight: 800; color: #475467; background: #f4f7fb; border-top: 1px solid var(--line2); }
+.lv-grp { margin: 12px 0 0; padding: 8px 12px; font-size: 13px; font-weight: 800; color: #475467; background: #f4f7fb; border-top: 1px solid var(--line2); }
 .doc-grp.row-doc { cursor: pointer; }
 .doc-grp.row-doc:hover { color: var(--blue-text); }
 .doc-grp .cnt { font-weight: 600; color: var(--muted); margin-left: 4px; }
 /* 검색 결과: 자료마다 목차 단계(단원·업무·항목)가 달라도 글자 크기·굵기를 같게. 찾은 줄과 위 단계는 색으로만 구분 */
-.res-kids .row .ttl, .res-kids .row.k-ch .ttl, .res-kids .row.k-task .ttl, .res-kids .row.k-part .ttl, .res-kids .row.k-group .ttl, .res-kids .row.k-item .ttl, .res-kids .row.k-bullet .ttl { font-size: 14px; font-weight: 400; color: var(--text); }
+.res-kids .row .ttl, .res-kids .row.k-ch .ttl, .res-kids .row.k-task .ttl, .res-kids .row.k-part .ttl, .res-kids .row.k-group .ttl, .res-kids .row.k-item .ttl, .res-kids .row.k-bullet .ttl, .res-kids .row.k-page .ttl { font-weight: 400; color: var(--text); }
 .res-kids .row.via .ttl { color: var(--muted); }
 .res-kids .row.k-ch { margin-top: 0; }
 .res-kids .row .num, .res-kids .row.k-ch .num, .res-kids .row.k-task .num { font-weight: 400; color: var(--muted); }
@@ -365,7 +366,7 @@ details.lv-dept > summary i { font-style: normal; font-size: 13px; color: var(--
 .df { border: 0; background: none; color: var(--muted); padding: 0 4px 0 0; font-size: 12px; line-height: 1; cursor: pointer; transition: transform .12s; display: inline-block; }
 .doc-grp.shut .df { transform: rotate(-90deg); }
 .doc-grp.shut { padding-bottom: 8px; }
-.doc-only { padding: 2px 12px 8px 26px; font-size: 12.5px; color: var(--muted); }
+.doc-only { padding: 2px 12px 8px 26px; font-size: 13.5px; color: var(--muted); }
 .res-more { padding: 6px 12px 10px 26px; font-size: 12.5px; color: var(--muted); }
 .v-note.v-note-err { position: sticky; top: 0; z-index: 3; background: #fdecea; color: #b42318; box-shadow: 0 2px 6px #0002; }
 /* 검색 중에는 가운데 칸 결과 목록으로 충분하므로 왼쪽 자료 칸을 숨긴다 */
