@@ -201,6 +201,14 @@ console.log('\n[7-1] 공통 학교급 · 부서');
 test('학교급 정리: 공통은 다른 학교급과 함께 쓰지 않음', () => { eq(SAS.cleanLevels(['초등', '공통', '유아']), ['공통']); eq(SAS.cleanLevels(['중등', '유아', '없음', '유아']), ['유아', '중등']); });
 test('공통 + 다른 학교급은 검사 오류', () => { const d = JSON.parse(JSON.stringify(doc)); d.school_levels = ['공통', '초등']; ok(SAS.validateDocument(d).errors.some(e => e.includes('공통'))); });
 test('학교업무자료실 자료의 부서 = 교무학사 공통자료', () => { eq(SAS.defaultDepartment({ origin: { site: '학교업무자료실' } }), '교무학사 공통자료'); eq(SAS.defaultDepartment({ origin: { site: '기본계획나눔방' } }), ''); });
+test('학교급 자료 순서: 최신 연도 → 가나다순, 공통은 부서 묶음 먼저', () => {
+  const d = (id, title, year, department) => ({ id, title, year, department });
+  const docs = [d('a', '나 자료', 2025, '감사관'), d('b', '다 자료', 2026, '감사관'), d('c', '가 자료', 2026, '감사관'), d('e', '라 자료', 2026, '재무과'), d('f', '마 자료', 2024, '교무학사 공통자료')];
+  const c = { 감사관: 3, 재무과: 1 };
+  eq(SAS.sortForLevel(docs, '유아', c).map(x => x.id), ['c', 'b', 'e', 'a', 'f']);
+  eq(SAS.sortForLevel(docs, '공통', c).map(x => x.id), ['c', 'b', 'a', 'f', 'e']);
+  eq(docs.map(x => x.id), ['a', 'b', 'c', 'e', 'f']);
+});
 test('부서 묶음: 1~2건 부서·빈 부서 → 기타 부서', () => { const c = { 민주시민교육과: 37, 소통담당관: 1, 재무과: 2, 감사관: 3 }; eq(['민주시민교육과', '소통담당관', '재무과', '감사관', ''].map(d => SAS.deptGroup(d, c)), ['민주시민교육과', '기타 부서', '기타 부서', '감사관', '기타 부서']); eq(SAS.deptGroup('교무학사 공통자료', {}), '교무학사 공통자료'); });
 test('부서 목록은 가나다순', () => eq(SAS.DEPARTMENTS, SAS.DEPARTMENTS.slice().sort((a, b) => a.localeCompare(b, 'ko'))));
 test('공통 색인·부서별 개수 생성, 예전 자료는 원 출처로 부서 채움', () => {

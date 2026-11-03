@@ -136,6 +136,22 @@
     return counts && (counts[d] || 0) > OTHER_DEPT_MAX ? d : OTHER_DEPT;
   }
 
+  /** 자료 순서(사용자 화면 기준): 최신 연도 먼저 → 자료명 가나다순. 색인과 관리자 목록이 같은 기준을 쓴다 */
+  function docOrder(a, b) {
+    return (b.year || 0) - (a.year || 0) || String(a.title || '').localeCompare(String(b.title || ''), 'ko') || String(a.id).localeCompare(String(b.id));
+  }
+
+  /**
+   * 사용자 화면에서 학교급을 골랐을 때의 자료 순서로 정렬한다.
+   * 공통은 부서 묶음 가나다순 → 묶음 안 docOrder, 다른 학교급은 docOrder. counts = 전체 자료의 부서별 건수
+   */
+  function sortForLevel(docs, levelName, counts) {
+    const list = docs.slice().sort(docOrder);
+    if (levelName !== COMMON_LEVEL) return list;
+    const g = d => deptGroup(d.department, counts);
+    return list.sort((a, b) => g(a).localeCompare(g(b), 'ko') || docOrder(a, b));
+  }
+
   function formatOf(filename) {
     const m = String(filename || '').toLowerCase().match(/\.([a-z0-9]{2,5})$/);
     return m ? m[1] : 'etc';
@@ -490,5 +506,5 @@
     doc.outline.nodes.forEach(n => { if (n.k === 'task' && n.s && byId.has(n.s)) n.t = byId.get(n.s).heading; });
   }
 
-  return { EDIT_FORMATS, keepEditOriginal, STORAGE_PREFIX, STORAGE_MAX, FILE_MAX, fileUrl, makeOriginal, planStorage, storageUsage, COMMON_LEVEL, ACADEMIC_COMMON, OTHER_DEPT, OTHER_DEPT_MAX, DEPARTMENTS, cleanLevels, defaultDepartment, deptGroup, setLinkUrl, setLinkInfo, carryLinkEdits, syncOutline, SCHEMA_VERSION, LEVELS, TEXT_FORMATS, ORIGIN_SITES, CATEGORIES, levelSlug, levelName, formatOf, kindOf, newDocId, titleFromFilename, createDocument, finalizeDocument, carryKeywords, carryForms, numberForms, addManualForms, removeManualForm, formList, matchBundle, migrateV1, validateDocument };
+  return { EDIT_FORMATS, keepEditOriginal, STORAGE_PREFIX, STORAGE_MAX, FILE_MAX, fileUrl, makeOriginal, planStorage, storageUsage, COMMON_LEVEL, ACADEMIC_COMMON, OTHER_DEPT, OTHER_DEPT_MAX, DEPARTMENTS, cleanLevels, defaultDepartment, deptGroup, docOrder, sortForLevel, setLinkUrl, setLinkInfo, carryLinkEdits, syncOutline, SCHEMA_VERSION, LEVELS, TEXT_FORMATS, ORIGIN_SITES, CATEGORIES, levelSlug, levelName, formatOf, kindOf, newDocId, titleFromFilename, createDocument, finalizeDocument, carryKeywords, carryForms, numberForms, addManualForms, removeManualForm, formList, matchBundle, migrateV1, validateDocument };
 });

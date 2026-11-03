@@ -69,7 +69,7 @@
   /** 학교급 하나의 목록 색인과 본문 조각 */
   function buildLevel(docs, level, shardCount, generatedAt) {
     const list = docs.filter(d => (d.school_levels || []).includes(level.name))
-      .sort((a, b) => (b.year || 0) - (a.year || 0) || a.title.localeCompare(b.title, 'ko'));
+      .sort(N.docOrder);
     const index = { schema_version: N.SCHEMA_VERSION, level: level.name, slug: level.slug, generated_at: generatedAt, shard_count: shardCount, sec_base: SEC_BASE, docs: [], sections: [] };
     const shards = Array.from({ length: shardCount }, () => new Map());
     list.forEach((d, di) => {

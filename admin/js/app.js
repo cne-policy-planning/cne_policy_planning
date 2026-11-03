@@ -826,14 +826,19 @@
     const curCat = fCat.value;
     fCat.replaceChildren(h('option', { value: '' }, '모든 분류'), ...cats.map(c => h('option', { value: c, selected: c === curCat }, c)));
     const q = SAS.norm($('fQuery').value);
-    const list = S.state.docs.filter(d =>
+    let list = S.state.docs.filter(d =>
       (!q || SAS.norm(d.title + d.category + (d.department || '')).includes(q)) &&
       (!fLevel.value || d.school_levels.includes(fLevel.value)) &&
       (!fCat.value || d.category === fCat.value) &&
       (!$('fNoWorks').checked || (!d.original && !d.pdf && !d.works_url)) &&
-      (!$('fWarn').checked || needsCheck(d)))
-      // 등록 순서(최근 등록 먼저) → 자료 ID. 자료명·내용을 고쳐도(수정 시각이 바뀌어도) 목록 자리는 그대로
-      .sort((a, b) => (b.created_at || '').localeCompare(a.created_at || '') || a.id.localeCompare(b.id));
+      (!$('fWarn').checked || needsCheck(d)));
+    // 학교급을 고르면 사용자 화면과 같은 순서(최신 연도 → 가나다순, 공통은 부서별). 고르지 않으면
+    // 등록 순서(최근 등록 먼저) → 자료 ID: 자료명·내용을 고쳐도(수정 시각이 바뀌어도) 목록 자리는 그대로
+    if (fLevel.value) {
+      const counts = {};
+      S.state.docs.forEach(d => { if (d.department) counts[d.department] = (counts[d.department] || 0) + 1; });
+      list = SAS.sortForLevel(list, fLevel.value, counts);
+    } else list.sort((a, b) => (b.created_at || '').localeCompare(a.created_at || '') || a.id.localeCompare(b.id));
     renderCount(list.length);
     const box = $('docList');
     const keepTop = box.scrollTop;   // 목록을 다시 그려도 보던 위치 그대로
