@@ -1,6 +1,6 @@
 {
  "schema_version": "2.0",
- "generated_at": "2026-11-03T00:35:24.555Z",
+ "generated_at": "2026-11-03T00:53:24.646Z",
  "count": 554,
  "documents": [
   {
@@ -5403,7 +5403,7 @@
   },
   {
    "id": "doc-2026-932wmz",
-   "title": "2026학년도 유치원급식 기본방향(배포용) m",
+   "title": "2026학년도 유치원급식 기본방향",
    "school_levels": [
     "유아"
    ],
@@ -5422,7 +5422,7 @@
    "forms_bundle_url": "",
    "section_count": 36,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:36.238Z",
+   "updated_at": "2026-11-03T00:44:38.610Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-932wmz.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-932wmz.pdf",
@@ -17317,7 +17317,7 @@
   },
   {
    "id": "doc-2026-w6awl8",
-   "title": "붙임1. 2026 유초 이음교육 운영 계획",
+   "title": "2026 유초 이음교육 운영 계획",
    "school_levels": [
     "유아"
    ],
@@ -17336,7 +17336,7 @@
    "forms_bundle_url": "",
    "section_count": 14,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:38.359Z",
+   "updated_at": "2026-11-03T00:44:54.548Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-w6awl8.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-w6awl8.pdf",
