@@ -189,5 +189,47 @@
     });
   }
 
-  return { spacedRatio, SPACED_DOC, joinSpaced, tidyOutline, TITLE_MAX, clean, repairSpacing, norm, bigrams, esc, looseRegex, snippet, highlight, splitList, shardOf };
+  /**
+   * 목차에 보일 줄만 남긴다(제목만).
+   *  - ▸ 세부 줄(bullet): 본문 문장이므로 뺀다
+   *  - 글자가 깨진 줄: PDF 글꼴 문제로 엉뚱한 문자(ɱ, ॹ, ߯ …)가 섞인 제목, 한두 글자뿐인 조각(「커」, 「Ⅲ」)
+   *  - 문장으로 끝나는 줄(…합니다. / …한다): 제목이 아니라 본문
+   * 빠진 줄 아래의 줄은 가장 가까운 남은 위 줄에 붙는다(화면에서 처리).
+   */
+  const OK_CH = /[가-힣ㄱ-ㆎ一-鿿 -~·°×‐-⁯⅐-⇿①-➿　-〿㈀-㏿＀-￯]/;
+  function oddChars(t) { let n = 0; for (const ch of String(t || '')) if (!OK_CH.test(ch)) n++; return n; }
+  function isGarbled(t) {
+    const s = String(t || '').replace(/\s+/g, '');
+    if (!s) return true;
+    const odd = oddChars(s);
+    if (odd >= 4 || (odd >= 2 && odd / s.length >= 0.15)) return true;
+    const han = (s.match(/[가-힣一-鿿]/g) || []).length;
+    // 한글이 하나도 없는데 기호가 섞였거나 대소문자가 뒤섞인 줄(「[[ J\?]^ GE$」, 「bb cPB$」)
+    // 한글이 하나도 없는 줄은 글자가 깨진 조각으로 본다(「GG _1」, 「RSTU」, 「CONTENTS」).
+    // 단, PART 1 · Chapter 2 · Q&A 같은 표지나 영어 낱말이 둘 이상인 제목은 둔다
+    if (!han) {
+      const raw = String(t || '').trim();
+      if (/^(part|chapter|step|unit|appendix|q\s*&\s*a|faq)\b/i.test(raw)) return false;
+      if ((raw.match(/\b[A-Za-z][a-z]{2,}\b/g) || []).length >= 2 && !/[\[\]^$\\{}|`~#@]/.test(raw)) return false;
+      return true;
+    }
+    const letters = (s.match(/[가-힣A-Za-z一-鿿]/g) || []).length;
+    return letters < 2;   // 「커」, 「Ⅲ」처럼 글자 한두 개뿐인 조각
+  }
+  const SENT_END = /(습니다|합니다|입니다|됩니다|하였으며|하며|이며|되며|한다|된다|있다|없다|하였다)\s*[.。…]?\s*$/;
+  function isSentence(t) {
+    const s = String(t || '').trim();
+    if (/[?？]\s*$/.test(s)) return false;   // 질문(Q&A)은 제목으로 둔다
+    return SENT_END.test(s) && s.replace(/\s/g, '').length >= 12;
+  }
+  function cleanOutline(nodes) {
+    return (nodes || []).filter(n => {
+      if (n.k === 'bullet') return false;
+      if (n.k === 'link') return !isGarbled(n.t) || !!n.l;
+      if (n.k === 'ch') return true;
+      return !isGarbled(n.t) && !isSentence(n.t);
+    });
+  }
+
+  return { spacedRatio, SPACED_DOC, joinSpaced, tidyOutline, cleanOutline, isGarbled, isSentence, TITLE_MAX, clean, repairSpacing, norm, bigrams, esc, looseRegex, snippet, highlight, splitList, shardOf };
 });

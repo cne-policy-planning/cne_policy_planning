@@ -253,6 +253,7 @@
     let nodes = rows.map((r, i) => ({ c: r[0], k: TOC_KIND[r[1]] || 'item', t: r[2], pg: r[3] || '', ty: r[4] || '', url: r[5] || '', i }));
     // 예전에 만든 색인도 정리(띄어쓰기 붙이기 · 긴 문장은 앞부분만). 줄인 제목에는 … 표시
     if (SAS.tidyOutline) nodes = SAS.tidyOutline(nodes);   // 줄인 제목은 화면에서 … 표시(rowHTML)
+    if (SAS.cleanOutline) nodes = SAS.cleanOutline(nodes);   // 본문 문장·깨진 글자 줄은 검색 결과에서도 뺀다
     nodes.forEach(n => {
       n.p = n.c.includes('.') ? n.c.slice(0, n.c.lastIndexOf('.')) : '';
       prep.nodes.push(n); prep.by[n.c] = n;
@@ -385,7 +386,9 @@
     if (V.docs.has(id)) return V.docs.get(id);
     const d = await loader.doc(id);
     // 목차 정리(띄어쓰기 붙이기 · 문장처럼 긴 제목은 앞부분만): 예전에 만든 자료도 화면에서 바로 깔끔하게
-    const nodes = d.outline && d.outline.nodes ? (SAS.tidyOutline ? SAS.tidyOutline(d.outline.nodes) : d.outline.nodes.map(n => Object.assign({}, n))) : fallbackOutline(d);
+    let nodes = d.outline && d.outline.nodes ? (SAS.tidyOutline ? SAS.tidyOutline(d.outline.nodes) : d.outline.nodes.map(n => Object.assign({}, n))) : fallbackOutline(d);
+    // 목차에는 제목만: 본문 문장(▸ 세부 줄)·깨진 글자 줄은 뺀다
+    if (SAS.cleanOutline) nodes = SAS.cleanOutline(nodes);
     const links = new Map((d.links || []).map(l => [l.id, l]));
     const prep = { id: d.id, title: d.title, raw: d, nodes, by: {}, kids: {} };
     nodes.forEach((n, i) => {
@@ -393,7 +396,17 @@
       // 사람이 만든 목차는 적은 제목을 그대로, 자동 목차는 링크 이름을 쓴다
       if (n.l && links.has(n.l)) { const l = links.get(n.l); n.link = l; n.t = (d.outline && d.outline.manual ? n.t : l.text) || n.t; n.ty = n.ty || l.type || typeFromKind(l); }
       prep.by[n.c] = n;
-      n.p = n.c.includes('.') ? n.c.slice(0, n.c.lastIndexOf('.')) : '';
+    });
+    // 위 줄이 빠졌으면 가장 가까운 남은 위 줄에 붙이고, 단계와 번호(1, 1.1)를 다시 매긴다
+    const cnt = {};
+    nodes.forEach(n => {
+      let p = n.c.includes('.') ? n.c.slice(0, n.c.lastIndexOf('.')) : '';
+      while (p && !prep.by[p]) p = p.includes('.') ? p.slice(0, p.lastIndexOf('.')) : '';
+      n.p = p;
+      const par = p ? prep.by[p] : null;
+      n.dp = par ? par.dp + 1 : 1;
+      cnt[p] = (cnt[p] || 0) + 1;
+      n.lbl = par ? `${par.lbl}.${cnt[p]}` : String(cnt[p]);
       (prep.kids[n.p] = prep.kids[n.p] || []).push(n);
     });
     V.docs.set(id, prep);
@@ -494,8 +507,8 @@
     const full = n.cut && n.d && n.d[0] ? ` title="${esc(n.t + ' ' + n.d[0])}"` : '';
     const cur = V.cur && V.cur.c === n.c && (!opts.doc || opts.doc === V.doc.id);
     // 번호는 단원(1)과 업무(1.1)까지만 보이고, 그 아래는 들여쓰기 + '-'
-    const depth = n.c.split('.').length;
-    const label = depth <= 2 ? n.c : '-';
+    const depth = n.dp || n.c.split('.').length;
+    const label = depth <= 2 ? (n.lbl || n.c) : '-';
     const ind = depth > 2 && !opts.flat ? `<span class="ind" style="width:${(depth - 3) * 14 + 6}px"></span>` : '';
     return `<div class="row k-${n.k} d${Math.min(depth, 6)}${cur ? ' cur' : ''}" data-c="${n.c}"${opts.doc ? ` data-d="${opts.doc}"` : ''}${full}><span class="pg">${pgOf(raw, n)}</span><span class="code">${ind}${tg}<span class="num">${label}</span></span><span class="ttl">${badge}${t}${open}</span></div>`;
   }
