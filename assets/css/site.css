@@ -195,12 +195,14 @@ button.accent { color: #c2410c; border-color: #f5c9ad; background: #fff7f1; }
 .v-src { grid-column: 1 / -1; margin-top: 6px; font-size: 12px; }
 
 /* 가운데 번호 목차 */
-.v-tree { padding: 4px 0 30px; font-size: 14px; }
+/* 목차는 자료(PDF·HWPX)와 상관없이 글꼴 하나로 보여 준다. 영문·숫자도 같은 글꼴 */
+.v-tree { padding: 4px 0 30px; font-size: 14px; font-family: "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+.v-tree button { font-family: inherit; }
 .row { display: grid; grid-template-columns: 34px auto 1fr; gap: 0 6px; align-items: start; padding: 3px 10px 3px 0; cursor: pointer; border-left: 3px solid transparent; }
 .row:hover { background: #f6f8fc; }
 .row.cur { background: #fff4ea; border-left-color: #ea6a26; }
 .row .pg { font-size: 11px; color: #98a2b3; text-align: right; padding-top: 3px; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.row .code { font-size: 12px; color: #667085; padding-top: 2px; white-space: nowrap; display: flex; gap: 3px; align-items: center; font-variant-numeric: tabular-nums; font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; }
+.row .code { font-size: 12px; color: #667085; padding-top: 2px; white-space: nowrap; display: flex; gap: 3px; align-items: center; font-variant-numeric: tabular-nums; }
 .tg { width: 16px; height: 16px; padding: 0; border-radius: 50%; border: 1px solid #98a2b3; background: #fff; color: #475467; font-size: 12px; line-height: 1; display: inline-grid; place-items: center; flex: none; }
 .tg.sp { border-color: transparent; background: none; }
 .row .ttl { min-width: 0; overflow-wrap: anywhere; line-height: 1.5; }
@@ -353,9 +355,11 @@ details.lv-dept > summary i { font-style: normal; font-size: 13px; color: var(--
 .doc-grp.row-doc { cursor: pointer; }
 .doc-grp.row-doc:hover { color: var(--blue-text); }
 .doc-grp .cnt { font-weight: 600; color: var(--muted); margin-left: 4px; }
-.row.via .ttl, .row.via .ttl * { color: var(--muted); font-weight: 500; }
-.row.via.k-ch .ttl { font-weight: 700; }
-.row.hit .ttl { color: var(--text); }
+/* 검색 결과: 자료마다 목차 단계(단원·업무·항목)가 달라도 글자 크기·굵기를 같게. 찾은 줄과 위 단계는 색으로만 구분 */
+.res-kids .row .ttl, .res-kids .row.k-ch .ttl, .res-kids .row.k-task .ttl, .res-kids .row.k-part .ttl, .res-kids .row.k-group .ttl, .res-kids .row.k-item .ttl, .res-kids .row.k-bullet .ttl { font-size: 14px; font-weight: 400; color: var(--text); }
+.res-kids .row.via .ttl { color: var(--muted); }
+.res-kids .row.k-ch { margin-top: 0; }
+.res-kids .row .num, .res-kids .row.k-ch .num, .res-kids .row.k-task .num { font-weight: 400; color: var(--muted); }
 .doc-grp.row-fold { cursor: pointer; display: block; }
 .doc-grp.row-fold:hover { color: var(--blue-text); }
 .df { border: 0; background: none; color: var(--muted); padding: 0 4px 0 0; font-size: 12px; line-height: 1; cursor: pointer; transition: transform .12s; display: inline-block; }

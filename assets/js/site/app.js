@@ -509,7 +509,9 @@
     const url = SS.safeUrl(n.link ? n.link.url : n.url);
     const open = url ? `<a class="open o-${n.ty}" href="${esc(url)}" target="_blank" rel="noopener noreferrer" title="새 탭에서 열기">${n.ty === '법령' ? '법령 ↗' : n.ty === '사이트' ? '열기 ↗' : '받기 ⤓'}</a>` : '';
     // 문장처럼 긴 제목은 앞부분만 보이고(…), 마우스를 올리면 전체를 보여 준다
-    const t = (opts.hl ? opts.hl(n.t) : esc(n.t)) + (n.cut ? '<span class="more">…</span>' : '');
+    // 자모가 풀린 제목(NFD)은 브라우저가 다른 글꼴로 그리므로 합쳐서 보여 준다
+    const nt = String(n.t).normalize('NFC');
+    const t = (opts.hl ? opts.hl(nt) : esc(nt)) + (n.cut ? '<span class="more">…</span>' : '');
     const full = n.cut && n.d && n.d[0] ? ` title="${esc(n.t + ' ' + n.d[0])}"` : '';
     const cur = V.cur && V.cur.c === n.c && (!opts.doc || opts.doc === V.doc.id);
     // 번호는 단원(1)과 업무(1.1)까지만 보이고, 그 아래는 들여쓰기 + '-'

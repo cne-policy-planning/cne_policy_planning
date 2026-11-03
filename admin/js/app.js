@@ -962,7 +962,10 @@
   function pdfCard(doc) {
     const pending = S.pendingPdfIds().includes(doc.id);
     let state;
-    if (doc.format !== 'pdf') state = h('p', { class: 'muted small' }, `${doc.format.toUpperCase()} 자료는 쪽 보기를 할 수 없어 사용자 화면에 본문 글자로 보여 줍니다. PDF로 저장해 「파일 교체」하면 쪽 보기와 번호 목차가 생깁니다.`);
+    if (doc.format !== 'pdf' && SAS.EDIT_FORMATS.includes(doc.format)) state = h('div', {},
+      h('p', { class: 'muted small' }, `${doc.format.toUpperCase()} 자료는 쪽 보기를 할 수 없어 사용자 화면에 본문 글자로 보여 줍니다. 같은 내용의 PDF를 추가하면 쪽 보기와 번호 목차가 생기고, ${doc.format.toUpperCase()} 원본은 그대로 남아 PDF와 함께 내려받을 수 있습니다.`),
+      h('div', { class: 'actions' }, h('button', { class: 'primary', onclick: () => replaceFile(doc, { addPdf: true }) }, 'PDF 추가')));
+    else if (doc.format !== 'pdf') state = h('p', { class: 'muted small' }, `${doc.format.toUpperCase()} 자료는 쪽 보기를 할 수 없어 사용자 화면에 본문 글자로 보여 줍니다. PDF로 저장해 「파일 교체」하면 쪽 보기와 번호 목차가 생깁니다.`);
     else if (!doc.pdf) state = h('div', { class: 'notice warn' }, '원본 PDF가 사이트에 없습니다. 아래 「자료 교체·삭제 → 파일 교체」로 같은 PDF를 다시 넣으면 번호 목차와 쪽 보기가 만들어집니다.');
     else state = h('div', { class: 'kv' },
       h('span', {}, pending ? h('span', { class: 'tag warn' }, '반영 대기') : h('span', { class: 'tag ok' }, '사이트에 있음')),
@@ -1394,9 +1397,15 @@ ${groups.map(g => `<div class="card"><h2>${e(g.title)}</h2><table>${g.items.map(
         h('button', { class: 'danger', onclick: () => deleteDoc(doc) }, '자료 삭제')));
   }
 
-  async function replaceFile(doc) {
-    const file = await pickFile('');
+  /** opts.addPdf: HWPX 등 자료에 PDF 추가(PDF가 본 파일이 되고 기존 원본은 편집용 원본으로 남는다) */
+  async function replaceFile(doc, opts) {
+    const addPdf = !!(opts && opts.addPdf);
+    const label = addPdf ? 'PDF 추가' : '파일 교체';
+    // 기존 원본이 창고에 올라가 있어야 편집용 원본으로 남길 수 있다
+    if (addPdf && S.pendingPdfIds().includes(doc.id)) { toast(`이 자료의 원본 파일이 아직 올라가지 않았습니다. 「③ 점검·반영」에서 먼저 반영한 뒤 PDF를 추가해 주세요.`, 6000); return; }
+    const file = await pickFile(addPdf ? '.pdf' : '');
     if (!file) return;
+    if (addPdf && SAS.formatOf(file.name) !== 'pdf') { toast('PDF 파일을 골라 주세요. 기존 자료를 유지합니다.', 5000); return; }
     let r;
     try { r = await withProgress('새 파일을 분석하는 중…', p => X.extractFile(file, p)); }
     catch (e) { toast('분석 실패 — 기존 자료를 유지합니다: ' + e.message, 6000); return; }
@@ -1411,17 +1420,18 @@ ${groups.map(g => `<div class="card"><h2>${e(g.title)}</h2><table>${g.items.map(
     if (doc.original && doc.original.repo && doc.original.format === nd.original.format) nd.original.repo = doc.original.repo; // 같은 연도면 같은 창고 자리에 덮어쓰기
     if (r.format === 'pdf') nd.pdf = { repo: null, path: nd.original.path, bytes: file.size };
     const keptEdit = SAS.keepEditOriginal(doc, nd);
-    const ok = await confirmBox(`<h2>파일 교체</h2>${keptEdit ? `<p class="small">편집용 원본 <b>${SAS.esc(keptEdit.name || '')}</b>은 그대로 남아 사용자 화면에서 함께 내려받을 수 있습니다.</p>` : ''}<p><b>${SAS.esc(file.name)}</b></p><ul>
+    const noEdit = addPdf && !keptEdit ? `<p class="small warn-text">창고에 ${SAS.esc(doc.format.toUpperCase())} 원본이 없어 사용자 화면에는 PDF만 내려받기로 나옵니다.</p>` : '';
+    const ok = await confirmBox(`<h2>${label}</h2>${noEdit}${keptEdit ? `<p class="small">편집용 원본 <b>${SAS.esc(keptEdit.name || '')}</b>은 그대로 남아 사용자 화면에서 함께 내려받을 수 있습니다.</p>` : ''}<p><b>${SAS.esc(file.name)}</b></p><ul>
       <li>업무: ${doc.sections.length}개 → <b>${nd.sections.length}개</b>${nd.extraction.toc_found ? ' (목차 인식)' : ''}</li>
       <li>업무 검색어 유지: ${kept}개 업무</li><li>링크: ${(doc.links || []).length}개 → <b>${(nd.links || []).length}개</b> (고친 주소·이름 유지 ${keptLinks}개)</li>
-      ${keptToc ? `<li>사람이 만든 목차는 그대로 이어 씁니다 — 새 판의 쪽이 맞는지 확인하세요</li>` : nd.outline ? `<li>번호 목차: <b>${nd.outline.nodes.length}개 항목</b></li>` : ''}<li>사이트의 원본 파일도 새 파일로 바꿉니다 (${fmtBytes(file.size)})</li>
+      ${keptToc ? `<li>사람이 만든 목차는 그대로 이어 씁니다 — 새 판의 쪽이 맞는지 확인하세요</li>` : nd.outline ? `<li>번호 목차: <b>${nd.outline.nodes.length}개 항목</b></li>` : ''}<li>${addPdf ? `이 PDF를 쪽 보기·내려받기에 씁니다` : `사이트의 원본 파일도 새 파일로 바꿉니다`} (${fmtBytes(file.size)})</li>
       ${nd.extraction.warnings.length ? `<li>참고: ${nd.extraction.warnings.map(SAS.esc).join(' / ')}</li>` : ''}</ul>
-      <p class="small muted">따로 넣은 원본 내려받기 링크가 있다면 새 판으로 바꿔 주세요.</p>`, '교체 적용');
+      <p class="small muted">따로 넣은 원본 내려받기 링크가 있다면 새 판으로 바꿔 주세요.</p>`, addPdf ? '추가 적용' : '교체 적용');
     if (!ok) return;
     S.replaceDoc(doc.id, nd);
     await S.setPendingPdf(doc.id, file);
     renderEditor(); renderList();
-    toast('교체했습니다. 「③ 점검·반영」에서 반영해 주세요.');
+    toast(`${addPdf ? 'PDF를 추가' : '교체'}했습니다. 「③ 점검·반영」에서 반영해 주세요.`);
   }
 
   async function deleteDoc(doc) {
