@@ -1,6 +1,6 @@
 {
  "schema_version": "2.0",
- "generated_at": "2026-11-03T06:04:43.520Z",
+ "generated_at": "2026-11-03T06:24:48.729Z",
  "count": 554,
  "documents": [
   {
@@ -10429,7 +10429,7 @@
    "category": "",
    "department": "유아교육복지과",
    "year": 2026,
-   "format": "hwpx",
+   "format": "pdf",
    "kind": "text",
    "works_url": "",
    "origin": {
@@ -10439,19 +10439,24 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 7,
+   "section_count": 2,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:08.070Z",
-   "pdf": "",
+   "updated_at": "2026-11-03T06:22:58.025Z",
+   "pdf": "../cne_files_2026_1/files/doc-2026-ikmdbn.pdf",
    "original": {
+    "url": "../cne_files_2026_1/files/doc-2026-ikmdbn.pdf",
+    "name": "2026 4~5세 단계적 무상교육 지원계획.pdf",
+    "bytes": 398608,
+    "format": "pdf"
+   },
+   "edit": {
     "url": "../cne_files_2026_2/files/doc-2026-ikmdbn.hwpx",
     "name": "2026 4~5세 단계적 무상교육 지원계획.hwpx",
     "bytes": 657530,
     "format": "hwpx"
    },
-   "edit": null,
-   "pages": 146,
-   "outline_count": 8
+   "pages": 12,
+   "outline_count": 57
   },
   {
    "id": "doc-2026-ilnc4r",
