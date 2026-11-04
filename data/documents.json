@@ -1,6 +1,6 @@
 {
  "schema_version": "2.0",
- "generated_at": "2026-11-04T12:37:09.187Z",
+ "generated_at": "2026-11-04T13:00:42.334Z",
  "count": 554,
  "documents": [
   {
@@ -4377,7 +4377,7 @@
    "forms_bundle_url": "",
    "section_count": 11,
    "form_count": 0,
-   "updated_at": "2026-11-04T12:14:31.556Z",
+   "updated_at": "2026-11-04T12:55:21.078Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-7738my.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-7738my.pdf",
@@ -4392,7 +4392,7 @@
     "format": "hwpx"
    },
    "pages": 16,
-   "outline_count": 62
+   "outline_count": 49
   },
   {
    "id": "doc-2026-77qwsb",
@@ -9138,7 +9138,7 @@
    "forms_bundle_url": "",
    "section_count": 3,
    "form_count": 0,
-   "updated_at": "2026-11-04T12:15:53.262Z",
+   "updated_at": "2026-11-04T12:46:15.356Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-fvylxp.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-fvylxp.pdf",
@@ -9153,7 +9153,7 @@
     "format": "hwpx"
    },
    "pages": 23,
-   "outline_count": 12
+   "outline_count": 114
   },
   {
    "id": "doc-2026-fx72dj",
@@ -9669,7 +9669,7 @@
    "id": "doc-2026-gvcmo6",
    "title": "2026년도 충청남도교육청 시간제기간제교사 성과상여금 지급 안내",
    "school_levels": [
-    "초등"
+    "공통"
    ],
    "category": "",
    "department": "교원인사과",
@@ -9686,7 +9686,7 @@
    "forms_bundle_url": "",
    "section_count": 4,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:31.010Z",
+   "updated_at": "2026-11-04T12:59:04.763Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-gvcmo6.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-gvcmo6.pdf",
@@ -9696,7 +9696,7 @@
    },
    "edit": null,
    "pages": 5,
-   "outline_count": 10
+   "outline_count": 12
   },
   {
    "id": "doc-2026-gxedg3",
@@ -16998,7 +16998,7 @@
    "forms_bundle_url": "",
    "section_count": 147,
    "form_count": 0,
-   "updated_at": "2026-11-02T07:00:10.641Z",
+   "updated_at": "2026-11-04T12:57:39.512Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-vgncv0.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-vgncv0.pdf",
@@ -17008,7 +17008,7 @@
    },
    "edit": null,
    "pages": 167,
-   "outline_count": 385
+   "outline_count": 121
   },
   {
    "id": "doc-2026-vhr3vs",
@@ -17995,7 +17995,7 @@
    "forms_bundle_url": "",
    "section_count": 7,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:36.488Z",
+   "updated_at": "2026-11-04T12:59:53.582Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-xjr69n.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-xjr69n.pdf",
@@ -18010,7 +18010,7 @@
     "format": "hwp"
    },
    "pages": 8,
-   "outline_count": 14
+   "outline_count": 32
   },
   {
    "id": "doc-2026-xrdrci",
@@ -18482,7 +18482,7 @@
    "forms_bundle_url": "",
    "section_count": 35,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:09.242Z",
+   "updated_at": "2026-11-04T12:59:36.421Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-ysq54n.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-ysq54n.pdf",
@@ -18492,7 +18492,7 @@
    },
    "edit": null,
    "pages": 230,
-   "outline_count": 379
+   "outline_count": 218
   },
   {
    "id": "doc-2026-yyypdj",
