@@ -281,7 +281,7 @@
       const depth = Math.min(MAX_DEPTH, pd + 1);
       depthOf.set(n.c, depth);
       const l = n.l ? links.get(n.l) : null;
-      rows.push({ 단계: depth, 제목: l && !(doc.outline && doc.outline.manual) ? (l.text || n.t) : n.t, 쪽: pageOfBlock(doc, n.b), 종류: l ? (l.type || '서식') : (n.ty || ''), 주소: l ? l.url || '' : '', 번호: n.c });
+      rows.push({ 단계: depth, 제목: l && !(doc.outline && doc.outline.manual) ? (l.text || n.t) : n.t, 쪽: pageOfBlock(doc, n.b), 종류: l ? (l.type || '서식') : (n.ty || ''), 주소: l ? l.url || '' : '', 번호: n.c, node: n });
     });
     return rows;
   }
@@ -345,6 +345,30 @@
     return { nodes, newLinks, errors, warnings, count: nodes.length };
   }
 
+  /**
+   * 관리자 화면에서 고친 줄 → 목차. rows: outlineToRows 결과를 고친 것(새 줄은 node 없음).
+   * 엑셀과 같은 검사를 거치고, 고치지 않은 값(화면 위치·링크·이어지는 글)은 원래 줄에서 이어받는다.
+   */
+  function rowsFromEditor(doc, rows) {
+    const sheet = [TOC_COLS].concat(rows.map(r => TOC_COLS.map(c => (r[c] == null ? '' : r[c]))));
+    const res = rowsToOutline(doc, sheet);
+    res.errors.forEach(e => { e.row -= 1; });       // 머리글을 뺀 화면 줄 번호
+    res.warnings.forEach(e => { e.row -= 1; });
+    if (res.errors.length) return res;
+    res.nodes.forEach((n, i) => {
+      const o = rows[i].node;
+      if (!o) return;
+      const depth = n.c.split('.').length;
+      if (n.b === o.b) { n.y = o.y || 0; n.x = o.x || 0; }
+      if (o.s) n.s = o.s;
+      if (n.t === o.t) { if (o.d) n.d = o.d; if (o.cut) n.cut = o.cut; }
+      if (o.l && depth >= 2) { n.k = 'link'; n.l = o.l; n.ty = o.ty || rows[i].종류 || n.ty; }
+      else if (depth >= 3 && ['part', 'group'].includes(o.k)) n.k = o.k;
+    });
+    res.warnings = res.warnings.filter(w => !/같은 이름의 링크도 없습니다/.test(w.msg) || !rows[w.row - 1].node);
+    return res;
+  }
+
   /** 사람이 만든 목차를 자료에 넣는다(자동 목차는 outline_auto로 보관 → 되돌리기) */
   function applyManualOutline(doc, result, meta) {
     if (!doc.outline_auto && doc.outline && !doc.outline.manual) doc.outline_auto = doc.outline;
@@ -380,5 +404,5 @@
   }
 
   return { buildOutline, linkType, isSuspectUrl, suggestUrl, applyOutlineEdits, sortOutline: sortNodes,
-    TOC_COLS, outlineToRows, rowsToOutline, applyManualOutline, revertManualOutline, carryManualOutline, pageOfBlock, blockOfPage };
+    TOC_COLS, outlineToRows, rowsToOutline, rowsFromEditor, applyManualOutline, revertManualOutline, carryManualOutline, pageOfBlock, blockOfPage };
 });

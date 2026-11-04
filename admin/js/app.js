@@ -1012,8 +1012,9 @@
     const det = h('details', {}, h('summary', {}, `번호 목차 펼쳐 보기 (${nodes.length}개 항목)`), h('div', { style: 'margin:8px 0' }, filter), list);
     det.addEventListener('toggle', () => { if (det.open && !list.childElementCount) render(); });
     const tools = h('div', { class: 'actions', style: 'justify-content:flex-start;margin:10px 0' },
+      nodes.length ? h('button', { class: 'small primary', onclick: () => editOutline(doc) }, '✎ 목차 직접 고치기') : null,
       h('button', { class: 'small', onclick: () => exportToc(doc) }, '⤓ 목차 내려받기(엑셀)'),
-      h('button', { class: 'small primary', onclick: () => importToc(doc) }, '⤒ 목차 올리기'),
+      h('button', { class: 'small', onclick: () => importToc(doc) }, '⤒ 목차 올리기'),
       manual ? h('button', { class: 'small ghost', onclick: async () => {
         if (!(await confirmBox(`<h2>자동 목차로 되돌리기</h2><p>「${SAS.esc(doc.title)}」의 사람이 만든 목차를 지우고 자동으로 만든 목차로 되돌립니다. 지우기 전에 「목차 내려받기」로 엑셀을 받아 두면 나중에 다시 올릴 수 있습니다.</p>`, '되돌리기', true))) return;
         SAS.revertManualOutline(doc); S.touch(doc); renderEditor(); renderList(); toast('자동 목차로 되돌렸습니다. 「③ 점검·반영」에서 반영하세요.');
@@ -1025,9 +1026,101 @@
         manual ? h('span', { class: 'muted' }, `${doc.outline.file ? doc.outline.file + ' · ' : ''}${new Date(doc.outline.built_at).toLocaleString('ko-KR')} 올림`)
           : h('span', { class: 'muted' }, `세부 목차가 있는 업무 ${doc.outline.stats ? doc.outline.stats.detailed : '-'}/${doc.sections.length}`)) : h('p', { class: 'muted' }, '아직 목차가 없습니다.'),
       h('p', { class: 'muted small' }, manual
-        ? '사람이 엑셀로 만들어 올린 목차입니다. 사용자 화면·검색이 이 목차를 씁니다. 고치려면 「목차 내려받기」로 받아 엑셀에서 고친 뒤 다시 올리세요.'
-        : 'PDF의 목차·「업무개요 / 업무의 내용 및 방법 / 관련 자료 및 서식」·◆·번호·▸ 표시를 읽어 자동으로 만든 목차입니다. 더 깔끔하게 하려면 「목차 내려받기」로 엑셀을 받아 고친 뒤 「목차 올리기」로 넣으세요(사람이 만든 목차).'),
+        ? '사람이 엑셀로 만들어 올린 목차입니다. 사용자 화면·검색이 이 목차를 씁니다. 「목차 직접 고치기」로 고치거나, 엑셀로 받아 고친 뒤 다시 올리세요.'
+        : 'PDF의 목차·「업무개요 / 업무의 내용 및 방법 / 관련 자료 및 서식」·◆·번호·▸ 표시를 읽어 자동으로 만든 목차입니다. 모든 단계는 「목차 직접 고치기」로 바로 고칠 수 있고, 엑셀로 받아 고쳐 올려도 됩니다(사람이 만든 목차).'),
       tools, nodes.length ? det : null);
+  }
+
+  /** 목차 직접 고치기: 모든 단계의 제목·쪽·단계·순서를 고친다. 저장하면 사람이 만든 목차가 된다 */
+  async function editOutline(doc) {
+    const unit = doc.format === 'pdf' ? '쪽' : '문단';
+    let rows = SAS.outlineToRows(doc);
+    const onSite = new Set(SAS.cleanOutline ? SAS.cleanOutline(SAS.tidyOutline(doc.outline ? doc.outline.nodes : [])).map(n => n.c) : rows.map(r => r.번호));
+    const undo = [];
+    let problems = [];
+    const MAX = 6;
+    const snap = () => { undo.push(rows.map(r => Object.assign({}, r))); if (undo.length > 50) undo.shift(); undoBtn.disabled = false; };
+    const endOf = i => { let e = i + 1; while (e < rows.length && rows[e].단계 > rows[i].단계) e++; return e; };
+    const ops = {
+      out(i) { if (rows[i].단계 < 2) return; snap(); const e = endOf(i); for (let j = i; j < e; j++) rows[j].단계--; },
+      in(i) {
+        const e = endOf(i), deepest = Math.max(...rows.slice(i, e).map(r => r.단계));
+        if (!i || rows[i].단계 > rows[i - 1].단계 || deepest >= MAX) return;
+        snap(); for (let j = i; j < e; j++) rows[j].단계++;
+      },
+      up(i) {
+        let p = i - 1; while (p >= 0 && rows[p].단계 > rows[i].단계) p--;
+        if (p < 0 || rows[p].단계 < rows[i].단계) return;
+        snap(); const block = rows.splice(i, endOf(i) - i); rows.splice(p, 0, ...block);
+      },
+      down(i) {
+        const e = endOf(i);
+        if (e >= rows.length || rows[e].단계 < rows[i].단계) return;
+        snap(); const next = rows.splice(e, endOf(e) - e); rows.splice(i, 0, ...next);
+      },
+      add(i, sub) {
+        if (sub && rows[i].단계 >= MAX) return;
+        snap(); const at = sub ? i + 1 : endOf(i);
+        rows.splice(at, 0, { 단계: rows[i].단계 + (sub ? 1 : 0), 제목: '', 쪽: rows[i].쪽, 종류: '', 주소: '' });
+        focusAt = at;
+      },
+      del(i) {
+        snap(); const n = endOf(i) - i; rows.splice(i, n);
+        if (n > 1) toast(`아래 단계 ${n - 1}줄도 함께 지웠습니다. 「되돌리기」로 살릴 수 있습니다.`, 4000);
+      }
+    };
+    let focusAt = -1;
+    const filter = h('input', { type: 'search', placeholder: '목차에서 찾기', style: 'max-width:240px' });
+    const undoBtn = h('button', { class: 'small ghost', type: 'button', disabled: true, onclick: () => { if (undo.length) { rows = undo.pop(); undoBtn.disabled = !undo.length; draw(); } } }, '↶ 되돌리기');
+    const addFirst = h('button', { class: 'small ghost', type: 'button', onclick: () => { snap(); rows.unshift({ 단계: 1, 제목: '', 쪽: 1, 종류: '', 주소: '' }); focusAt = 0; draw(); } }, '+ 맨 위에 줄 추가');
+    const list = h('div', { class: 'te-list' });
+    const errBox = h('div', {});
+    const ibtn = (label, title, fn) => h('button', { type: 'button', class: 'te-btn', title, 'aria-label': title, onclick: fn }, label);
+    const act = (name, ...a) => () => { ops[name](...a); draw(); };
+    function draw() {
+      const q = SAS.norm(filter.value);
+      const bad = new Set(problems.map(p => p.row));
+      const frag = document.createDocumentFragment();
+      rows.forEach((r, i) => {
+        if (q && !SAS.norm(r.제목).includes(q)) return;
+        const title = h('input', { class: 'te-title', type: 'text', value: r.제목, placeholder: '제목', 'aria-label': '제목', oninput: e => { r.제목 = e.target.value; } });
+        frag.append(h('div', { class: 'te-row' + (bad.has(i + 1) ? ' bad' : ''), style: `padding-left:${(r.단계 - 1) * 22}px` },
+          ibtn('←', '한 단계 위로(내어쓰기)', act('out', i)), ibtn('→', '한 단계 아래로(들여쓰기)', act('in', i)),
+          r.종류 ? h('span', { class: 'ltag t-' + r.종류 }, r.종류) : null, title,
+          r.node && !onSite.has(r.node.c) ? h('span', { class: 'tag gray', title: '문장이나 깨진 글자로 보여 사용자 화면에서는 빠지는 줄입니다' }, '화면에 안 보임') : null,
+          h('input', { class: 'te-page', type: 'text', inputmode: 'numeric', value: r.쪽, 'aria-label': unit, title: unit, oninput: e => { r.쪽 = e.target.value.trim(); } }),
+          h('span', { class: 'small muted' }, unit),
+          ibtn('↑', '위로 옮기기', act('up', i)), ibtn('↓', '아래로 옮기기', act('down', i)),
+          ibtn('+', '아래에 같은 단계 줄 추가', act('add', i, false)), ibtn('⤷', '아래 단계 줄 추가', act('add', i, true)),
+          ibtn('✕', '이 줄 지우기(아래 단계 포함)', act('del', i))));
+        if (i === focusAt) { title.dataset.focus = '1'; }
+      });
+      list.replaceChildren(frag);
+      const f = list.querySelector('[data-focus]'); if (f) { f.focus(); f.scrollIntoView({ block: 'center' }); }
+      focusAt = -1;
+      errBox.replaceChildren(...(problems.length ? [h('div', { class: 'notice err' }, h('b', {}, `고쳐야 할 줄 ${problems.length}개`), h('ul', { class: 'small', style: 'max-height:110px;overflow:auto;margin:4px 0' }, ...problems.slice(0, 50).map(m => h('li', {}, `${m.row}번째 줄 ${rows[m.row - 1] && rows[m.row - 1].제목 ? '「' + rows[m.row - 1].제목.slice(0, 30) + '」' : ''}: ${m.msg}`))))] : []));
+    }
+    filter.addEventListener('input', draw);
+    const body = h('div', { class: 'te' }, h('h2', {}, '목차 직접 고치기'),
+      h('p', { class: 'muted small' }, h('b', {}, doc.title), ` · ${rows.length}줄. ←→로 단계를 바꾸고 ↑↓로 옮깁니다. 아래 단계 줄은 함께 움직입니다.${doc.format === 'pdf' ? ' 쪽은 PDF 뷰어의 쪽 번호입니다.' : ''} 저장하면 사람이 만든 목차가 되고, 자동 목차는 보관됩니다.`),
+      h('div', { class: 'actions', style: 'margin:8px 0;justify-content:flex-start' }, filter, undoBtn, addFirst), errBox, list);
+    $('modal').querySelector('.modal-box').classList.add('wide');
+    try {
+      for (;;) {
+        draw();
+        const ok = await modal(body, [{ label: '취소', value: false }, { label: '저장', value: true, primary: true }]);
+        if (!ok) return;
+        const r = SAS.rowsFromEditor(doc, rows);
+        problems = r.errors;
+        if (r.errors.length) { filter.value = ''; continue; }
+        SAS.applyManualOutline(doc, r, { file: '직접 수정' });
+        S.touch(doc); renderEditor(); renderList();
+        const shown = SAS.cleanOutline ? new Set(SAS.cleanOutline(SAS.tidyOutline(r.nodes)).map(n => n.c)) : null;
+        const hidden = shown ? r.nodes.filter(n => !shown.has(n.c)).length : 0;
+        toast(`목차 ${r.count}줄을 저장했습니다.${hidden ? ` 그중 ${hidden}줄은 문장·깨진 글자로 보여 사용자 화면에서 빠집니다.` : ''} 「③ 점검·반영」에서 반영하세요.`, 7000);
+        return;
+      }
+    } finally { $('modal').querySelector('.modal-box').classList.remove('wide'); }
   }
 
   /** 목차 엑셀 내려받기: 「목차」 시트(단계·제목·쪽·종류·주소) + 「안내」 시트 */
@@ -1038,7 +1131,7 @@
     const guide = [['목차 엑셀 쓰는 법'], [''],
       ['자료', doc.title], ['자료 ID', doc.id], ['쪽 수', `${(doc.blocks || []).length}${doc.format === 'pdf' ? '쪽' : '문단'}`], [''],
       ['칸', '적는 법'],
-      ['단계', '1 = 단원(편·장), 2 = 업무, 3~6 = 세부. 위 줄보다 한 단계씩만 내려갈 수 있습니다(1 → 3은 안 됨). 번호(1.2.3)는 자동으로 붙습니다.'],
+      ['단계', '1 = 단원(편·장), 2 = 업무, 3~6 = 세부. 위 줄보다 한 단계씩만 내려갈 수 있습니다(1 → 3은 안 됨). 번호는 사용자 화면에 보이지 않고, 단계만큼 들여 씁니다.'],
       ['제목', '목차에 보일 이름. 짧게(40자 안쪽) 적으세요.'],
       ['쪽', `누르면 열릴 ${unit}. 비우면 바로 위 줄과 같은 쪽.`],
       ['종류', '서식·참고·법령·사이트 중 하나를 적으면 내려받기·열기 단추가 붙습니다. 보통 목차 줄은 비워 두세요.'],

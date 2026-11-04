@@ -402,16 +402,13 @@
       if (n.l && links.has(n.l)) { const l = links.get(n.l); n.link = l; n.t = (d.outline && d.outline.manual ? n.t : l.text) || n.t; n.ty = n.ty || l.type || typeFromKind(l); }
       prep.by[n.c] = n;
     });
-    // 위 줄이 빠졌으면 가장 가까운 남은 위 줄에 붙이고, 단계와 번호(1, 1.1)를 다시 매긴다
-    const cnt = {};
+    // 위 줄이 빠졌으면 가장 가까운 남은 위 줄에 붙이고 단계를 다시 매긴다
     nodes.forEach(n => {
       let p = n.c.includes('.') ? n.c.slice(0, n.c.lastIndexOf('.')) : '';
       while (p && !prep.by[p]) p = p.includes('.') ? p.slice(0, p.lastIndexOf('.')) : '';
       n.p = p;
       const par = p ? prep.by[p] : null;
       n.dp = par ? par.dp + 1 : 1;
-      cnt[p] = (cnt[p] || 0) + 1;
-      n.lbl = par ? `${par.lbl}.${cnt[p]}` : String(cnt[p]);
       (prep.kids[n.p] = prep.kids[n.p] || []).push(n);
     });
     V.docs.set(id, prep);
@@ -514,12 +511,11 @@
     const t = (opts.hl ? opts.hl(nt) : esc(nt)) + (n.cut ? '<span class="more">…</span>' : '');
     const full = n.cut && n.d && n.d[0] ? ` title="${esc(n.t + ' ' + n.d[0])}"` : '';
     const cur = V.cur && V.cur.c === n.c && (!opts.doc || opts.doc === V.doc.id);
-    // 번호는 단원(1)과 업무(1.1)까지만 보이고, 그 아래는 들여쓰기 + '-'
+    // 자동 번호·기호 없이 단계마다 들여 쓴다
     const depth = n.dp || n.c.split('.').length;
-    const label = depth <= 2 ? (n.lbl || n.c) : '-';
-    const ind = depth > 2 && !opts.flat ? `<span class="ind" style="width:${(depth - 3) * 14 + 6}px"></span>` : '';
+    const ind = depth > 1 && !opts.flat ? `<span class="ind" style="width:${(depth - 1) * 14}px"></span>` : '';
     const state = tr ? (tr.hit ? ' hit' : ' via') : '';
-    return `<div class="row k-${n.k} d${Math.min(depth, 6)}${state}${cur ? ' cur' : ''}" data-c="${n.c}"${opts.doc ? ` data-d="${opts.doc}"` : ''}${full}><span class="pg">${pgOf(raw, n)}</span><span class="code">${ind}${tg}<span class="num">${label}</span></span><span class="ttl">${badge}${t}${open}</span></div>`;
+    return `<div class="row k-${n.k} d${Math.min(depth, 6)}${state}${cur ? ' cur' : ''}" data-c="${n.c}"${opts.doc ? ` data-d="${opts.doc}"` : ''}${full}><span class="pg">${pgOf(raw, n)}</span><span class="code">${ind}${tg}</span><span class="ttl">${badge}${t}${open}</span></div>`;
   }
   function renderToc() {
     if (!V.doc) return;

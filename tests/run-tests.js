@@ -426,6 +426,30 @@ test('같은 이름 PDF가 있으면 HWP는 건너뜀 · 직접 고른 처리는
 });
 test('교체할 때 자료명 연도만 바꿈', () => { eq(SAS.renewTitle('2026 교무학사 도움자료 유치원', 2026, 2027), '2027 교무학사 도움자료 유치원'); eq(SAS.renewTitle('교무학사 도움자료', 2026, 2027), '교무학사 도움자료'); });
 
+console.log('\n[목차 직접 고치기]');
+test('고친 줄만 바뀌고 위치·링크는 이어받음', () => {
+  const d = { format: 'pdf', blocks: [{ pdf_page: 1 }, { pdf_page: 2 }, { pdf_page: 3 }], links: [{ id: 'k1', text: '신청서', url: '', type: '서식' }],
+    outline: { nodes: [{ c: '1', k: 'ch', t: '단원', b: 0, y: 0, x: 0 }, { c: '1.1', k: 'task', t: '업무', b: 1, y: 120, x: 5, s: 'sec-001' }, { c: '1.1.1', k: 'group', t: '묶음', b: 1, y: 200, x: 5 }, { c: '1.1.2', k: 'link', t: '신청서', b: 2, y: 30, x: 5, l: 'k1', ty: '서식' }, { c: '1.1.3', k: 'bullet', t: '세부', b: 2, y: 40, x: 5 }] } };
+  const rows = SAS.outlineToRows(d);
+  eq(rows.length, 4);
+  rows[2].제목 = '묶음 고침';
+  rows[3].제목 = '신청서 고침';
+  rows.push({ 단계: 3, 제목: '새 줄', 쪽: 3, 종류: '', 주소: '' });
+  const r = SAS.rowsFromEditor(d, rows);
+  eq(r.errors, []);
+  eq(r.nodes.map(n => n.t), ['단원', '업무', '묶음 고침', '신청서 고침', '새 줄']);
+  eq([r.nodes[1].y, r.nodes[1].s], [120, 'sec-001']);
+  eq(r.nodes[2].k, 'group');
+  eq([r.nodes[3].k, r.nodes[3].l], ['link', 'k1']);
+});
+test('쪽을 바꾸면 줄 위치는 버림, 단계 건너뛰면 화면 줄 번호로 오류', () => {
+  const d = { format: 'pdf', blocks: [{ pdf_page: 1 }, { pdf_page: 2 }], links: [], outline: { nodes: [{ c: '1', k: 'ch', t: '가', b: 0, y: 50, x: 0 }, { c: '1.1', k: 'task', t: '나', b: 0, y: 70, x: 0 }] } };
+  const rows = SAS.outlineToRows(d); rows[1].쪽 = 2;
+  eq(SAS.rowsFromEditor(d, rows).nodes[1].y, 0);
+  rows[1].단계 = 3;
+  eq(SAS.rowsFromEditor(d, rows).errors[0].row, 2);
+});
+
 (async () => {
   for (const [name, fn] of asyncTests) {
     try { await fn(); pass++; console.log('  ✓ ' + name); }
