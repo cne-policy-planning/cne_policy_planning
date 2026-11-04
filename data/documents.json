@@ -1,6 +1,6 @@
 {
  "schema_version": "2.0",
- "generated_at": "2026-11-04T06:51:54.024Z",
+ "generated_at": "2026-11-04T07:44:22.345Z",
  "count": 554,
  "documents": [
   {
@@ -1127,7 +1127,7 @@
   },
   {
    "id": "doc-2025-xzwpa0",
-   "title": "2025 5세 이음교육 표준안(최종)",
+   "title": "2025 5세 이음교육 표준안",
    "school_levels": [
     "유아"
    ],
@@ -1146,7 +1146,7 @@
    "forms_bundle_url": "",
    "section_count": 12,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:08.065Z",
+   "updated_at": "2026-11-04T07:38:38.808Z",
    "pdf": "../cne_files_2026_2/files/doc-2025-xzwpa0.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2025-xzwpa0.pdf",
@@ -1156,7 +1156,7 @@
    },
    "edit": null,
    "pages": 72,
-   "outline_count": 157
+   "outline_count": 112
   },
   {
    "id": "doc-2026-02gskh",
@@ -1302,7 +1302,7 @@
   },
   {
    "id": "doc-2026-0hercy",
-   "title": "2026 충남 유아교육계획(안)",
+   "title": "2026 충남 유아교육계획",
    "school_levels": [
     "유아"
    ],
@@ -1321,7 +1321,7 @@
    "forms_bundle_url": "",
    "section_count": 49,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:33.887Z",
+   "updated_at": "2026-11-04T07:09:16.153Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-0hercy.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-0hercy.pdf",
@@ -1331,7 +1331,7 @@
    },
    "edit": null,
    "pages": 59,
-   "outline_count": 28
+   "outline_count": 213
   },
   {
    "id": "doc-2026-0pbln9",
@@ -1423,14 +1423,14 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 7,
+   "section_count": 15,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:31.527Z",
+   "updated_at": "2026-11-04T07:07:21.925Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-0rul8n.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-0rul8n.pdf",
     "name": "2. 2026학년도 유아학비 지원계획.pdf",
-    "bytes": 863171,
+    "bytes": 943858,
     "format": "pdf"
    },
    "edit": {
@@ -1439,7 +1439,7 @@
     "bytes": 301056,
     "format": "hwp"
    },
-   "pages": 13,
+   "pages": 26,
    "outline_count": 17
   },
   {
@@ -1740,14 +1740,14 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 4,
+   "section_count": 7,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:38.553Z",
+   "updated_at": "2026-11-04T07:28:18.473Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-261kr6.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-261kr6.pdf",
     "name": "세계 최고 영유아교육·보육을 위한  유보통합 실행 계획.pdf",
-    "bytes": 1593337,
+    "bytes": 2227499,
     "format": "pdf"
    },
    "edit": {
@@ -1756,8 +1756,8 @@
     "bytes": 712704,
     "format": "hwp"
    },
-   "pages": 16,
-   "outline_count": 5
+   "pages": 31,
+   "outline_count": 148
   },
   {
    "id": "doc-2026-27ahto",
@@ -2825,7 +2825,7 @@
    "forms_bundle_url": "",
    "section_count": 1,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:08.235Z",
+   "updated_at": "2026-11-04T07:39:36.498Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-4fjtnr.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-4fjtnr.pdf",
@@ -2835,7 +2835,7 @@
    },
    "edit": null,
    "pages": 9,
-   "outline_count": 15
+   "outline_count": 53
   },
   {
    "id": "doc-2026-4frk73",
@@ -4126,7 +4126,7 @@
    "forms_bundle_url": "",
    "section_count": 129,
    "form_count": 0,
-   "updated_at": "2026-11-02T11:45:45.072Z",
+   "updated_at": "2026-11-04T07:10:11.516Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-6n6wt4.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-6n6wt4.pdf",
@@ -4136,7 +4136,7 @@
    },
    "edit": null,
    "pages": 156,
-   "outline_count": 413
+   "outline_count": 157
   },
   {
    "id": "doc-2026-6pva60",
@@ -8986,7 +8986,7 @@
    "forms_bundle_url": "",
    "section_count": 33,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:39.257Z",
+   "updated_at": "2026-11-04T07:38:54.104Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-flg110.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-flg110.pdf",
@@ -8996,7 +8996,7 @@
    },
    "edit": null,
    "pages": 67,
-   "outline_count": 53
+   "outline_count": 126
   },
   {
    "id": "doc-2026-fmcp0h",
@@ -9775,7 +9775,7 @@
    "forms_bundle_url": "",
    "section_count": 21,
    "form_count": 0,
-   "updated_at": "2026-11-02T07:00:10.571Z",
+   "updated_at": "2026-11-04T07:39:14.255Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-h3kaaz.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-h3kaaz.pdf",
@@ -9785,7 +9785,7 @@
    },
    "edit": null,
    "pages": 23,
-   "outline_count": 43
+   "outline_count": 47
   },
   {
    "id": "doc-2026-h57boc",
@@ -13111,7 +13111,7 @@
   },
   {
    "id": "doc-2026-nkn1g0",
-   "title": "2026 충남형 한울타리유치원 운영 계획(안)",
+   "title": "2026 충남형 한울타리유치원 운영 계획",
    "school_levels": [
     "유아"
    ],
@@ -13130,7 +13130,7 @@
    "forms_bundle_url": "",
    "section_count": 17,
    "form_count": 0,
-   "updated_at": "2026-11-03T01:02:56.136Z",
+   "updated_at": "2026-11-04T07:08:38.257Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-nkn1g0.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-nkn1g0.pdf",
@@ -13145,7 +13145,7 @@
     "format": "hwp"
    },
    "pages": 18,
-   "outline_count": 6
+   "outline_count": 96
   },
   {
    "id": "doc-2026-nksbxg",
