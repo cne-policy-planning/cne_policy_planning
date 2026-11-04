@@ -1,13 +1,13 @@
 {
  "schema_version": "2.0",
- "generated_at": "2026-11-04T05:42:36.877Z",
+ "generated_at": "2026-11-04T06:51:54.024Z",
  "shard_count": 128,
  "document_count": 554,
  "levels": {
   "kindergarten": {
    "name": "유아",
    "documents": 82,
-   "sections": 1860
+   "sections": 1865
   },
   "elementary": {
    "name": "초등",
