@@ -1,6 +1,6 @@
 {
  "schema_version": "2.0",
- "generated_at": "2026-11-04T13:00:42.334Z",
+ "generated_at": "2026-11-04T13:17:50.428Z",
  "count": 554,
  "documents": [
   {
@@ -6472,7 +6472,7 @@
    "forms_bundle_url": "",
    "section_count": 21,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:39.493Z",
+   "updated_at": "2026-11-04T13:02:28.725Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-aldzv5.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-aldzv5.pdf",
@@ -6487,7 +6487,7 @@
     "format": "hwp"
    },
    "pages": 37,
-   "outline_count": 100
+   "outline_count": 22
   },
   {
    "id": "doc-2026-alezbg",
@@ -10504,7 +10504,7 @@
    "forms_bundle_url": "",
    "section_count": 6,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:32.120Z",
+   "updated_at": "2026-11-04T13:11:45.583Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-ilnc4r.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-ilnc4r.pdf",
@@ -10519,7 +10519,7 @@
     "format": "hwp"
    },
    "pages": 16,
-   "outline_count": 12
+   "outline_count": 17
   },
   {
    "id": "doc-2026-im0zhy",
@@ -17194,7 +17194,7 @@
    "category": "",
    "department": "교무학사 공통자료",
    "year": 2026,
-   "format": "hwpx",
+   "format": "pdf",
    "kind": "text",
    "works_url": "",
    "origin": {
@@ -17204,19 +17204,24 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 98,
+   "section_count": 0,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:08.691Z",
-   "pdf": "",
+   "updated_at": "2026-11-04T13:15:42.679Z",
+   "pdf": "../cne_files_2026_3/files/doc-2026-vusfab.pdf",
    "original": {
+    "url": "../cne_files_2026_3/files/doc-2026-vusfab.pdf",
+    "name": "인사실무 도움자료_유초등-compressed (1).pdf",
+    "bytes": 15709093,
+    "format": "pdf"
+   },
+   "edit": {
     "url": "../cne_files_2026_3/files/doc-2026-vusfab.hwpx",
     "name": "인사실무 도움자료_유초등.hwpx",
     "bytes": 19324930,
     "format": "hwpx"
    },
-   "edit": null,
-   "pages": 11509,
-   "outline_count": 249
+   "pages": 393,
+   "outline_count": 0
   },
   {
    "id": "doc-2026-vwo6fy",
@@ -17702,7 +17707,7 @@
   },
   {
    "id": "doc-2026-x8fixw",
-   "title": "-2. 서식 등 참고자료(고 학교주관구매제도)",
+   "title": "서식 등 참고자료(고 학교주관구매제도)",
    "school_levels": [
     "중등"
    ],
@@ -17721,7 +17726,7 @@
    "forms_bundle_url": "",
    "section_count": 27,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:30.837Z",
+   "updated_at": "2026-11-04T13:07:08.977Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-x8fixw.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-x8fixw.pdf",
