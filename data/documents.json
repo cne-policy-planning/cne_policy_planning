@@ -1,6 +1,6 @@
 {
  "schema_version": "2.0",
- "generated_at": "2026-11-04T12:08:36.582Z",
+ "generated_at": "2026-11-04T12:37:09.187Z",
  "count": 554,
  "documents": [
   {
@@ -4327,7 +4327,7 @@
    "id": "doc-2026-7483e1",
    "title": "2026 중등 학습지원교육 길라잡이(저용량)",
    "school_levels": [
-    "초등"
+    "중등"
    ],
    "category": "",
    "department": "중등교육과",
@@ -4344,7 +4344,7 @@
    "forms_bundle_url": "",
    "section_count": 117,
    "form_count": 0,
-   "updated_at": "2026-11-04T11:22:13.434Z",
+   "updated_at": "2026-11-04T12:22:34.989Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-7483e1.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-7483e1.pdf",
@@ -4365,7 +4365,7 @@
    "category": "",
    "department": "초등특수교육과",
    "year": 2026,
-   "format": "hwpx",
+   "format": "pdf",
    "kind": "text",
    "works_url": "",
    "origin": {
@@ -4375,19 +4375,24 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 4,
+   "section_count": 11,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:09.239Z",
-   "pdf": "",
+   "updated_at": "2026-11-04T12:14:31.556Z",
+   "pdf": "../cne_files_2026_1/files/doc-2026-7738my.pdf",
    "original": {
+    "url": "../cne_files_2026_1/files/doc-2026-7738my.pdf",
+    "name": "2026학년도 초등 수업 장학 운영 계획(안내용).pdf",
+    "bytes": 4756152,
+    "format": "pdf"
+   },
+   "edit": {
     "url": "../cne_files_2026_3/files/doc-2026-7738my.hwpx",
     "name": "2026학년도 초등 수업 장학 운영 계획(안내용).hwpx",
     "bytes": 607761,
     "format": "hwpx"
    },
-   "edit": null,
-   "pages": 614,
-   "outline_count": 7
+   "pages": 16,
+   "outline_count": 62
   },
   {
    "id": "doc-2026-77qwsb",
@@ -5887,7 +5892,7 @@
    "category": "",
    "department": "중등교육과",
    "year": 2026,
-   "format": "hwpx",
+   "format": "pdf",
    "kind": "text",
    "works_url": "",
    "origin": {
@@ -5897,18 +5902,23 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 2,
+   "section_count": 9,
    "form_count": 0,
-   "updated_at": "2026-11-04T12:04:45.031Z",
-   "pdf": "",
+   "updated_at": "2026-11-04T12:12:50.278Z",
+   "pdf": "../cne_files_2026_1/files/doc-2026-a0n3ah.pdf",
    "original": {
+    "url": "../cne_files_2026_1/files/doc-2026-a0n3ah.pdf",
+    "name": "17. 18. 2026 초등영어교육(초등영어교육, 초등영어수업혁신사례발표) 유공 교육감 표창 계획.pdf",
+    "bytes": 2745235,
+    "format": "pdf"
+   },
+   "edit": {
     "url": "../cne_files_2026_3/files/doc-2026-a0n3ah.hwpx",
     "name": "17. 18. 2026 초등영어교육(초등영어교육, 초등영어수업혁신사례발표) 유공 교육감 표창 계획.hwpx",
     "bytes": 85510,
     "format": "hwpx"
    },
-   "edit": null,
-   "pages": 379,
+   "pages": 13,
    "outline_count": 40
   },
   {
@@ -9116,7 +9126,7 @@
    "category": "",
    "department": "교무학사 공통자료",
    "year": 2026,
-   "format": "hwpx",
+   "format": "pdf",
    "kind": "text",
    "works_url": "",
    "origin": {
@@ -9126,19 +9136,24 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 12,
-   "form_count": 1,
-   "updated_at": "2026-10-31T19:34:08.687Z",
-   "pdf": "",
+   "section_count": 3,
+   "form_count": 0,
+   "updated_at": "2026-11-04T12:15:53.262Z",
+   "pdf": "../cne_files_2026_3/files/doc-2026-fvylxp.pdf",
    "original": {
+    "url": "../cne_files_2026_3/files/doc-2026-fvylxp.pdf",
+    "name": "교무학사 도움자료_초등.pdf",
+    "bytes": 9805753,
+    "format": "pdf"
+   },
+   "edit": {
     "url": "../cne_files_2026_3/files/doc-2026-fvylxp.hwpx",
     "name": "교무학사 도움자료_초등.hwpx",
     "bytes": 11828360,
     "format": "hwpx"
    },
-   "edit": null,
-   "pages": 917,
-   "outline_count": 205
+   "pages": 23,
+   "outline_count": 12
   },
   {
    "id": "doc-2026-fx72dj",
@@ -14914,7 +14929,7 @@
    "category": "",
    "department": "교무학사 공통자료",
    "year": 2026,
-   "format": "hwpx",
+   "format": "pdf",
    "kind": "text",
    "works_url": "",
    "origin": {
@@ -14926,17 +14941,22 @@
    "forms_bundle_url": "",
    "section_count": 1,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:08.690Z",
-   "pdf": "",
+   "updated_at": "2026-11-04T12:15:03.108Z",
+   "pdf": "../cne_files_2026_1/files/doc-2026-r1w8l2.pdf",
    "original": {
+    "url": "../cne_files_2026_1/files/doc-2026-r1w8l2.pdf",
+    "name": "담임 업무자료_초등.pdf",
+    "bytes": 455075,
+    "format": "pdf"
+   },
+   "edit": {
     "url": "../cne_files_2026_3/files/doc-2026-r1w8l2.hwpx",
     "name": "담임 업무자료_초등.hwpx",
     "bytes": 84576,
     "format": "hwpx"
    },
-   "edit": null,
-   "pages": 94,
-   "outline_count": 31
+   "pages": 1,
+   "outline_count": 3
   },
   {
    "id": "doc-2026-r56agi",
@@ -15099,14 +15119,14 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 7,
+   "section_count": 12,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:34.194Z",
+   "updated_at": "2026-11-04T12:13:49.255Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-rm6xiv.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-rm6xiv.pdf",
-    "name": "2026 충남온돌봄 활성화 유공 표창 계획(안)_탑재용.pdf",
-    "bytes": 659855,
+    "name": "2026 충남온돌봄 활성화 유공 표창 계획(안)_탑재용-나눔.pdf",
+    "bytes": 900525,
     "format": "pdf"
    },
    "edit": {
@@ -15115,8 +15135,8 @@
     "bytes": 414720,
     "format": "hwp"
    },
-   "pages": 9,
-   "outline_count": 19
+   "pages": 18,
+   "outline_count": 33
   },
   {
    "id": "doc-2026-rn0p2b",
