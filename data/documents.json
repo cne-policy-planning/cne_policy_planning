@@ -1,7 +1,7 @@
 {
  "schema_version": "2.0",
- "generated_at": "2026-11-04T16:28:51.712Z",
- "count": 554,
+ "generated_at": "2026-11-04T17:56:35.257Z",
+ "count": 553,
  "documents": [
   {
    "id": "doc-2018-9sjbw2",
@@ -5488,39 +5488,6 @@
    "outline_count": 39
   },
   {
-   "id": "doc-2026-972cq1",
-   "title": "서식 등 참고자료(고 학교주관구매제도)",
-   "school_levels": [
-    "중등"
-   ],
-   "category": "",
-   "department": "민주시민교육과",
-   "year": 2026,
-   "format": "hwpx",
-   "kind": "text",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 4,
-   "form_count": 0,
-   "updated_at": "2026-10-31T19:34:08.448Z",
-   "pdf": "",
-   "original": {
-    "url": "../cne_files_2026_2/files/doc-2026-972cq1.hwpx",
-    "name": "서식 등 참고자료(고_학교주관구매제도).hwpx",
-    "bytes": 336665,
-    "format": "hwpx"
-   },
-   "edit": null,
-   "pages": 1101,
-   "outline_count": 5
-  },
-  {
    "id": "doc-2026-976ij0",
    "title": "2026학년도 충남교육청 역사독도교육 기본 계획",
    "school_levels": [
@@ -5640,7 +5607,7 @@
    "forms_bundle_url": "",
    "section_count": 30,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:31.145Z",
+   "updated_at": "2026-11-04T17:08:18.509Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-9g2bwt.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-9g2bwt.pdf",
@@ -6150,7 +6117,7 @@
    "forms_bundle_url": "",
    "section_count": 27,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:37.218Z",
+   "updated_at": "2026-11-04T16:44:20.238Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-a974ih.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-a974ih.pdf",
@@ -6160,7 +6127,7 @@
    },
    "edit": null,
    "pages": 48,
-   "outline_count": 134
+   "outline_count": 29
   },
   {
    "id": "doc-2026-ab6dxk",
@@ -10395,7 +10362,7 @@
    "forms_bundle_url": "",
    "section_count": 26,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:38.022Z",
+   "updated_at": "2026-11-04T16:59:06.054Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-iiozzc.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-iiozzc.pdf",
@@ -10410,7 +10377,7 @@
     "format": "hwp"
    },
    "pages": 43,
-   "outline_count": 106
+   "outline_count": 24
   },
   {
    "id": "doc-2026-ijh6dw",
@@ -10613,7 +10580,7 @@
    "forms_bundle_url": "",
    "section_count": 28,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:37.286Z",
+   "updated_at": "2026-11-04T16:52:10.819Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-inlwo0.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-inlwo0.pdf",
@@ -10623,7 +10590,7 @@
    },
    "edit": null,
    "pages": 51,
-   "outline_count": 128
+   "outline_count": 30
   },
   {
    "id": "doc-2026-ip5lpv",
@@ -10963,7 +10930,7 @@
    "forms_bundle_url": "",
    "section_count": 36,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:36.433Z",
+   "updated_at": "2026-11-04T16:32:20.904Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-jejmjf.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-jejmjf.pdf",
@@ -10973,7 +10940,7 @@
    },
    "edit": null,
    "pages": 134,
-   "outline_count": 21
+   "outline_count": 18
   },
   {
    "id": "doc-2026-jf17r6",
@@ -11870,7 +11837,7 @@
   },
   {
    "id": "doc-2026-l10dik",
-   "title": "운영자료(2026 중등 학습지원담당교원 역량강화 배움자리)",
+   "title": "2026 중등 학습지원담당교원 역량강화 배움자리",
    "school_levels": [
     "중등"
    ],
@@ -11889,7 +11856,7 @@
    "forms_bundle_url": "",
    "section_count": 53,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:38.744Z",
+   "updated_at": "2026-11-04T17:13:34.347Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-l10dik.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-l10dik.pdf",
@@ -11899,7 +11866,7 @@
    },
    "edit": null,
    "pages": 57,
-   "outline_count": 37
+   "outline_count": 38
   },
   {
    "id": "doc-2026-l1ic9c",
@@ -13018,7 +12985,7 @@
    "forms_bundle_url": "",
    "section_count": 109,
    "form_count": 65,
-   "updated_at": "2026-11-03T00:34:38.916Z",
+   "updated_at": "2026-11-04T17:49:18.392Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-n8m7nc.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-n8m7nc.pdf",
@@ -13028,7 +12995,7 @@
    },
    "edit": null,
    "pages": 293,
-   "outline_count": 458
+   "outline_count": 473
   },
   {
    "id": "doc-2026-n925er",
@@ -18350,7 +18317,7 @@
    "forms_bundle_url": "",
    "section_count": 23,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:39.068Z",
+   "updated_at": "2026-11-04T17:56:00.735Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-yi9qb0.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-yi9qb0.pdf",
@@ -18365,7 +18332,7 @@
     "format": "hwp"
    },
    "pages": 42,
-   "outline_count": 113
+   "outline_count": 24
   },
   {
    "id": "doc-2026-yl76jc",

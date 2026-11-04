@@ -1,8 +1,8 @@
 {
  "schema_version": "2.0",
- "generated_at": "2026-11-04T16:28:51.712Z",
+ "generated_at": "2026-11-04T17:56:35.257Z",
  "shard_count": 128,
- "document_count": 554,
+ "document_count": 553,
  "levels": {
   "kindergarten": {
    "name": "유아",
@@ -16,8 +16,8 @@
   },
   "middle": {
    "name": "중등",
-   "documents": 67,
-   "sections": 1394
+   "documents": 66,
+   "sections": 1390
   },
   "special": {
    "name": "특수",
@@ -34,7 +34,7 @@
   "초등특수교육과": 90,
   "학교지원과": 12,
   "미래인재과": 45,
-  "민주시민교육과": 90,
+  "민주시민교육과": 89,
   "정책기획과": 42,
   "체육건강과": 43,
   "감사관": 20,
