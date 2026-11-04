@@ -1,6 +1,6 @@
 {
  "schema_version": "2.0",
- "generated_at": "2026-11-04T03:21:04.876Z",
+ "generated_at": "2026-11-04T05:42:36.877Z",
  "count": 554,
  "documents": [
   {
@@ -9872,14 +9872,14 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 8,
+   "section_count": 11,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:32.265Z",
+   "updated_at": "2026-11-04T05:37:53.150Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-h7no3q.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-h7no3q.pdf",
     "name": "2026 사립유치원 원비 안정화 추진 계획.pdf",
-    "bytes": 412471,
+    "bytes": 469566,
     "format": "pdf"
    },
    "edit": {
@@ -9888,7 +9888,7 @@
     "bytes": 272896,
     "format": "hwp"
    },
-   "pages": 12,
+   "pages": 23,
    "outline_count": 18
   },
   {
