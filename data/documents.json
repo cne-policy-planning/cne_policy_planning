@@ -1,6 +1,6 @@
 {
  "schema_version": "2.0",
- "generated_at": "2026-11-04T15:18:44.560Z",
+ "generated_at": "2026-11-04T16:28:51.712Z",
  "count": 554,
  "documents": [
   {
@@ -1562,7 +1562,7 @@
    "forms_bundle_url": "",
    "section_count": 7,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:36.328Z",
+   "updated_at": "2026-11-04T15:54:40.263Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-151qv9.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-151qv9.pdf",
@@ -1577,7 +1577,7 @@
     "format": "hwp"
    },
    "pages": 10,
-   "outline_count": 11
+   "outline_count": 8
   },
   {
    "id": "doc-2026-160tih",
@@ -2064,7 +2064,7 @@
    "forms_bundle_url": "",
    "section_count": 13,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:08.640Z",
+   "updated_at": "2026-11-04T16:00:08.108Z",
    "pdf": "",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-2t49ph.hwpx",
@@ -2074,7 +2074,7 @@
    },
    "edit": null,
    "pages": 1625,
-   "outline_count": 32
+   "outline_count": 49
   },
   {
    "id": "doc-2026-2wq19t",
@@ -4600,7 +4600,7 @@
    "forms_bundle_url": "",
    "section_count": 11,
    "form_count": 0,
-   "updated_at": "2026-11-02T12:51:32.894Z",
+   "updated_at": "2026-11-04T16:27:02.744Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-7ham6w.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-7ham6w.pdf",
@@ -4610,7 +4610,7 @@
    },
    "edit": null,
    "pages": 200,
-   "outline_count": 144
+   "outline_count": 58
   },
   {
    "id": "doc-2026-7k9iju",
@@ -5065,7 +5065,7 @@
    "category": "",
    "department": "체육건강과",
    "year": 2026,
-   "format": "hwpx",
+   "format": "pdf",
    "kind": "text",
    "works_url": "",
    "origin": {
@@ -5075,19 +5075,24 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 7,
+   "section_count": 21,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:08.645Z",
-   "pdf": "",
+   "updated_at": "2026-11-04T15:57:12.085Z",
+   "pdf": "../cne_files_2026_3/files/doc-2026-8aqkr8.pdf",
    "original": {
+    "url": "../cne_files_2026_3/files/doc-2026-8aqkr8.pdf",
+    "name": "2026학년도 중학교스포츠강사 학교단위 채용업무 안내서.pdf",
+    "bytes": 8919091,
+    "format": "pdf"
+   },
+   "edit": {
     "url": "../cne_files_2026_3/files/doc-2026-8aqkr8.hwpx",
     "name": "2026학년도 중학교스포츠강사 학교단위 채용업무 안내서.hwpx",
     "bytes": 351612,
     "format": "hwpx"
    },
-   "edit": null,
-   "pages": 983,
-   "outline_count": 8
+   "pages": 39,
+   "outline_count": 228
   },
   {
    "id": "doc-2026-8bsizh",
@@ -5602,7 +5607,7 @@
    "forms_bundle_url": "",
    "section_count": 60,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:08.555Z",
+   "updated_at": "2026-11-04T15:59:49.215Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-9c0jqr.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-9c0jqr.pdf",
@@ -5612,7 +5617,7 @@
    },
    "edit": null,
    "pages": 263,
-   "outline_count": 232
+   "outline_count": 203
   },
   {
    "id": "doc-2026-9g2bwt",
@@ -9280,7 +9285,7 @@
    "forms_bundle_url": "",
    "section_count": 11,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:31.807Z",
+   "updated_at": "2026-11-04T15:39:56.711Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-g1qf90.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-g1qf90.pdf",
@@ -9927,7 +9932,7 @@
    "forms_bundle_url": "",
    "section_count": 5,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:34.811Z",
+   "updated_at": "2026-11-04T15:41:55.452Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-hdq1wq.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-hdq1wq.pdf",
@@ -11260,7 +11265,7 @@
    "forms_bundle_url": "",
    "section_count": 7,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:34.867Z",
+   "updated_at": "2026-11-04T15:42:22.258Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-jnlpep.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-jnlpep.pdf",
@@ -11296,14 +11301,14 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 6,
+   "section_count": 7,
    "form_count": 0,
-   "updated_at": "2026-11-04T14:13:11.674Z",
+   "updated_at": "2026-11-04T16:01:53.816Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-jsogat.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-jsogat.pdf",
-    "name": "2026년 직업계고 장영실 창업교육 유공교원(학교) 표창 계획(게시용).pdf",
-    "bytes": 279690,
+    "name": "2026년 직업계고 장영실 창업교육 유공교원(학교) 표창 계획(게시용)-나눔.pdf",
+    "bytes": 408456,
     "format": "pdf"
    },
    "edit": {
@@ -11312,8 +11317,8 @@
     "bytes": 65536,
     "format": "hwp"
    },
-   "pages": 6,
-   "outline_count": 9
+   "pages": 12,
+   "outline_count": 26
   },
   {
    "id": "doc-2026-jwp4oj",
@@ -12288,14 +12293,14 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 7,
+   "section_count": 11,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:35.342Z",
+   "updated_at": "2026-11-04T15:51:08.572Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-lwrhyj.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-lwrhyj.pdf",
-    "name": "2026년 충남 진로융합교육 추진계획(안내용).pdf",
-    "bytes": 851767,
+    "name": "2026년 충남 진로융합교육 추진계획(안내용)-나눔.pdf",
+    "bytes": 1453570,
     "format": "pdf"
    },
    "edit": {
@@ -12304,7 +12309,7 @@
     "bytes": 1887744,
     "format": "hwp"
    },
-   "pages": 16,
+   "pages": 32,
    "outline_count": 13
   },
   {
@@ -12465,7 +12470,7 @@
    "forms_bundle_url": "",
    "section_count": 17,
    "form_count": 0,
-   "updated_at": "2026-11-02T12:49:28.736Z",
+   "updated_at": "2026-11-04T16:00:57.100Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-m8jsnf.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-m8jsnf.pdf",
@@ -12475,7 +12480,7 @@
    },
    "edit": null,
    "pages": 189,
-   "outline_count": 39
+   "outline_count": 94
   },
   {
    "id": "doc-2026-m9di6h",
@@ -12597,7 +12602,7 @@
    "forms_bundle_url": "",
    "section_count": 11,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:33.368Z",
+   "updated_at": "2026-11-04T15:20:50.659Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-mhk02b.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-mhk02b.pdf",
@@ -14244,14 +14249,14 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 2,
+   "section_count": 4,
    "form_count": 0,
-   "updated_at": "2026-11-04T14:13:11.644Z",
+   "updated_at": "2026-11-04T16:01:33.589Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-piiny4.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-piiny4.pdf",
-    "name": "2026년 전국상업경진대회 유공교원 표창계획(게시용).pdf",
-    "bytes": 233039,
+    "name": "2026년 전국상업경진대회 유공교원 표창계획(게시용)-나눔.pdf",
+    "bytes": 321330,
     "format": "pdf"
    },
    "edit": {
@@ -14260,8 +14265,8 @@
     "bytes": 67584,
     "format": "hwp"
    },
-   "pages": 4,
-   "outline_count": 9
+   "pages": 8,
+   "outline_count": 24
   },
   {
    "id": "doc-2026-pj7g12",
@@ -18076,7 +18081,7 @@
    "forms_bundle_url": "",
    "section_count": 42,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:08.392Z",
+   "updated_at": "2026-11-04T15:38:29.768Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-xt9j40.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-xt9j40.pdf",
@@ -18086,7 +18091,7 @@
    },
    "edit": null,
    "pages": 96,
-   "outline_count": 927
+   "outline_count": 46
   },
   {
    "id": "doc-2026-xtegn4",
@@ -18416,7 +18421,7 @@
    "forms_bundle_url": "",
    "section_count": 5,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:08.654Z",
+   "updated_at": "2026-11-04T15:59:24.060Z",
    "pdf": "",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-yrr23z.hwpx",
@@ -18426,7 +18431,7 @@
    },
    "edit": null,
    "pages": 4015,
-   "outline_count": 6
+   "outline_count": 74
   },
   {
    "id": "doc-2026-ysc3bm",

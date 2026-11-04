@@ -1,6 +1,6 @@
 {
  "schema_version": "2.0",
- "generated_at": "2026-11-04T15:18:44.560Z",
+ "generated_at": "2026-11-04T16:28:51.712Z",
  "shard_count": 128,
  "document_count": 554,
  "levels": {
@@ -17,7 +17,7 @@
   "middle": {
    "name": "중등",
    "documents": 67,
-   "sections": 1373
+   "sections": 1394
   },
   "special": {
    "name": "특수",
