@@ -450,6 +450,10 @@ test('쪽을 바꾸면 줄 위치는 버림, 단계 건너뛰면 화면 줄 번�
   eq(SAS.rowsFromEditor(d, rows).errors[0].row, 2);
 });
 
+console.log('\n[목차 번호 알아보기]');
+test('번호·기호가 있는 제목', () => { ['1. 근거', '1.근거', '1) 신청', '(1) 대상', '1.1 개요', '1-1. 개요', '가. 대상', '가) 대상', '(가) 대상', 'Ⅲ. 계획', '① 신청', '제1장 총칙', '제 2 절', '◆ 평가', 'A. 개요'].forEach(t => ok(SAS.isNumbered(t), t)); });
+test('번호가 아닌 제목', () => { ['2026 운영 계획', '1인 1악기', '3월 행사', '교직원 안전교육', '1.5배 확대', '가정통신문', '(주)회사 안내', '[예시] 계획서', '가을 행사'].forEach(t => ok(!SAS.isNumbered(t), t)); });
+
 (async () => {
   for (const [name, fn] of asyncTests) {
     try { await fn(); pass++; console.log('  ✓ ' + name); }

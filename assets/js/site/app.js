@@ -501,9 +501,9 @@
     const tr = opts.tree;   // 검색 결과 나무: 펼침 상태를 자료 목차와 따로 둔다
     const has = tr ? tr.has : !opts.flat && !!V.kids[n.c];
     const isOpen = tr ? tr.open : V.open.has(n.c);
-    // 가장 아래 항목(2단계 이하)은 접기 단추 자리에 '-'를 붙이고 진하게 쓰지 않는다
+    // 가장 아래 항목(2단계 이하)은 접기 단추 자리에 '-'를 붙이고 진하게 쓰지 않는다. 제목에 번호가 이미 있으면 '-'는 뺀다
     const leaf = (n.dp || n.c.split('.').length) > 1 && (tr ? tr.leaf : !V.kids[n.c]);
-    const tg = has ? `<button class="tg" ${tr ? 'data-rtg' : 'data-tg'}="${n.c}" aria-label="${isOpen ? '접기' : '펼치기'}" aria-expanded="${isOpen}">${isOpen ? '−' : '+'}</button>` : leaf ? '<span class="tg sp dash">-</span>' : '<span class="tg sp"></span>';
+    const tg = has ? `<button class="tg" ${tr ? 'data-rtg' : 'data-tg'}="${n.c}" aria-label="${isOpen ? '접기' : '펼치기'}" aria-expanded="${isOpen}">${isOpen ? '−' : '+'}</button>` : leaf && !SAS.isNumbered(n.t) ? '<span class="tg sp dash">-</span>' : '<span class="tg sp"></span>';
     const badge = n.ty ? `<span class="badge b-${n.ty}">${TYPE_SHORT[n.ty]}</span>` : '';
     const url = SS.safeUrl(n.link ? n.link.url : n.url);
     const open = url ? `<a class="open o-${n.ty}" href="${esc(url)}" target="_blank" rel="noopener noreferrer" title="새 탭에서 열기">${n.ty === '법령' ? '법령 ↗' : n.ty === '사이트' ? '열기 ↗' : '받기 ⤓'}</a>` : '';

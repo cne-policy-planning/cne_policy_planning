@@ -231,5 +231,9 @@
     });
   }
 
-  return { spacedRatio, SPACED_DOC, joinSpaced, tidyOutline, cleanOutline, isGarbled, isSentence, TITLE_MAX, clean, repairSpacing, norm, bigrams, esc, looseRegex, snippet, highlight, splitList, shardOf };
+  /** 제목 앞에 번호·기호가 이미 있는지(1. · 1) · (1) · 1.1 · 가. · (가) · Ⅰ · ① · 제1장 · ◆ 등). 연도·수량(2026 계획, 1인 1악기)은 아니다 */
+  const NUMBERED_RE = /^\s*(?:\d{1,3}(?:[.．-]\d{1,3})*[.．)](?!\d)|\d{1,3}(?:[.．-]\d{1,3})+\s|\(\s*\d{1,3}\s*\)|[가나다라마바사아자차카타파하][.．)]|\(\s*[가나다라마바사아자차카타파하]\s*\)\s|[A-Za-z][.)]\s|[Ⅰ-Ⅻⅰ-ⅻ①-⒛㉠-㉻]|제\s*\d+\s*[장절항편관부]|[◆◇■□●○◦▪▶▸►•※☞★])/;
+  function isNumbered(t) { return NUMBERED_RE.test(String(t == null ? '' : t)); }
+
+  return { isNumbered, spacedRatio, SPACED_DOC, joinSpaced, tidyOutline, cleanOutline, isGarbled, isSentence, TITLE_MAX, clean, repairSpacing, norm, bigrams, esc, looseRegex, snippet, highlight, splitList, shardOf };
 });
