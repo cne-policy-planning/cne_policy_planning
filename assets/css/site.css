@@ -205,6 +205,7 @@ button.accent { color: #c2410c; border-color: #f5c9ad; background: #fff7f1; }
 .row .code { font-size: 13px; color: #667085; padding-top: 2px; white-space: nowrap; display: flex; gap: 3px; align-items: center; font-variant-numeric: tabular-nums; }
 .tg { width: 16px; height: 16px; padding: 0; border-radius: 50%; border: 1px solid #98a2b3; background: #fff; color: #475467; font-size: 12px; line-height: 1; display: inline-grid; place-items: center; flex: none; }
 .tg.sp { border-color: transparent; background: none; }
+.tg.dash { color: var(--muted); font-size: 14px; }
 /* 목차 제목 크기는 자료·단계와 상관없이 .v-tree 크기 하나만 쓴다 */
 .row .ttl { min-width: 0; overflow-wrap: anywhere; line-height: 1.5; font-size: inherit; }
 .row.k-ch { margin-top: 8px; } .row.k-ch .ttl { font-weight: 800; }
@@ -213,6 +214,7 @@ button.accent { color: #c2410c; border-color: #f5c9ad; background: #fff7f1; }
 .row.k-group .ttl { color: var(--blue-text); font-weight: 700; }
 .row.k-item .ttl { font-weight: 500; }
 .row.k-bullet .ttl { color: #475467; }
+.row.leaf .ttl { font-weight: 400; }
 .badge { display: inline-block; font-size: 12px; font-weight: 700; color: #fff; padding: 0 5px; border-radius: 4px; margin-right: 5px; line-height: 17px; vertical-align: 1px; }
 .b-서식 { background: #2e7a57; } .b-참고 { background: #b26f12; } .b-법령 { background: #2a5ba6; } .b-사이트 { background: #6650b0; }
 .open { margin-left: 6px; font-size: 12.5px; text-decoration: none; border: 1px solid currentColor; border-radius: 5px; padding: 0 5px; white-space: nowrap; vertical-align: 1px; color: #2e7a57; }

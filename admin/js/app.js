@@ -1527,6 +1527,24 @@ ${groups.map(g => `<div class="card"><h2>${e(g.title)}</h2><table>${g.items.map(
     toast(`${addPdf ? 'PDF를 추가' : '교체'}했습니다. 「③ 점검·반영」에서 반영해 주세요.`);
   }
 
+  /** 반영 대기 파일을 찾지 못했을 때: 같은 파일을 다시 골라 이어서 반영한다 */
+  async function reattachPending(e) {
+    const doc = S.getDoc(e.docId);
+    const again = await modal(h('div', {}, h('h2', {}, '파일을 찾을 수 없습니다'), h('p', {}, e.message),
+      h('p', { class: 'small muted' }, '같은 파일을 다시 고른 뒤 「사이트에 반영」을 누르면 남은 파일부터 이어서 올립니다. 이미 올린 파일은 창고에 남아 있고, 사이트 데이터는 아직 바뀌지 않았습니다.')),
+      [{ label: '닫기', value: false }, { label: '파일 다시 고르기', value: true, primary: true }]);
+    if (!again || !doc) return;
+    const ext = (doc.original && doc.original.format) || doc.format;
+    const file = await pickFile(ext ? '.' + ext : '');
+    if (!file) return;
+    if (ext && SAS.formatOf(file.name) !== ext) { toast(`${String(ext).toUpperCase()} 파일을 골라 주세요.`, 5000); return; }
+    await S.setPendingPdf(doc.id, file);
+    if (doc.original) doc.original.bytes = file.size;
+    if (doc.pdf) doc.pdf.bytes = file.size;
+    S.touch(doc);
+    toast('파일을 다시 넣었습니다. 「사이트에 반영」을 다시 눌러 주세요.', 6000);
+  }
+
   async function deleteDoc(doc) {
     if (!(await confirmBox(`<h2>자료 삭제</h2><p>「${SAS.esc(doc.title)}」을(를) 목록과 모든 색인에서 지웁니다. 「사이트에 반영」해야 사이트에서 사라집니다. 웍스의 원본 파일은 지워지지 않습니다.</p>`, '삭제', true))) return;
     S.removeDoc(doc.id);
@@ -1621,6 +1639,7 @@ ${groups.map(g => `<div class="card"><h2>${e(g.title)}</h2><table>${g.items.map(
             h('ul', {}, r.pagesWarn.map(x => h('li', {}, h('a', { href: `https://github.com/${S.state.github.owner}/${x}/settings/pages`, target: '_blank', rel: 'noopener' }, `${x} → Settings → Pages`)))),
             h('p', { class: 'small' }, '「Build and deployment」에서 Source: Deploy from a branch, Branch: main / (root) → Save.')));
         } catch (e) {
+          if (e.kind === 'file-missing') { await reattachPending(e); return; }
           await modal(h('div', {}, h('h2', {}, '원본 파일을 다 올리지 못했습니다'), h('p', {}, e.message), h('p', { class: 'small muted' }, '올린 파일은 창고에 남아 있습니다. 문제를 해결한 뒤 다시 「사이트에 반영」을 누르면 남은 파일부터 올립니다. 사이트 데이터는 아직 바뀌지 않았습니다.')));
           if (e.kind === 'auth') openTokenDialog();
           if (e.kind === 'storage-missing') await storageHelp([(e.message.match(/「([^」]+)」/) || [])[1]].filter(Boolean), []);

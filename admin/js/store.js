@@ -89,7 +89,24 @@
   // 자료 ID → File/Blob(PDF·HWP·엑셀 등 모든 형식). 창을 닫아도 이어서 반영할 수 있게 IndexedDB에도 넣어 둔다.
   // (예전 판과 맞추려고 함수·키 이름은 pdf를 그대로 쓴다)
   const pendingPdfs = new Map();
-  async function setPendingPdf(id, blob) { pendingPdfs.set(id, blob); await kvSet('pdf:' + id, blob); markChanged(id); }
+  // 고른 파일은 내용을 바로 복사해 둔다: File은 디스크의 파일을 가리키기만 해서, 반영 전에 파일을 옮기거나 고치면 읽지 못한다(NotFoundError)
+  async function setPendingPdf(id, blob) {
+    let copy = blob;
+    try { copy = new File([await blob.arrayBuffer()], blob.name || id, { type: blob.type || '' }); } catch (e) { console.warn('[관리자 도구] 파일을 복사하지 못했습니다:', id, e && e.message); }
+    pendingPdfs.set(id, copy); await kvSet('pdf:' + id, copy); markChanged(id);
+  }
+  /** 반영 대기 파일 읽기. 파일을 읽지 못하면 임시 보관본을 쓰고, 그것도 없으면 어느 자료인지 알려 준다 */
+  async function readPending(id) {
+    const blob = pendingPdfs.get(id);
+    try { return new Uint8Array(await blob.arrayBuffer()); }
+    catch (e) {
+      try { const kept = await kvGet('pdf:' + id); if (kept) { const bytes = new Uint8Array(await kept.arrayBuffer()); pendingPdfs.set(id, kept); return bytes; } } catch (e2) { /* 아래에서 안내 */ }
+      const d = getDoc(id);
+      const err = new GH.GitHubError(`「${(d && d.title) || id}」의 파일 「${(blob && blob.name) || (d && d.filename) || ''}」을 찾을 수 없습니다. 파일을 고른 뒤 옮겼거나 이름을 바꿨거나 내용이 바뀌었을 수 있습니다.`, 'file-missing', 0);
+      err.docId = id;
+      throw err;
+    }
+  }
   async function dropPendingPdf(id) { pendingPdfs.delete(id); await kvDel('pdf:' + id); }
   function pendingPdfIds() { return [...pendingPdfs.keys()].filter(id => getDoc(id)); }
   async function restorePendingPdfs() {
@@ -242,7 +259,7 @@
     for (let i = 0; i < pdfIds.length; i++) {
       const id = pdfIds[i], doc = getDoc(id);
       if (!doc || !doc.pdf) continue;
-      const bytes = new Uint8Array(await pendingPdfs.get(id).arrayBuffer());
+      const bytes = await readPending(id);
       const sha = await GH.gitBlobSha(bytes);
       if (latest.files.get(doc.pdf.path) !== sha) {
         if (onProgress) onProgress(i, pdfIds.length + 1);
@@ -353,8 +370,7 @@
       if (!head.files.has('.nojekyll')) batch.push({ path: '.nojekyll', content: '' });
       for (const id of mine) {
         const doc = getDoc(id), o = doc.original;
-        const blob = pendingPdfs.get(id);
-        const bytes = new Uint8Array(await blob.arrayBuffer());
+        const bytes = await readPending(id);
         if (bytes.length > root.SAS.FILE_MAX) throw new GH.GitHubError(`「${doc.title}」 원본 파일이 ${(bytes.length / 1048576).toFixed(0)}MB라 올릴 수 없습니다(파일 하나 38MB까지). 용량을 줄인 파일로 바꿔 넣어 주세요.`, 'too-big', 0);
         o.bytes = bytes.length;
         if (onProgress) onProgress(done, total, `${repo} · ${o.name}`);
@@ -567,7 +583,7 @@
   }
 
   root.SASStore = {
-    setPendingPdf, dropPendingPdf, pendingPdfIds, pdfPath, orphanPdfs, planPendingStorage, checkStorage, publishStorage, attachOriginals, pendingTooBig, docsWithoutOriginal,
+    setPendingPdf, readPending, dropPendingPdf, pendingPdfIds, pdfPath, orphanPdfs, planPendingStorage, checkStorage, publishStorage, attachOriginals, pendingTooBig, docsWithoutOriginal,
     STATUS, state, onChange, dataDigest, markChanged, getDoc, addDocs, replaceDoc, removeDoc, touch, allIds, diffOutputs,
     kvGet, kvSet, loadGithubConfig, connectGithub, setExpiry, forgetToken, checkActivity, acknowledgeActivity, recentActivity, loadFromGithub, publishToGithub,
     fsSupported, pickFolder, reopenLastFolder, saveToFolder, buildZip, markExported, markPublished, loadZip,

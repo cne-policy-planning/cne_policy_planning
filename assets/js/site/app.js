@@ -501,7 +501,9 @@
     const tr = opts.tree;   // 검색 결과 나무: 펼침 상태를 자료 목차와 따로 둔다
     const has = tr ? tr.has : !opts.flat && !!V.kids[n.c];
     const isOpen = tr ? tr.open : V.open.has(n.c);
-    const tg = has ? `<button class="tg" ${tr ? 'data-rtg' : 'data-tg'}="${n.c}" aria-label="${isOpen ? '접기' : '펼치기'}" aria-expanded="${isOpen}">${isOpen ? '−' : '+'}</button>` : '<span class="tg sp"></span>';
+    // 가장 아래 항목(2단계 이하)은 접기 단추 자리에 '-'를 붙이고 진하게 쓰지 않는다
+    const leaf = (n.dp || n.c.split('.').length) > 1 && (tr ? tr.leaf : !V.kids[n.c]);
+    const tg = has ? `<button class="tg" ${tr ? 'data-rtg' : 'data-tg'}="${n.c}" aria-label="${isOpen ? '접기' : '펼치기'}" aria-expanded="${isOpen}">${isOpen ? '−' : '+'}</button>` : leaf ? '<span class="tg sp dash">-</span>' : '<span class="tg sp"></span>';
     const badge = n.ty ? `<span class="badge b-${n.ty}">${TYPE_SHORT[n.ty]}</span>` : '';
     const url = SS.safeUrl(n.link ? n.link.url : n.url);
     const open = url ? `<a class="open o-${n.ty}" href="${esc(url)}" target="_blank" rel="noopener noreferrer" title="새 탭에서 열기">${n.ty === '법령' ? '법령 ↗' : n.ty === '사이트' ? '열기 ↗' : '받기 ⤓'}</a>` : '';
@@ -515,7 +517,7 @@
     const depth = n.dp || n.c.split('.').length;
     const ind = depth > 1 && !opts.flat ? `<span class="ind" style="width:${(depth - 1) * 14}px"></span>` : '';
     const state = tr ? (tr.hit ? ' hit' : ' via') : '';
-    return `<div class="row k-${n.k} d${Math.min(depth, 6)}${state}${cur ? ' cur' : ''}" data-c="${n.c}"${opts.doc ? ` data-d="${opts.doc}"` : ''}${full}><span class="pg">${pgOf(raw, n)}</span><span class="code">${ind}${tg}</span><span class="ttl">${badge}${t}${open}</span></div>`;
+    return `<div class="row k-${n.k} d${Math.min(depth, 6)}${leaf ? ' leaf' : ''}${state}${cur ? ' cur' : ''}" data-c="${n.c}"${opts.doc ? ` data-d="${opts.doc}"` : ''}${full}><span class="pg">${pgOf(raw, n)}</span><span class="code">${ind}${tg}</span><span class="ttl">${badge}${t}${open}</span></div>`;
   }
   function renderToc() {
     if (!V.doc) return;
@@ -562,6 +564,8 @@
    */
   function resultTree(p, hits, hl) {
     const hit = new Set(hits), kids = new Map(), roots = [], seen = new Set();
+    // 검색과 상관없이 자료 목차에서 아래 항목이 있는 줄
+    const parents = p.parents || (p.parents = new Set(p.nodes.map(x => parentIn(p.by, x)).filter(Boolean)));
     // 자동으로 붙은 이름뿐인 '본문' 단원은 위치 설명이 되지 않으므로 건너뛴다
     const up = n => { const a = parentIn(p.by, n); return a && a.k === 'ch' && a.t === '본문' && !hit.has(a) ? null : a; };
     hits.forEach(h0 => {
@@ -575,7 +579,7 @@
     const folded = seen.size > FOLD_ROWS && roots.length > 1;
     const walk = (list, top) => list.sort(byI).map(n => {
       const sub = kids.get(n), open = !(folded && top);
-      const row = rowHTML(n, p.raw, { hl: hit.has(n) ? hl : esc, doc: p.id, tree: { has: !!sub, open, hit: hit.has(n) } });
+      const row = rowHTML(n, p.raw, { hl: hit.has(n) ? hl : esc, doc: p.id, tree: { has: !!sub, open, hit: hit.has(n), leaf: !parents.has(n) } });
       return row + (sub ? `<div class="res-kids"${open ? '' : ' hidden'}>${walk(sub, false)}</div>` : '');
     }).join('');
     return { html: walk(roots, true), rows: seen.size };
