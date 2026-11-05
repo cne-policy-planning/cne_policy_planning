@@ -1,6 +1,6 @@
 {
  "schema_version": "2.0",
- "generated_at": "2026-11-05T05:42:20.193Z",
+ "generated_at": "2026-11-05T05:53:57.084Z",
  "count": 551,
  "documents": [
   {
@@ -4456,18 +4456,18 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 20,
+   "section_count": 37,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:36.380Z",
+   "updated_at": "2026-11-05T05:52:39.186Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-78rkmr.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-78rkmr.pdf",
-    "name": "2026학년도 참학력 공동교육과정 운영 안내서(용량줄임).pdf",
-    "bytes": 4798899,
+    "name": "2026학년도 참학력 공동교육과정 운영 안내서(용량줄임)-나눔.pdf",
+    "bytes": 4725109,
     "format": "pdf"
    },
    "edit": null,
-   "pages": 76,
+   "pages": 150,
    "outline_count": 43
   },
   {
@@ -7951,19 +7951,19 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 47,
+   "section_count": 82,
    "form_count": 0,
-   "updated_at": "2026-11-02T07:00:10.358Z",
+   "updated_at": "2026-11-05T05:51:40.139Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-df9cts.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-df9cts.pdf",
-    "name": "신설학교 개교 업무.pdf",
-    "bytes": 20846680,
+    "name": "신설학교 개교 업무-나눔.pdf",
+    "bytes": 20338058,
     "format": "pdf"
    },
    "edit": null,
-   "pages": 63,
-   "outline_count": 101
+   "pages": 124,
+   "outline_count": 168
   },
   {
    "id": "doc-2026-djhe1y",
