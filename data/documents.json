@@ -1,6 +1,6 @@
 {
  "schema_version": "2.0",
- "generated_at": "2026-11-05T00:54:21.723Z",
+ "generated_at": "2026-11-05T05:42:20.193Z",
  "count": 551,
  "documents": [
   {
@@ -385,18 +385,18 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 6,
+   "section_count": 18,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:31.696Z",
+   "updated_at": "2026-11-05T05:35:59.053Z",
    "pdf": "../cne_files_2026_1/files/doc-2025-1eeyjm.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2025-1eeyjm.pdf",
-    "name": "2025 생성형 인공지능 챗봇 활용 안내서.pdf",
-    "bytes": 2837847,
+    "name": "2025 생성형 인공지능 챗봇 활용 안내서-나눔.pdf",
+    "bytes": 3168627,
     "format": "pdf"
    },
    "edit": null,
-   "pages": 10,
+   "pages": 20,
    "outline_count": 14
   },
   {
@@ -1887,14 +1887,14 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 6,
+   "section_count": 7,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:32.092Z",
+   "updated_at": "2026-11-05T05:38:27.971Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-2f84nn.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-2f84nn.pdf",
-    "name": "2026 민주시민교육 기본계획.pdf",
-    "bytes": 599774,
+    "name": "2026 민주시민교육 기본계획-나눔.pdf",
+    "bytes": 1309872,
     "format": "pdf"
    },
    "edit": {
@@ -1903,7 +1903,7 @@
     "bytes": 297984,
     "format": "hwp"
    },
-   "pages": 12,
+   "pages": 24,
    "outline_count": 12
   },
   {
@@ -5376,7 +5376,7 @@
    "forms_bundle_url": "",
    "section_count": 11,
    "form_count": 0,
-   "updated_at": "2026-11-04T22:08:29.542Z",
+   "updated_at": "2026-11-05T05:31:25.271Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-8s48k6.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-8s48k6.pdf",
@@ -5391,7 +5391,7 @@
     "format": "hwp"
    },
    "pages": 14,
-   "outline_count": 8
+   "outline_count": 11
   },
   {
    "id": "doc-2026-8y3o2a",
@@ -6267,14 +6267,14 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 5,
+   "section_count": 10,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:37.598Z",
+   "updated_at": "2026-11-05T05:40:59.072Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-acqtfv.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-acqtfv.pdf",
-    "name": "[붙임1] 2026 성인지교육 활성화 유공  표창 계획.pdf",
-    "bytes": 368606,
+    "name": "[붙임1] 2026 성인지교육 활성화 유공  표창 계획-나눔.pdf",
+    "bytes": 602329,
     "format": "pdf"
    },
    "edit": {
@@ -6283,7 +6283,7 @@
     "bytes": 119808,
     "format": "hwp"
    },
-   "pages": 8,
+   "pages": 16,
    "outline_count": 14
   },
   {
@@ -7885,18 +7885,18 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 5,
+   "section_count": 8,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:35.372Z",
+   "updated_at": "2026-11-05T05:40:18.727Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-dcao7l.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-dcao7l.pdf",
-    "name": "2026년 충남과학교육 추진 계획.pdf",
-    "bytes": 1033044,
+    "name": "2026년 충남과학교육 추진 계획-나눔.pdf",
+    "bytes": 1574165,
     "format": "pdf"
    },
    "edit": null,
-   "pages": 19,
+   "pages": 38,
    "outline_count": 10
   },
   {
@@ -9374,18 +9374,18 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 1,
+   "section_count": 2,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:35.461Z",
+   "updated_at": "2026-11-05T05:40:34.665Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-gb3ykk.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-gb3ykk.pdf",
-    "name": "2026년 특성화고 AI역량 강화사업 계획(발송용).pdf",
-    "bytes": 508771,
+    "name": "2026년 특성화고 AI역량 강화사업 계획(발송용)-나눔.pdf",
+    "bytes": 736035,
     "format": "pdf"
    },
    "edit": null,
-   "pages": 9,
+   "pages": 18,
    "outline_count": 8
   },
   {
@@ -11699,14 +11699,14 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 6,
+   "section_count": 7,
    "form_count": 0,
-   "updated_at": "2026-11-04T14:13:11.494Z",
+   "updated_at": "2026-11-05T05:39:48.777Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-kmqc90.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-kmqc90.pdf",
-    "name": "2026년 금융교육 유공교원(기관) 표창계획(게시용).pdf",
-    "bytes": 276832,
+    "name": "2026년 금융교육 유공교원(기관) 표창계획(게시용)-나눔.pdf",
+    "bytes": 405496,
     "format": "pdf"
    },
    "edit": {
@@ -11715,7 +11715,7 @@
     "bytes": 127488,
     "format": "hwp"
    },
-   "pages": 6,
+   "pages": 12,
    "outline_count": 14
   },
   {
@@ -12939,7 +12939,7 @@
    "forms_bundle_url": "",
    "section_count": 19,
    "form_count": 0,
-   "updated_at": "2026-11-02T21:26:37.260Z",
+   "updated_at": "2026-11-05T03:10:42.124Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-n6epf3.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-n6epf3.pdf",
@@ -12949,7 +12949,7 @@
    },
    "edit": null,
    "pages": 24,
-   "outline_count": 47
+   "outline_count": 19
   },
   {
    "id": "doc-2026-n8b8yj",
@@ -14203,18 +14203,18 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 3,
+   "section_count": 7,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:34.838Z",
+   "updated_at": "2026-11-05T05:39:20.602Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-piijzy.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-piijzy.pdf",
-    "name": "2026년 과학실험실 안전관리 계획.pdf",
-    "bytes": 3327844,
+    "name": "2026년 과학실험실 안전관리 계획-나눔.pdf",
+    "bytes": 6862929,
     "format": "pdf"
    },
    "edit": null,
-   "pages": 37,
+   "pages": 74,
    "outline_count": 52
   },
   {
@@ -16919,7 +16919,7 @@
    "forms_bundle_url": "",
    "section_count": 61,
    "form_count": 0,
-   "updated_at": "2026-11-02T21:28:43.533Z",
+   "updated_at": "2026-11-05T02:53:18.730Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-uxaen5.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-uxaen5.pdf",
@@ -16929,7 +16929,7 @@
    },
    "edit": null,
    "pages": 183,
-   "outline_count": 448
+   "outline_count": 81
   },
   {
    "id": "doc-2026-vgncv0",
@@ -17406,7 +17406,7 @@
    "forms_bundle_url": "",
    "section_count": 3,
    "form_count": 0,
-   "updated_at": "2026-11-04T21:58:10.012Z",
+   "updated_at": "2026-11-05T05:22:07.314Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-wgvgmw.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-wgvgmw.pdf",
@@ -17421,7 +17421,7 @@
     "format": "hwp"
    },
    "pages": 7,
-   "outline_count": 8
+   "outline_count": 11
   },
   {
    "id": "doc-2026-wknzb4",

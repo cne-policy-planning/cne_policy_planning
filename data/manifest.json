@@ -1,6 +1,6 @@
 {
  "schema_version": "2.0",
- "generated_at": "2026-11-05T00:54:21.723Z",
+ "generated_at": "2026-11-05T05:42:20.193Z",
  "shard_count": 128,
  "document_count": 551,
  "levels": {
@@ -17,7 +17,7 @@
   "middle": {
    "name": "중등",
    "documents": 66,
-   "sections": 1390
+   "sections": 1391
   },
   "special": {
    "name": "특수",
@@ -27,7 +27,7 @@
   "common": {
    "name": "공통",
    "documents": 326,
-   "sections": 8080
+   "sections": 8106
   }
  },
  "departments": {
