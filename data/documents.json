@@ -1,6 +1,6 @@
 {
  "schema_version": "2.0",
- "generated_at": "2026-11-05T05:56:24.493Z",
+ "generated_at": "2026-11-05T07:49:52.199Z",
  "count": 551,
  "documents": [
   {
@@ -981,7 +981,7 @@
    "forms_bundle_url": "",
    "section_count": 10,
    "form_count": 0,
-   "updated_at": "2026-11-04T14:13:10.651Z",
+   "updated_at": "2026-11-05T07:38:02.014Z",
    "pdf": "../cne_files_2026_1/files/doc-2025-tzr3t9.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2025-tzr3t9.pdf",
@@ -991,7 +991,7 @@
    },
    "edit": null,
    "pages": 44,
-   "outline_count": 4
+   "outline_count": 2
   },
   {
    "id": "doc-2025-u879gt",
@@ -1113,7 +1113,7 @@
    "forms_bundle_url": "",
    "section_count": 10,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:31.636Z",
+   "updated_at": "2026-11-05T07:32:56.589Z",
    "pdf": "../cne_files_2026_1/files/doc-2025-xzfva4.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2025-xzfva4.pdf",
@@ -1123,7 +1123,7 @@
    },
    "edit": null,
    "pages": 22,
-   "outline_count": 13
+   "outline_count": 10
   },
   {
    "id": "doc-2025-xzwpa0",
@@ -1451,7 +1451,7 @@
    "category": "",
    "department": "소통담당관",
    "year": 2026,
-   "format": "hwpx",
+   "format": "pdf",
    "kind": "text",
    "works_url": "",
    "origin": {
@@ -1461,19 +1461,24 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 19,
+   "section_count": 32,
    "form_count": 0,
-   "updated_at": "2026-11-02T21:30:42.878Z",
-   "pdf": "",
+   "updated_at": "2026-11-05T07:48:32.599Z",
+   "pdf": "../cne_files_2026_3/files/doc-2026-0uz4kr.pdf",
    "original": {
+    "url": "../cne_files_2026_3/files/doc-2026-0uz4kr.pdf",
+    "name": "★2026년 충남교육 홍보 기본 계획 - 발송.pdf",
+    "bytes": 14876766,
+    "format": "pdf"
+   },
+   "edit": {
     "url": "../cne_files_2026_1/files/doc-2026-0uz4kr.hwpx",
     "name": "★2026년 충남교육 홍보 기본 계획 - 발송.hwpx",
     "bytes": 6159839,
     "format": "hwpx"
    },
-   "edit": null,
-   "pages": 1715,
-   "outline_count": 33
+   "pages": 41,
+   "outline_count": 56
   },
   {
    "id": "doc-2026-0vmpgd",
@@ -2168,7 +2173,7 @@
    "forms_bundle_url": "",
    "section_count": 7,
    "form_count": 0,
-   "updated_at": "2026-11-02T11:35:58.001Z",
+   "updated_at": "2026-11-05T07:39:46.981Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-2yzuax.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-2yzuax.pdf",
@@ -2178,7 +2183,7 @@
    },
    "edit": null,
    "pages": 10,
-   "outline_count": 15
+   "outline_count": 1
   },
   {
    "id": "doc-2026-2zaoqj",
@@ -4676,7 +4681,7 @@
    "forms_bundle_url": "",
    "section_count": 20,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:30.867Z",
+   "updated_at": "2026-11-05T07:18:23.443Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-7lnpx8.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-7lnpx8.pdf",
@@ -4686,7 +4691,7 @@
    },
    "edit": null,
    "pages": 36,
-   "outline_count": 32
+   "outline_count": 29
   },
   {
    "id": "doc-2026-7mj874",
@@ -5047,19 +5052,19 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 8,
+   "section_count": 11,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:30.292Z",
+   "updated_at": "2026-11-05T07:47:22.073Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-89vg7p.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-89vg7p.pdf",
-    "name": "(붙임 1) 생활형 교복 활성화를 위한 교복 디자인 변경 방법 안내.pdf",
-    "bytes": 801268,
+    "name": "(붙임 1) 생활형 교복 활성화를 위한 교복 디자인 변경 방법 안내-나눔.pdf",
+    "bytes": 1058168,
     "format": "pdf"
    },
    "edit": null,
-   "pages": 11,
-   "outline_count": 13
+   "pages": 21,
+   "outline_count": 33
   },
   {
    "id": "doc-2026-8aqkr8",
@@ -5820,7 +5825,7 @@
    "forms_bundle_url": "",
    "section_count": 68,
    "form_count": 0,
-   "updated_at": "2026-11-04T22:36:43.577Z",
+   "updated_at": "2026-11-05T07:15:49.187Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-9y6671.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-9y6671.pdf",
@@ -5830,7 +5835,7 @@
    },
    "edit": null,
    "pages": 141,
-   "outline_count": 100
+   "outline_count": 102
   },
   {
    "id": "doc-2026-a0m6v6",
@@ -6672,7 +6677,7 @@
    "forms_bundle_url": "",
    "section_count": 13,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:35.569Z",
+   "updated_at": "2026-11-05T06:24:41.642Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-b9wu8m.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-b9wu8m.pdf",
@@ -6687,7 +6692,7 @@
     "format": "hwp"
    },
    "pages": 20,
-   "outline_count": 17
+   "outline_count": 14
   },
   {
    "id": "doc-2026-ba67kk",
@@ -7920,7 +7925,7 @@
    "forms_bundle_url": "",
    "section_count": 22,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:37.094Z",
+   "updated_at": "2026-11-05T06:34:53.754Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-dd80dm.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-dd80dm.pdf",
@@ -8605,7 +8610,7 @@
    "forms_bundle_url": "",
    "section_count": 11,
    "form_count": 0,
-   "updated_at": "2026-11-04T22:27:36.140Z",
+   "updated_at": "2026-11-05T06:28:05.731Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-f6ty7b.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-f6ty7b.pdf",
@@ -11975,7 +11980,7 @@
    "forms_bundle_url": "",
    "section_count": 59,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:30.897Z",
+   "updated_at": "2026-11-05T07:28:18.756Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-l89ga0.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-l89ga0.pdf",
@@ -11985,7 +11990,7 @@
    },
    "edit": null,
    "pages": 104,
-   "outline_count": 27
+   "outline_count": 35
   },
   {
    "id": "doc-2026-lfr0i2",
@@ -13728,7 +13733,7 @@
    "forms_bundle_url": "",
    "section_count": 38,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:30.617Z",
+   "updated_at": "2026-11-05T07:30:10.738Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-oafv8e.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-oafv8e.pdf",
@@ -13738,7 +13743,7 @@
    },
    "edit": null,
    "pages": 76,
-   "outline_count": 26
+   "outline_count": 29
   },
   {
    "id": "doc-2026-ofd0lc",
@@ -16123,14 +16128,14 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 3,
+   "section_count": 9,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:31.422Z",
+   "updated_at": "2026-11-05T07:36:01.805Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-t8yqbb.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-t8yqbb.pdf",
-    "name": "1. 2026년 누리봄교실 운영 유공 표창계획.pdf",
-    "bytes": 413194,
+    "name": "1. 2026년 누리봄교실 운영 유공 표창계획-나눔.pdf",
+    "bytes": 671645,
     "format": "pdf"
    },
    "edit": {
@@ -16139,8 +16144,8 @@
     "bytes": 103936,
     "format": "hwp"
    },
-   "pages": 7,
-   "outline_count": 6
+   "pages": 14,
+   "outline_count": 23
   },
   {
    "id": "doc-2026-tbg1ph",
@@ -17368,7 +17373,7 @@
    "forms_bundle_url": "",
    "section_count": 10,
    "form_count": 0,
-   "updated_at": "2026-11-04T22:13:05.219Z",
+   "updated_at": "2026-11-05T06:22:53.376Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-wdui31.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-wdui31.pdf",
@@ -17383,7 +17388,7 @@
     "format": "hwp"
    },
    "pages": 13,
-   "outline_count": 12
+   "outline_count": 13
   },
   {
    "id": "doc-2026-wgvgmw",
