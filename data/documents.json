@@ -1,7 +1,7 @@
 {
  "schema_version": "2.0",
- "generated_at": "2026-11-04T17:56:35.257Z",
- "count": 553,
+ "generated_at": "2026-11-05T00:54:21.723Z",
+ "count": 551,
  "documents": [
   {
    "id": "doc-2018-9sjbw2",
@@ -717,7 +717,7 @@
    "forms_bundle_url": "",
    "section_count": 11,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:37.930Z",
+   "updated_at": "2026-11-04T20:30:41.735Z",
    "pdf": "../cne_files_2026_1/files/doc-2025-nwjvv0.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2025-nwjvv0.pdf",
@@ -727,7 +727,7 @@
    },
    "edit": null,
    "pages": 14,
-   "outline_count": 6
+   "outline_count": 12
   },
   {
    "id": "doc-2025-p3bs33",
@@ -750,7 +750,7 @@
    "forms_bundle_url": "",
    "section_count": 30,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:31.586Z",
+   "updated_at": "2026-11-04T20:26:29.006Z",
    "pdf": "../cne_files_2026_1/files/doc-2025-p3bs33.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2025-p3bs33.pdf",
@@ -760,7 +760,7 @@
    },
    "edit": null,
    "pages": 150,
-   "outline_count": 13
+   "outline_count": 11
   },
   {
    "id": "doc-2025-pfgkdj",
@@ -816,7 +816,7 @@
    "forms_bundle_url": "",
    "section_count": 207,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:31.667Z",
+   "updated_at": "2026-11-04T20:56:35.097Z",
    "pdf": "../cne_files_2026_1/files/doc-2025-plkqwt.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2025-plkqwt.pdf",
@@ -826,7 +826,7 @@
    },
    "edit": null,
    "pages": 279,
-   "outline_count": 143
+   "outline_count": 166
   },
   {
    "id": "doc-2025-qb5ehs",
@@ -1212,7 +1212,7 @@
    "forms_bundle_url": "",
    "section_count": 5,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:35.294Z",
+   "updated_at": "2026-11-04T21:23:56.488Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-03ip4t.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-03ip4t.pdf",
@@ -1227,7 +1227,7 @@
     "format": "hwp"
    },
    "pages": 9,
-   "outline_count": 7
+   "outline_count": 8
   },
   {
    "id": "doc-2026-04ca48",
@@ -1283,7 +1283,7 @@
    "forms_bundle_url": "",
    "section_count": 18,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:34.250Z",
+   "updated_at": "2026-11-04T21:03:55.477Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-0gu7l5.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-0gu7l5.pdf",
@@ -1298,7 +1298,7 @@
     "format": "hwp"
    },
    "pages": 22,
-   "outline_count": 30
+   "outline_count": 19
   },
   {
    "id": "doc-2026-0hercy",
@@ -1598,14 +1598,14 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 3,
+   "section_count": 8,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:31.450Z",
+   "updated_at": "2026-11-04T22:22:22.116Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-160tih.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-160tih.pdf",
-    "name": "1. 2026년 학업중단숙려제지원교 및 행복드림학교 운영 유공 표창계획.pdf",
-    "bytes": 415765,
+    "name": "1. 2026년 학업중단숙려제지원교 및 행복드림학교 운영 유공 표창계획-나눔.pdf",
+    "bytes": 667592,
     "format": "pdf"
    },
    "edit": {
@@ -1614,7 +1614,7 @@
     "bytes": 104448,
     "format": "hwp"
    },
-   "pages": 7,
+   "pages": 14,
    "outline_count": 6
   },
   {
@@ -1704,7 +1704,7 @@
    "forms_bundle_url": "",
    "section_count": 11,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:36.268Z",
+   "updated_at": "2026-11-04T22:32:18.531Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-2363fo.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-2363fo.pdf",
@@ -1719,7 +1719,7 @@
     "format": "hwp"
    },
    "pages": 13,
-   "outline_count": 11
+   "outline_count": 10
   },
   {
    "id": "doc-2026-261kr6",
@@ -2714,14 +2714,14 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 5,
+   "section_count": 8,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:32.595Z",
+   "updated_at": "2026-11-04T21:14:58.296Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-49q32g.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-49q32g.pdf",
-    "name": "2026 수학교육이끎학교 유공 교육감 표창 계획.pdf",
-    "bytes": 286428,
+    "name": "2026 수학교육이끎학교 유공 교육감 표창 계획-나눔.pdf",
+    "bytes": 420148,
     "format": "pdf"
    },
    "edit": {
@@ -2730,7 +2730,7 @@
     "bytes": 591872,
     "format": "hwp"
    },
-   "pages": 6,
+   "pages": 12,
    "outline_count": 12
   },
   {
@@ -3104,7 +3104,7 @@
    "forms_bundle_url": "",
    "section_count": 9,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:36.082Z",
+   "updated_at": "2026-11-04T22:30:18.998Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-4qjxgi.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-4qjxgi.pdf",
@@ -3119,7 +3119,7 @@
     "format": "hwp"
    },
    "pages": 12,
-   "outline_count": 9
+   "outline_count": 10
   },
   {
    "id": "doc-2026-4sfzde",
@@ -3163,8 +3163,8 @@
    "category": "",
    "department": "민주시민교육과",
    "year": 2026,
-   "format": "xlsx",
-   "kind": "link",
+   "format": "pdf",
+   "kind": "text",
    "works_url": "",
    "origin": {
     "site": "",
@@ -3173,19 +3173,24 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 0,
+   "section_count": 9,
    "form_count": 0,
-   "updated_at": "2026-11-02T13:00:52.039Z",
-   "pdf": "",
+   "updated_at": "2026-11-04T22:09:26.142Z",
+   "pdf": "../cne_files_2026_1/files/doc-2026-4ywunz.pdf",
    "original": {
+    "url": "../cne_files_2026_1/files/doc-2026-4ywunz.pdf",
+    "name": "1. 2026년 누리봄교실 운영 유공 표창계획-나눔.pdf",
+    "bytes": 671645,
+    "format": "pdf"
+   },
+   "edit": {
     "url": "../cne_files_2026_1/files/doc-2026-4ywunz.xlsx",
     "name": "2. 2026년도 누리봄교실 유공 교육감 표창 추천 대상(교원, 기관) 명부(양식).xlsx",
     "bytes": 13340,
     "format": "xlsx"
    },
-   "edit": null,
-   "pages": 0,
-   "outline_count": 0
+   "pages": 14,
+   "outline_count": 52
   },
   {
    "id": "doc-2026-4zgpyq",
@@ -3340,7 +3345,7 @@
    "forms_bundle_url": "",
    "section_count": 1,
    "form_count": 0,
-   "updated_at": "2026-11-02T06:31:02.438Z",
+   "updated_at": "2026-11-04T22:05:56.972Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-51xuky.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-51xuky.pdf",
@@ -3355,7 +3360,7 @@
     "format": "hwp"
    },
    "pages": 4,
-   "outline_count": 26
+   "outline_count": 4
   },
   {
    "id": "doc-2026-5b0d0b",
@@ -3444,7 +3449,7 @@
    "forms_bundle_url": "",
    "section_count": 9,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:34.725Z",
+   "updated_at": "2026-11-04T22:01:22.819Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-5sduzk.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-5sduzk.pdf",
@@ -5321,7 +5326,7 @@
    "category": "",
    "department": "민주시민교육과",
    "year": 2026,
-   "format": "hwpx",
+   "format": "pdf",
    "kind": "text",
    "works_url": "",
    "origin": {
@@ -5331,19 +5336,24 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 4,
+   "section_count": 10,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:06.667Z",
-   "pdf": "",
+   "updated_at": "2026-11-04T22:16:57.233Z",
+   "pdf": "../cne_files_2026_1/files/doc-2026-8o3l1a.pdf",
    "original": {
+    "url": "../cne_files_2026_1/files/doc-2026-8o3l1a.pdf",
+    "name": "2026년 학교폭력 예방 및 해결 유공 교육감 표창 계획.pdf",
+    "bytes": 3053207,
+    "format": "pdf"
+   },
+   "edit": {
     "url": "../cne_files_2026_1/files/doc-2026-8o3l1a.hwpx",
     "name": "2026년 학교폭력 예방 및 해결 유공 교육감 표창 계획.hwpx",
     "bytes": 128023,
     "format": "hwpx"
    },
-   "edit": null,
-   "pages": 470,
-   "outline_count": 5
+   "pages": 13,
+   "outline_count": 39
   },
   {
    "id": "doc-2026-8s48k6",
@@ -5364,14 +5374,14 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 7,
+   "section_count": 11,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:31.391Z",
+   "updated_at": "2026-11-04T22:08:29.542Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-8s48k6.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-8s48k6.pdf",
-    "name": "1. 2026년 교육지원청 학업중단 예방프로그램 운영 유공 표창계획.pdf",
-    "bytes": 412010,
+    "name": "1. 2026년 교육지원청 학업중단 예방프로그램 운영 유공 표창계획-나눔.pdf",
+    "bytes": 675870,
     "format": "pdf"
    },
    "edit": {
@@ -5380,7 +5390,7 @@
     "bytes": 107520,
     "format": "hwp"
    },
-   "pages": 7,
+   "pages": 14,
    "outline_count": 8
   },
   {
@@ -5810,7 +5820,7 @@
    "forms_bundle_url": "",
    "section_count": 68,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:37.168Z",
+   "updated_at": "2026-11-04T22:36:43.577Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-9y6671.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-9y6671.pdf",
@@ -5820,7 +5830,7 @@
    },
    "edit": null,
    "pages": 141,
-   "outline_count": 119
+   "outline_count": 100
   },
   {
    "id": "doc-2026-a0m6v6",
@@ -6079,7 +6089,7 @@
    "forms_bundle_url": "",
    "section_count": 5,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:35.404Z",
+   "updated_at": "2026-11-04T21:26:31.462Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-a8iofi.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-a8iofi.pdf",
@@ -6094,7 +6104,7 @@
     "format": "hwp"
    },
    "pages": 9,
-   "outline_count": 7
+   "outline_count": 8
   },
   {
    "id": "doc-2026-a974ih",
@@ -6335,7 +6345,7 @@
    "forms_bundle_url": "",
    "section_count": 44,
    "form_count": 1,
-   "updated_at": "2026-11-03T00:34:34.646Z",
+   "updated_at": "2026-11-04T20:10:18.962Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-ahxj4q.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-ahxj4q.pdf",
@@ -6345,7 +6355,7 @@
    },
    "edit": null,
    "pages": 109,
-   "outline_count": 334
+   "outline_count": 40
   },
   {
    "id": "doc-2026-ai5vo8",
@@ -6368,7 +6378,7 @@
    "forms_bundle_url": "",
    "section_count": 8,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:34.782Z",
+   "updated_at": "2026-11-04T22:03:49.567Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-ai5vo8.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-ai5vo8.pdf",
@@ -6766,7 +6776,7 @@
    "forms_bundle_url": "",
    "section_count": 15,
    "form_count": 0,
-   "updated_at": "2026-11-02T13:03:25.430Z",
+   "updated_at": "2026-11-04T20:16:31.826Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-bbl7pb.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-bbl7pb.pdf",
@@ -6776,7 +6786,7 @@
    },
    "edit": null,
    "pages": 30,
-   "outline_count": 41
+   "outline_count": 15
   },
   {
    "id": "doc-2026-bf6ept",
@@ -6936,7 +6946,7 @@
    "forms_bundle_url": "",
    "section_count": 12,
    "form_count": 0,
-   "updated_at": "2026-11-04T14:13:11.433Z",
+   "updated_at": "2026-11-04T21:34:43.600Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-bmmr0c.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-bmmr0c.pdf",
@@ -7139,7 +7149,7 @@
    "forms_bundle_url": "",
    "section_count": 7,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:34.923Z",
+   "updated_at": "2026-11-04T21:21:53.573Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-c55y35.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-c55y35.pdf",
@@ -7198,7 +7208,7 @@
    "category": "",
    "department": "민주시민교육과",
    "year": 2026,
-   "format": "hwpx",
+   "format": "pdf",
    "kind": "text",
    "works_url": "",
    "origin": {
@@ -7208,18 +7218,23 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 3,
+   "section_count": 13,
    "form_count": 0,
-   "updated_at": "2026-11-04T14:13:11.526Z",
-   "pdf": "",
+   "updated_at": "2026-11-04T22:11:15.121Z",
+   "pdf": "../cne_files_2026_1/files/doc-2026-caxax3.pdf",
    "original": {
+    "url": "../cne_files_2026_1/files/doc-2026-caxax3.pdf",
+    "name": "2026년 독도교육 활성화 유공 교육감 표창계획.pdf",
+    "bytes": 2473723,
+    "format": "pdf"
+   },
+   "edit": {
     "url": "../cne_files_2026_1/files/doc-2026-caxax3.hwpx",
     "name": "2026년 독도교육 활성화 유공 교육감 표창계획.hwpx",
     "bytes": 102137,
     "format": "hwpx"
    },
-   "edit": null,
-   "pages": 363,
+   "pages": 14,
    "outline_count": 13
   },
   {
@@ -7446,7 +7461,7 @@
    "forms_bundle_url": "",
    "section_count": 3,
    "form_count": 0,
-   "updated_at": "2026-11-04T14:13:11.612Z",
+   "updated_at": "2026-11-04T18:21:24.188Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-cmyds2.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-cmyds2.pdf",
@@ -7456,7 +7471,7 @@
    },
    "edit": null,
    "pages": 12,
-   "outline_count": 10
+   "outline_count": 5
   },
   {
    "id": "doc-2026-cnk5eh",
@@ -8309,7 +8324,7 @@
    "category": "",
    "department": "민주시민교육과",
    "year": 2026,
-   "format": "hwpx",
+   "format": "pdf",
    "kind": "text",
    "works_url": "",
    "origin": {
@@ -8319,19 +8334,24 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 14,
+   "section_count": 34,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:06.668Z",
-   "pdf": "",
+   "updated_at": "2026-11-04T22:20:21.507Z",
+   "pdf": "../cne_files_2026_3/files/doc-2026-e690du.pdf",
    "original": {
+    "url": "../cne_files_2026_3/files/doc-2026-e690du.pdf",
+    "name": "2026년 학생자살예방 사회정서교육 추진계획(최종).pdf",
+    "bytes": 11937275,
+    "format": "pdf"
+   },
+   "edit": {
     "url": "../cne_files_2026_1/files/doc-2026-e690du.hwpx",
     "name": "2026년 학생자살예방 사회정서교육 추진계획(최종).hwpx",
     "bytes": 1912964,
     "format": "hwpx"
    },
-   "edit": null,
-   "pages": 1549,
-   "outline_count": 16
+   "pages": 43,
+   "outline_count": 261
   },
   {
    "id": "doc-2026-egjkai",
@@ -8519,7 +8539,7 @@
    "forms_bundle_url": "",
    "section_count": 60,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:38.962Z",
+   "updated_at": "2026-11-04T19:29:21.618Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-f1l72q.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-f1l72q.pdf",
@@ -8529,7 +8549,7 @@
    },
    "edit": null,
    "pages": 164,
-   "outline_count": 50
+   "outline_count": 65
   },
   {
    "id": "doc-2026-f68so8",
@@ -8585,7 +8605,7 @@
    "forms_bundle_url": "",
    "section_count": 11,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:36.044Z",
+   "updated_at": "2026-11-04T22:27:36.140Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-f6ty7b.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-f6ty7b.pdf",
@@ -8600,7 +8620,7 @@
     "format": "hwp"
    },
    "pages": 12,
-   "outline_count": 9
+   "outline_count": 10
   },
   {
    "id": "doc-2026-f9xok0",
@@ -8935,7 +8955,7 @@
    "forms_bundle_url": "",
    "section_count": 16,
    "form_count": 0,
-   "updated_at": "2026-11-02T13:02:38.613Z",
+   "updated_at": "2026-11-04T20:25:10.411Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-fja85q.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-fja85q.pdf",
@@ -8945,7 +8965,7 @@
    },
    "edit": null,
    "pages": 22,
-   "outline_count": 64
+   "outline_count": 1
   },
   {
    "id": "doc-2026-flg110",
@@ -9486,14 +9506,14 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 5,
+   "section_count": 9,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:32.568Z",
+   "updated_at": "2026-11-04T21:12:55.757Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-gq6udq.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-gq6udq.pdf",
-    "name": "2026 수학교육 활성화 유공 교육감 표창 계획.pdf",
-    "bytes": 328465,
+    "name": "2026 수학교육 활성화 유공 교육감 표창 계획-나눔.pdf",
+    "bytes": 473543,
     "format": "pdf"
    },
    "edit": {
@@ -9502,7 +9522,7 @@
     "bytes": 596480,
     "format": "hwp"
    },
-   "pages": 7,
+   "pages": 14,
    "outline_count": 13
   },
   {
@@ -9658,7 +9678,7 @@
    "forms_bundle_url": "",
    "section_count": 4,
    "form_count": 0,
-   "updated_at": "2026-11-04T12:59:04.763Z",
+   "updated_at": "2026-11-04T20:33:00.462Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-gvcmo6.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-gvcmo6.pdf",
@@ -9668,7 +9688,7 @@
    },
    "edit": null,
    "pages": 5,
-   "outline_count": 12
+   "outline_count": 8
   },
   {
    "id": "doc-2026-gxedg3",
@@ -10003,7 +10023,7 @@
    "forms_bundle_url": "",
    "section_count": 2,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:35.763Z",
+   "updated_at": "2026-11-04T18:38:46.836Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-hx7eh7.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-hx7eh7.pdf",
@@ -10013,7 +10033,7 @@
    },
    "edit": null,
    "pages": 46,
-   "outline_count": 120
+   "outline_count": 46
   },
   {
    "id": "doc-2026-i3sz5j",
@@ -10216,7 +10236,7 @@
    "forms_bundle_url": "",
    "section_count": 10,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:35.488Z",
+   "updated_at": "2026-11-04T22:15:01.012Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-ib9sj8.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-ib9sj8.pdf",
@@ -10231,7 +10251,7 @@
     "format": "hwp"
    },
    "pages": 13,
-   "outline_count": 10
+   "outline_count": 11
   },
   {
    "id": "doc-2026-iboi47",
@@ -11341,7 +11361,7 @@
    "forms_bundle_url": "",
    "section_count": 79,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:39.166Z",
+   "updated_at": "2026-11-04T19:59:48.153Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-jycy01.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-jycy01.pdf",
@@ -11351,7 +11371,7 @@
    },
    "edit": null,
    "pages": 171,
-   "outline_count": 84
+   "outline_count": 119
   },
   {
    "id": "doc-2026-jyjn4n",
@@ -11629,7 +11649,7 @@
   },
   {
    "id": "doc-2026-kd91ml",
-   "title": "학교 내 장애학생 의료지원 가이드북",
+   "title": "학교 내 장애학생 의료지원 가이드북1",
    "school_levels": [
     "특수"
    ],
@@ -11648,7 +11668,7 @@
    "forms_bundle_url": "",
    "section_count": 84,
    "form_count": 0,
-   "updated_at": "2026-11-03T05:59:48.639Z",
+   "updated_at": "2026-11-04T20:03:47.752Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-kd91ml.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-kd91ml.pdf",
@@ -12026,7 +12046,7 @@
    "forms_bundle_url": "",
    "section_count": 45,
    "form_count": 0,
-   "updated_at": "2026-11-02T21:28:02.584Z",
+   "updated_at": "2026-11-04T21:46:50.691Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-lgp0li.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-lgp0li.pdf",
@@ -12036,7 +12056,7 @@
    },
    "edit": null,
    "pages": 181,
-   "outline_count": 334
+   "outline_count": 12
   },
   {
    "id": "doc-2026-lk8sjk",
@@ -12404,7 +12424,7 @@
    "forms_bundle_url": "",
    "section_count": 4,
    "form_count": 0,
-   "updated_at": "2026-11-04T14:13:11.098Z",
+   "updated_at": "2026-11-04T18:13:58.766Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-m6d43c.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-m6d43c.pdf",
@@ -13018,7 +13038,7 @@
    "forms_bundle_url": "",
    "section_count": 2,
    "form_count": 0,
-   "updated_at": "2026-11-04T14:13:12.851Z",
+   "updated_at": "2026-11-04T19:01:53.610Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-n925er.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-n925er.pdf",
@@ -13155,7 +13175,7 @@
    "forms_bundle_url": "",
    "section_count": 19,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:35.928Z",
+   "updated_at": "2026-11-04T22:24:45.584Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-nksbxg.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-nksbxg.pdf",
@@ -13297,7 +13317,7 @@
    "forms_bundle_url": "",
    "section_count": 16,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:39.758Z",
+   "updated_at": "2026-11-04T18:09:32.620Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-np2ufs.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-np2ufs.pdf",
@@ -13307,7 +13327,7 @@
    },
    "edit": null,
    "pages": 26,
-   "outline_count": 26
+   "outline_count": 24
   },
   {
    "id": "doc-2026-npgj9t",
@@ -13982,7 +14002,7 @@
    "forms_bundle_url": "",
    "section_count": 5,
    "form_count": 0,
-   "updated_at": "2026-11-02T13:02:58.102Z",
+   "updated_at": "2026-11-04T20:21:50.301Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-ozgtwk.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-ozgtwk.pdf",
@@ -13992,7 +14012,7 @@
    },
    "edit": null,
    "pages": 35,
-   "outline_count": 19
+   "outline_count": 8
   },
   {
    "id": "doc-2026-p3pfb6",
@@ -14048,7 +14068,7 @@
    "forms_bundle_url": "",
    "section_count": 9,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:37.749Z",
+   "updated_at": "2026-11-04T22:18:33.972Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-pae1pv.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-pae1pv.pdf",
@@ -14063,7 +14083,7 @@
     "format": "hwp"
    },
    "pages": 11,
-   "outline_count": 7
+   "outline_count": 8
   },
   {
    "id": "doc-2026-peq2yg",
@@ -14269,44 +14289,6 @@
    "outline_count": 501
   },
   {
-   "id": "doc-2026-pkcayc",
-   "title": "2026 성인지교육지원센터 운영 기본계획",
-   "school_levels": [
-    "공통"
-   ],
-   "category": "",
-   "department": "민주시민교육과",
-   "year": 2026,
-   "format": "pdf",
-   "kind": "text",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 84,
-   "form_count": 0,
-   "updated_at": "2026-11-03T00:34:32.491Z",
-   "pdf": "../cne_files_2026_3/files/doc-2026-pkcayc.pdf",
-   "original": {
-    "url": "../cne_files_2026_3/files/doc-2026-pkcayc.pdf",
-    "name": "2026 성인지교육지원센터 운영 기본계획.pdf",
-    "bytes": 3537927,
-    "format": "pdf"
-   },
-   "edit": {
-    "url": "../cne_files_2026_1/files/doc-2026-pkcayc.hwp",
-    "name": "2026 성인지교육지원센터 운영 기본계획.hwp",
-    "bytes": 7686144,
-    "format": "hwp"
-   },
-   "pages": 165,
-   "outline_count": 45
-  },
-  {
    "id": "doc-2026-pmcp71",
    "title": "2026 학생 건강관리 추진 계획",
    "school_levels": [
@@ -14358,14 +14340,14 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 13,
+   "section_count": 24,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:31.911Z",
+   "updated_at": "2026-11-04T21:09:00.314Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-prnfpp.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-prnfpp.pdf",
-    "name": "2026 농촌체험학습과 학교텃밭정원 가꾸기 운영 계획(안내용).pdf",
-    "bytes": 760745,
+    "name": "2026 농촌체험학습과 학교텃밭정원 가꾸기 운영 계획(안내용)-나눔.pdf",
+    "bytes": 1187344,
     "format": "pdf"
    },
    "edit": {
@@ -14374,7 +14356,7 @@
     "bytes": 1252864,
     "format": "hwp"
    },
-   "pages": 17,
+   "pages": 34,
    "outline_count": 14
   },
   {
@@ -14431,7 +14413,7 @@
    "forms_bundle_url": "",
    "section_count": 175,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:38.326Z",
+   "updated_at": "2026-11-04T18:30:01.926Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-q8fcrk.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-q8fcrk.pdf",
@@ -14441,7 +14423,7 @@
    },
    "edit": null,
    "pages": 370,
-   "outline_count": 220
+   "outline_count": 227
   },
   {
    "id": "doc-2026-qa2j9t",
@@ -14653,7 +14635,7 @@
   },
   {
    "id": "doc-2026-qthf7d",
-   "title": "2026 학교환경교육 활성화 유공 표창 계획202601005",
+   "title": "2026 학교환경교육 활성화 유공 표창 계획",
    "school_levels": [
     "공통"
    ],
@@ -14672,7 +14654,7 @@
    "forms_bundle_url": "",
    "section_count": 10,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:34.606Z",
+   "updated_at": "2026-11-04T21:18:08.940Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-qthf7d.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-qthf7d.pdf",
@@ -15197,7 +15179,7 @@
    "forms_bundle_url": "",
    "section_count": 2,
    "form_count": 0,
-   "updated_at": "2026-11-04T14:13:12.694Z",
+   "updated_at": "2026-11-04T19:01:12.030Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-rolkcc.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-rolkcc.pdf",
@@ -16552,14 +16534,14 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 16,
+   "section_count": 23,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:34.333Z",
+   "updated_at": "2026-11-04T18:20:02.022Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-tz47wc.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-tz47wc.pdf",
-    "name": "2026 특수교육대상학생 현장실습 운영 계획.pdf",
-    "bytes": 1154721,
+    "name": "2026 특수교육대상학생 현장실습 운영 계획-나눔.pdf",
+    "bytes": 2347571,
     "format": "pdf"
    },
    "edit": {
@@ -16568,7 +16550,7 @@
     "bytes": 1913856,
     "format": "hwp"
    },
-   "pages": 20,
+   "pages": 40,
    "outline_count": 34
   },
   {
@@ -16729,7 +16711,7 @@
    "forms_bundle_url": "",
    "section_count": 77,
    "form_count": 0,
-   "updated_at": "2026-11-04T14:13:13.169Z",
+   "updated_at": "2026-11-04T20:05:02.360Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-ufatha.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-ufatha.pdf",
@@ -17386,7 +17368,7 @@
    "forms_bundle_url": "",
    "section_count": 10,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:34.986Z",
+   "updated_at": "2026-11-04T22:13:05.219Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-wdui31.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-wdui31.pdf",
@@ -17401,11 +17383,11 @@
     "format": "hwp"
    },
    "pages": 13,
-   "outline_count": 11
+   "outline_count": 12
   },
   {
    "id": "doc-2026-wgvgmw",
-   "title": "2026 학교폭력통합지원센터운영계획(학교용 2026.1)",
+   "title": "2026 학교폭력통합지원센터운영계획",
    "school_levels": [
     "공통"
    ],
@@ -17424,7 +17406,7 @@
    "forms_bundle_url": "",
    "section_count": 3,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:34.578Z",
+   "updated_at": "2026-11-04T21:58:10.012Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-wgvgmw.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-wgvgmw.pdf",
@@ -17731,7 +17713,7 @@
    "forms_bundle_url": "",
    "section_count": 2,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:33.152Z",
+   "updated_at": "2026-11-04T18:17:27.698Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-xb6ad6.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-xb6ad6.pdf",
@@ -18218,7 +18200,7 @@
    "forms_bundle_url": "",
    "section_count": 37,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:36.726Z",
+   "updated_at": "2026-11-04T19:00:13.556Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-y4g6of.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-y4g6of.pdf",
@@ -18228,7 +18210,7 @@
    },
    "edit": null,
    "pages": 65,
-   "outline_count": 26
+   "outline_count": 58
   },
   {
    "id": "doc-2026-yatrn4",
@@ -18401,44 +18383,6 @@
    "outline_count": 74
   },
   {
-   "id": "doc-2026-ysc3bm",
-   "title": "2026학년도 교육활동 보호 기본 계획(안)",
-   "school_levels": [
-    "공통"
-   ],
-   "category": "",
-   "department": "교원인사과",
-   "year": 2026,
-   "format": "pdf",
-   "kind": "text",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 33,
-   "form_count": 0,
-   "updated_at": "2026-11-03T00:34:35.820Z",
-   "pdf": "../cne_files_2026_3/files/doc-2026-ysc3bm.pdf",
-   "original": {
-    "url": "../cne_files_2026_3/files/doc-2026-ysc3bm.pdf",
-    "name": "2026학년도 교육활동 보호 기본 계획(안).pdf",
-    "bytes": 1477520,
-    "format": "pdf"
-   },
-   "edit": {
-    "url": "../cne_files_2026_1/files/doc-2026-ysc3bm.hwp",
-    "name": "2026학년도 교육활동 보호 기본 계획(안).hwp",
-    "bytes": 1385472,
-    "format": "hwp"
-   },
-   "pages": 71,
-   "outline_count": 55
-  },
-  {
    "id": "doc-2026-ysq54n",
    "title": "2026학년도 초등학교 학적관리업무처리 지침",
    "school_levels": [
@@ -18558,7 +18502,7 @@
    "forms_bundle_url": "",
    "section_count": 11,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:31.937Z",
+   "updated_at": "2026-11-04T21:10:02.400Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-z8vark.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-z8vark.pdf",
@@ -18799,7 +18743,7 @@
    "forms_bundle_url": "",
    "section_count": 28,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:39.665Z",
+   "updated_at": "2026-11-04T21:30:41.844Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-zjohx1.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-zjohx1.pdf",
@@ -18809,7 +18753,7 @@
    },
    "edit": null,
    "pages": 62,
-   "outline_count": 20
+   "outline_count": 17
   },
   {
    "id": "doc-2026-zl8bum",
@@ -18974,7 +18918,7 @@
    "forms_bundle_url": "",
    "section_count": 4,
    "form_count": 0,
-   "updated_at": "2026-11-02T21:27:50.831Z",
+   "updated_at": "2026-11-04T21:50:46.708Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-zwe8g1.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-zwe8g1.pdf",
@@ -18984,7 +18928,7 @@
    },
    "edit": null,
    "pages": 4,
-   "outline_count": 23
+   "outline_count": 1
   },
   {
    "id": "doc-2027-8lbjdw",

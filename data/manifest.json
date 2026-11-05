@@ -1,8 +1,8 @@
 {
  "schema_version": "2.0",
- "generated_at": "2026-11-04T17:56:35.257Z",
+ "generated_at": "2026-11-05T00:54:21.723Z",
  "shard_count": 128,
- "document_count": 553,
+ "document_count": 551,
  "levels": {
   "kindergarten": {
    "name": "유아",
@@ -22,24 +22,24 @@
   "special": {
    "name": "특수",
    "documents": 28,
-   "sections": 937
+   "sections": 944
   },
   "common": {
    "name": "공통",
-   "documents": 328,
-   "sections": 8125
+   "documents": 326,
+   "sections": 8080
   }
  },
  "departments": {
   "초등특수교육과": 90,
   "학교지원과": 12,
   "미래인재과": 45,
-  "민주시민교육과": 89,
+  "민주시민교육과": 88,
   "정책기획과": 42,
   "체육건강과": 43,
   "감사관": 20,
   "중등교육과": 46,
-  "교원인사과": 14,
+  "교원인사과": 13,
   "유아교육복지과": 99,
   "교육과정평가지원부": 1,
   "소통담당관": 3,
