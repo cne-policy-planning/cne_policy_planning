@@ -1,6 +1,6 @@
 {
  "schema_version": "2.0",
- "generated_at": "2026-11-06T15:37:36.917Z",
+ "generated_at": "2026-11-06T15:57:01.724Z",
  "count": 549,
  "documents": [
   {
@@ -57,7 +57,7 @@
    "forms_bundle_url": "",
    "section_count": 167,
    "form_count": 0,
-   "updated_at": "2026-11-02T07:00:10.313Z",
+   "updated_at": "2026-11-06T15:49:45.813Z",
    "pdf": "../cne_files_2026_1/files/doc-2020-s2ttfb.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2020-s2ttfb.pdf",
@@ -67,7 +67,7 @@
    },
    "edit": null,
    "pages": 218,
-   "outline_count": 525
+   "outline_count": 238
   },
   {
    "id": "doc-2021-tcq021",
@@ -253,19 +253,19 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 2,
+   "section_count": 3,
    "form_count": 0,
-   "updated_at": "2026-11-02T12:53:47.269Z",
+   "updated_at": "2026-11-06T15:49:45.840Z",
    "pdf": "../cne_files_2026_2/files/doc-2024-fwhjd7.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2024-fwhjd7.pdf",
-    "name": "-3. 2024학년도 초중고 학생 교육비지원 나이스프로그램 FAQ.pdf",
-    "bytes": 2238032,
+    "name": "-3. 2024학년도 초중고 학생 교육비지원 나이스프로그램 FAQ-나눔.pdf",
+    "bytes": 2447667,
     "format": "pdf"
    },
    "edit": null,
-   "pages": 20,
-   "outline_count": 10
+   "pages": 38,
+   "outline_count": 27
   },
   {
    "id": "doc-2024-mo4sp7",
@@ -8054,7 +8054,7 @@
    "forms_bundle_url": "",
    "section_count": 76,
    "form_count": 0,
-   "updated_at": "2026-11-06T15:32:39.165Z",
+   "updated_at": "2026-11-06T15:49:45.838Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-dnjvxa.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-dnjvxa.pdf",
@@ -8064,7 +8064,7 @@
    },
    "edit": null,
    "pages": 154,
-   "outline_count": 41
+   "outline_count": 188
   },
   {
    "id": "doc-2026-dz35cb",
@@ -15503,7 +15503,7 @@
    "forms_bundle_url": "",
    "section_count": 12,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:39.536Z",
+   "updated_at": "2026-11-06T15:49:45.835Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-s79mxf.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-s79mxf.pdf",
@@ -15513,7 +15513,7 @@
    },
    "edit": null,
    "pages": 54,
-   "outline_count": 12
+   "outline_count": 49
   },
   {
    "id": "doc-2026-s8aj43",

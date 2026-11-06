@@ -1,6 +1,6 @@
 {
  "schema_version": "2.0",
- "generated_at": "2026-11-06T15:37:36.917Z",
+ "generated_at": "2026-11-06T15:57:01.724Z",
  "shard_count": 128,
  "document_count": 549,
  "levels": {
@@ -27,7 +27,7 @@
   "common": {
    "name": "공통",
    "documents": 324,
-   "sections": 8519
+   "sections": 8520
   }
  },
  "departments": {
