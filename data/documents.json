@@ -1,6 +1,6 @@
 {
  "schema_version": "2.0",
- "generated_at": "2026-11-06T08:11:43.693Z",
+ "generated_at": "2026-11-06T08:28:52.751Z",
  "count": 550,
  "documents": [
   {
@@ -453,7 +453,7 @@
    "forms_bundle_url": "",
    "section_count": 27,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:37.828Z",
+   "updated_at": "2026-11-06T08:14:15.860Z",
    "pdf": "../cne_files_2026_1/files/doc-2025-1zjx22.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2025-1zjx22.pdf",
@@ -463,7 +463,7 @@
    },
    "edit": null,
    "pages": 59,
-   "outline_count": 26
+   "outline_count": 43
   },
   {
    "id": "doc-2025-40g5m0",
@@ -552,7 +552,7 @@
    "forms_bundle_url": "",
    "section_count": 34,
    "form_count": 0,
-   "updated_at": "2026-11-02T12:58:16.119Z",
+   "updated_at": "2026-11-06T08:14:16.113Z",
    "pdf": "../cne_files_2026_1/files/doc-2025-6wmhnz.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2025-6wmhnz.pdf",
@@ -562,7 +562,7 @@
    },
    "edit": null,
    "pages": 67,
-   "outline_count": 134
+   "outline_count": 78
   },
   {
    "id": "doc-2025-8478qw",
@@ -651,7 +651,7 @@
    "forms_bundle_url": "",
    "section_count": 107,
    "form_count": 0,
-   "updated_at": "2026-11-02T11:36:05.118Z",
+   "updated_at": "2026-11-06T08:14:15.780Z",
    "pdf": "../cne_files_2026_1/files/doc-2025-a582we.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2025-a582we.pdf",
@@ -661,7 +661,7 @@
    },
    "edit": null,
    "pages": 122,
-   "outline_count": 222
+   "outline_count": 166
   },
   {
    "id": "doc-2025-ifkmv1",
@@ -684,7 +684,7 @@
    "forms_bundle_url": "",
    "section_count": 56,
    "form_count": 0,
-   "updated_at": "2026-11-02T12:58:37.492Z",
+   "updated_at": "2026-11-06T08:14:15.909Z",
    "pdf": "../cne_files_2026_1/files/doc-2025-ifkmv1.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2025-ifkmv1.pdf",
@@ -694,7 +694,7 @@
    },
    "edit": null,
    "pages": 166,
-   "outline_count": 592
+   "outline_count": 62
   },
   {
    "id": "doc-2025-nwjvv0",
@@ -1534,7 +1534,7 @@
    "forms_bundle_url": "",
    "section_count": 32,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:35.040Z",
+   "updated_at": "2026-11-06T08:20:23.580Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-149cxa.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-149cxa.pdf",
@@ -1544,7 +1544,7 @@
    },
    "edit": null,
    "pages": 153,
-   "outline_count": 46
+   "outline_count": 47
   },
   {
    "id": "doc-2026-151qv9",
@@ -2972,7 +2972,7 @@
    "forms_bundle_url": "",
    "section_count": 11,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:33.060Z",
+   "updated_at": "2026-11-06T08:16:35.588Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-4j825d.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-4j825d.pdf",
@@ -4430,7 +4430,7 @@
    "forms_bundle_url": "",
    "section_count": 7,
    "form_count": 0,
-   "updated_at": "2026-11-06T06:15:27.591Z",
+   "updated_at": "2026-11-06T08:14:16.169Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-77qwsb.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-77qwsb.pdf",
@@ -6578,7 +6578,7 @@
    "forms_bundle_url": "",
    "section_count": 11,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:33.183Z",
+   "updated_at": "2026-11-06T08:17:08.769Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-asehxj.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-asehxj.pdf",
@@ -6593,7 +6593,7 @@
     "format": "hwp"
    },
    "pages": 13,
-   "outline_count": 15
+   "outline_count": 14
   },
   {
    "id": "doc-2026-ay7h5b",
@@ -10795,7 +10795,7 @@
    "forms_bundle_url": "",
    "section_count": 10,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:33.291Z",
+   "updated_at": "2026-11-06T08:18:12.699Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-izoeyk.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-izoeyk.pdf",
@@ -10810,7 +10810,7 @@
     "format": "hwp"
    },
    "pages": 12,
-   "outline_count": 17
+   "outline_count": 14
   },
   {
    "id": "doc-2026-j44jam",
@@ -11447,7 +11447,7 @@
    "forms_bundle_url": "",
    "section_count": 6,
    "form_count": 0,
-   "updated_at": "2026-11-06T06:12:20.034Z",
+   "updated_at": "2026-11-06T08:14:16.050Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-k3bgsk.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-k3bgsk.pdf",
@@ -11462,7 +11462,7 @@
     "format": "hwp"
    },
    "pages": 14,
-   "outline_count": 6
+   "outline_count": 25
   },
   {
    "id": "doc-2026-k58qo5",
@@ -17277,7 +17277,7 @@
    "category": "",
    "department": "중등교육과",
    "year": 2026,
-   "format": "hwpx",
+   "format": "pdf",
    "kind": "text",
    "works_url": "",
    "origin": {
@@ -17287,19 +17287,24 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 5,
+   "section_count": 10,
    "form_count": 0,
-   "updated_at": "2026-11-02T21:32:00.456Z",
-   "pdf": "",
+   "updated_at": "2026-11-06T08:25:18.335Z",
+   "pdf": "../cne_files_2026_3/files/doc-2026-w69326.pdf",
    "original": {
+    "url": "../cne_files_2026_3/files/doc-2026-w69326.pdf",
+    "name": "★2026학년도 초중등학교 학사운영 계획.pdf",
+    "bytes": 3996831,
+    "format": "pdf"
+   },
+   "edit": {
     "url": "../cne_files_2026_1/files/doc-2026-w69326.hwpx",
     "name": "★2026학년도 초중등학교 학사운영 계획.hwpx",
     "bytes": 2125917,
     "format": "hwpx"
    },
-   "edit": null,
-   "pages": 339,
-   "outline_count": 7
+   "pages": 15,
+   "outline_count": 69
   },
   {
    "id": "doc-2026-w6awl8",
