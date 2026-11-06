@@ -358,6 +358,8 @@ details.lv-dept > summary i { font-style: normal; font-size: 13px; color: var(--
 .doc-grp.row-doc { cursor: pointer; }
 .doc-grp.row-doc:hover { color: var(--blue-text); }
 .doc-grp .cnt { font-weight: 600; color: var(--muted); margin-left: 4px; }
+.doc-grp .doc-all { display: inline-block; margin-left: 8px; padding: 1px 8px; border: 1px solid #c7d9f6; border-radius: 999px; background: #fff; color: var(--blue-text); font-size: 12px; font-weight: 600; text-decoration: none; white-space: nowrap; vertical-align: 1px; }
+.doc-grp .doc-all:hover { background: #eef4fd; }
 /* 검색 결과: 자료마다 목차 단계(단원·업무·항목)가 달라도 글자 크기·굵기를 같게. 찾은 줄과 위 단계는 색으로만 구분 */
 .res-kids .row .ttl, .res-kids .row.k-ch .ttl, .res-kids .row.k-task .ttl, .res-kids .row.k-part .ttl, .res-kids .row.k-group .ttl, .res-kids .row.k-item .ttl, .res-kids .row.k-bullet .ttl, .res-kids .row.k-page .ttl { font-weight: 400; color: var(--text); }
 .res-kids .row.via .ttl { color: var(--muted); }
