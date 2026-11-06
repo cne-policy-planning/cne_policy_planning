@@ -1,6 +1,6 @@
 {
  "schema_version": "2.0",
- "generated_at": "2026-11-06T08:28:52.751Z",
+ "generated_at": "2026-11-06T08:42:47.604Z",
  "count": 550,
  "documents": [
   {
@@ -585,7 +585,7 @@
    "forms_bundle_url": "",
    "section_count": 11,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:07.263Z",
+   "updated_at": "2026-11-06T08:38:15.765Z",
    "pdf": "../cne_files_2026_1/files/doc-2025-8478qw.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2025-8478qw.pdf",
@@ -595,7 +595,7 @@
    },
    "edit": null,
    "pages": 120,
-   "outline_count": 110
+   "outline_count": 49
   },
   {
    "id": "doc-2025-8j6ode",
@@ -1828,7 +1828,7 @@
    "forms_bundle_url": "",
    "section_count": 154,
    "form_count": 0,
-   "updated_at": "2026-11-02T07:00:10.423Z",
+   "updated_at": "2026-11-06T08:38:15.753Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-2a56bf.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-2a56bf.pdf",
@@ -1838,7 +1838,7 @@
    },
    "edit": null,
    "pages": 234,
-   "outline_count": 309
+   "outline_count": 27
   },
   {
    "id": "doc-2026-2eteig",
@@ -4773,7 +4773,7 @@
    "category": "",
    "department": "진로융합부",
    "year": 2026,
-   "format": "hwpx",
+   "format": "pdf",
    "kind": "text",
    "works_url": "",
    "origin": {
@@ -4785,17 +4785,22 @@
    "forms_bundle_url": "",
    "section_count": 1,
    "form_count": 0,
-   "updated_at": "2026-11-04T14:13:12.023Z",
-   "pdf": "",
+   "updated_at": "2026-11-06T08:40:34.854Z",
+   "pdf": "../cne_files_2026_1/files/doc-2026-7wsf0z.pdf",
    "original": {
+    "url": "../cne_files_2026_1/files/doc-2026-7wsf0z.pdf",
+    "name": "2026학년도 진로교육 유공 교육감 표창계획 요약서.pdf",
+    "bytes": 367195,
+    "format": "pdf"
+   },
+   "edit": {
     "url": "../cne_files_2026_1/files/doc-2026-7wsf0z.hwpx",
     "name": "2026학년도 진로교육 유공 교육감 표창계획 요약서.hwpx",
     "bytes": 80087,
     "format": "hwpx"
    },
-   "edit": null,
-   "pages": 28,
-   "outline_count": 6
+   "pages": 1,
+   "outline_count": 15
   },
   {
    "id": "doc-2026-7yps9d",
@@ -13309,7 +13314,7 @@
    "forms_bundle_url": "",
    "section_count": 68,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:07.355Z",
+   "updated_at": "2026-11-06T08:38:15.760Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-noxel1.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-noxel1.pdf",
@@ -13319,7 +13324,7 @@
    },
    "edit": null,
    "pages": 92,
-   "outline_count": 503
+   "outline_count": 91
   },
   {
    "id": "doc-2026-np2ufs",
@@ -16041,7 +16046,7 @@
    "forms_bundle_url": "",
    "section_count": 10,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:33.397Z",
+   "updated_at": "2026-11-06T08:37:16.583Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-sz2309.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-sz2309.pdf",
@@ -16056,7 +16061,7 @@
     "format": "hwp"
    },
    "pages": 19,
-   "outline_count": 8
+   "outline_count": 19
   },
   {
    "id": "doc-2026-t6f8dy",
@@ -17289,7 +17294,7 @@
    "forms_bundle_url": "",
    "section_count": 10,
    "form_count": 0,
-   "updated_at": "2026-11-06T08:25:18.335Z",
+   "updated_at": "2026-11-06T08:38:15.769Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-w69326.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-w69326.pdf",
@@ -17304,7 +17309,7 @@
     "format": "hwpx"
    },
    "pages": 15,
-   "outline_count": 69
+   "outline_count": 18
   },
   {
    "id": "doc-2026-w6awl8",
