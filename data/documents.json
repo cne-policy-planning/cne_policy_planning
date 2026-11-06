@@ -1,6 +1,6 @@
 {
  "schema_version": "2.0",
- "generated_at": "2026-11-06T15:13:28.570Z",
+ "generated_at": "2026-11-06T15:24:02.886Z",
  "count": 549,
  "documents": [
   {
@@ -1250,7 +1250,7 @@
    "forms_bundle_url": "",
    "section_count": 44,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:32.066Z",
+   "updated_at": "2026-11-06T15:22:09.422Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-04ca48.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-04ca48.pdf",
@@ -1260,7 +1260,7 @@
    },
    "edit": null,
    "pages": 68,
-   "outline_count": 21
+   "outline_count": 56
   },
   {
    "id": "doc-2026-0gu7l5",
@@ -4620,7 +4620,7 @@
    "forms_bundle_url": "",
    "section_count": 20,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:32.726Z",
+   "updated_at": "2026-11-06T15:17:24.476Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-7k9iju.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-7k9iju.pdf",
@@ -4635,7 +4635,7 @@
     "format": "hwp"
    },
    "pages": 37,
-   "outline_count": 41
+   "outline_count": 39
   },
   {
    "id": "doc-2026-7lnpx8",
@@ -5696,7 +5696,7 @@
    "category": "",
    "department": "초등특수교육과",
    "year": 2026,
-   "format": "hwpx",
+   "format": "pdf",
    "kind": "text",
    "works_url": "",
    "origin": {
@@ -5706,19 +5706,24 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 21,
+   "section_count": 63,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:07.673Z",
-   "pdf": "",
+   "updated_at": "2026-11-06T15:21:25.598Z",
+   "pdf": "../cne_files_2026_3/files/doc-2026-9st24t.pdf",
    "original": {
+    "url": "../cne_files_2026_3/files/doc-2026-9st24t.pdf",
+    "name": "2026 학부모회 활동 길라잡이.pdf",
+    "bytes": 19175482,
+    "format": "pdf"
+   },
+   "edit": {
     "url": "../cne_files_2026_2/files/doc-2026-9st24t.hwpx",
     "name": "2026 학부모회 활동 길라잡이.hwpx",
     "bytes": 4424771,
     "format": "hwpx"
    },
-   "edit": null,
-   "pages": 1920,
-   "outline_count": 31
+   "pages": 94,
+   "outline_count": 351
   },
   {
    "id": "doc-2026-9w1xhp",
@@ -13073,7 +13078,7 @@
    "forms_bundle_url": "",
    "section_count": 29,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:07.682Z",
+   "updated_at": "2026-11-06T15:22:09.415Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-nh3eko.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-nh3eko.pdf",
@@ -13083,7 +13088,7 @@
    },
    "edit": null,
    "pages": 45,
-   "outline_count": 243
+   "outline_count": 83
   },
   {
    "id": "doc-2026-nh3phb",
@@ -15559,7 +15564,7 @@
    "forms_bundle_url": "",
    "section_count": 9,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:33.119Z",
+   "updated_at": "2026-11-06T15:18:04.129Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-sa4a79.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-sa4a79.pdf",
@@ -18063,7 +18068,7 @@
    "category": "",
    "department": "초등특수교육과",
    "year": 2026,
-   "format": "hwpx",
+   "format": "pdf",
    "kind": "text",
    "works_url": "",
    "origin": {
@@ -18073,19 +18078,24 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 5,
+   "section_count": 11,
    "form_count": 0,
-   "updated_at": "2026-11-02T21:33:25.162Z",
-   "pdf": "",
+   "updated_at": "2026-11-06T15:22:09.409Z",
+   "pdf": "../cne_files_2026_2/files/doc-2026-xw96e2.pdf",
    "original": {
+    "url": "../cne_files_2026_2/files/doc-2026-xw96e2.pdf",
+    "name": "2026 수석교사제 운영 계획(탑재용).pdf",
+    "bytes": 3944134,
+    "format": "pdf"
+   },
+   "edit": {
     "url": "../cne_files_2026_2/files/doc-2026-xw96e2.hwpx",
     "name": "2026 수석교사제 운영 계획(탑재용).hwpx",
     "bytes": 392581,
     "format": "hwpx"
    },
-   "edit": null,
-   "pages": 579,
-   "outline_count": 6
+   "pages": 15,
+   "outline_count": 35
   },
   {
    "id": "doc-2026-xzzge0",
@@ -18524,7 +18534,7 @@
    "forms_bundle_url": "",
    "section_count": 31,
    "form_count": 0,
-   "updated_at": "2026-11-02T12:30:10.415Z",
+   "updated_at": "2026-11-06T15:22:09.428Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-zbd7rf.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-zbd7rf.pdf",
@@ -18534,7 +18544,7 @@
    },
    "edit": null,
    "pages": 36,
-   "outline_count": 79
+   "outline_count": 29
   },
   {
    "id": "doc-2026-zc28ai",
