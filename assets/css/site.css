@@ -181,7 +181,7 @@ body.splitting .v-viewer { pointer-events: none; }
 .v-pane { background: #fff; border: 1px solid var(--line); border-radius: 14px; min-height: 0; min-width: 0; display: flex; flex-direction: column; overflow: hidden; }
 .v-head { padding: 10px 12px; border-bottom: 1px solid var(--line2); display: flex; flex-direction: column; gap: 8px; }
 .v-head-row { flex-direction: row; align-items: center; flex-wrap: wrap; }
-.v-title { font-weight: 800; font-size: 15px; line-height: 1.35; word-break: keep-all; }
+.v-title { font-weight: 800; font-size: 17px; line-height: 1.35; word-break: keep-all; }
 .v-btns { display: flex; gap: 6px; flex-wrap: wrap; }
 button.small, .btn.small { padding: 4px 10px; font-size: 13px; border-radius: 8px; }
 button.accent { color: #c2410c; border-color: #f5c9ad; background: #fff7f1; }
@@ -205,19 +205,21 @@ button.accent { color: #c2410c; border-color: #f5c9ad; background: #fff7f1; }
 
 /* 가운데 번호 목차 */
 /* 목차는 자료(PDF·HWPX)와 상관없이 글꼴 하나로 보여 준다. 영문·숫자도 같은 글꼴 */
-.v-tree { padding: 4px 0 30px; font-size: 15px; font-family: "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+.v-tree { padding: 4px 0 30px; font-size: 16px; font-family: "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
 .v-tree button { font-family: inherit; }
 .row { display: grid; grid-template-columns: 42px auto 1fr; gap: 0 6px; align-items: start; padding: 3px 10px 3px 0; cursor: pointer; border-left: 3px solid transparent; }
 .row:hover { background: #f6f8fc; }
 .row.cur { background: #fff4ea; border-left-color: #ea6a26; }
-.row .pg { font-size: 12px; color: #98a2b3; text-align: right; padding-top: 3px; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.row .code { font-size: 13px; color: #667085; padding-top: 2px; white-space: nowrap; display: flex; gap: 3px; align-items: center; font-variant-numeric: tabular-nums; }
+.row .pg { font-size: 13px; color: #98a2b3; text-align: right; padding-top: 3px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.row .code { font-size: 14px; color: #667085; padding-top: 2px; white-space: nowrap; display: flex; gap: 3px; align-items: center; font-variant-numeric: tabular-nums; }
 .tg { width: 16px; height: 16px; padding: 0; border-radius: 50%; border: 1px solid #98a2b3; background: #fff; color: #475467; font-size: 12px; line-height: 1; display: inline-grid; place-items: center; flex: none; }
 .tg.sp { border-color: transparent; background: none; }
 .tg.dash { color: var(--muted); font-size: 14px; }
 /* 목차 제목 크기는 자료·단계와 상관없이 .v-tree 크기 하나만 쓴다 */
 .row .ttl { min-width: 0; overflow-wrap: anywhere; line-height: 1.5; font-size: inherit; }
 .row.k-ch { margin-top: 8px; } .row.k-ch .ttl { font-weight: 800; }
+/* 제목 줄(단원·업무)은 본문 줄보다 1px 크게(원래 15px → 제목 17px · 본문 16px) */
+.row.k-ch .ttl, .row.k-task .ttl { font-size: 17px; }
 .row.k-task .ttl { font-weight: 700; }
 .row.k-part .ttl { color: var(--muted); font-weight: 600; }
 .row.k-group .ttl { color: var(--blue-text); font-weight: 700; }
@@ -229,11 +231,11 @@ button.accent { color: #c2410c; border-color: #f5c9ad; background: #fff7f1; }
 .open { margin-left: 6px; font-size: 12.5px; text-decoration: none; border: 1px solid currentColor; border-radius: 5px; padding: 0 5px; white-space: nowrap; vertical-align: 1px; color: #2e7a57; }
 .open.o-법령 { color: #2a5ba6; } .open.o-사이트 { color: #6650b0; } .open.o-참고 { color: #b26f12; }
 .open:hover { background: #f6f8fc; }
-.res-h { display: flex; justify-content: space-between; gap: 8px; padding: 10px 12px 6px; font-size: 13px; color: var(--muted); }
+.res-h { display: flex; justify-content: space-between; gap: 8px; padding: 10px 12px 6px; font-size: 14px; color: var(--muted); }
 .res-h b { color: var(--text); }
 .linkbtn { border: 0; background: none; color: var(--blue-text); padding: 0; font-size: 13px; }
-.doc-grp { padding: 10px 12px 2px; font-size: 14px; font-weight: 800; color: var(--text); border-top: 1px solid var(--line2); margin-top: 6px; }
-.grp { padding: 8px 12px 2px; font-size: 13px; color: var(--muted); cursor: pointer; }
+.doc-grp { padding: 10px 12px 2px; font-size: 16px; font-weight: 800; color: var(--text); border-top: 1px solid var(--line2); margin-top: 6px; }
+.grp { padding: 8px 12px 2px; font-size: 14px; color: var(--muted); cursor: pointer; }
 .grp b { color: var(--text); }
 .grp:hover b { color: var(--blue-text); }
 .grp .pg { font-size: 11px; color: #98a2b3; }
@@ -373,6 +375,7 @@ details.lv-dept > summary i { font-style: normal; font-size: 13px; color: var(--
 .res-kids .row .ttl, .res-kids .row.k-ch .ttl, .res-kids .row.k-task .ttl, .res-kids .row.k-part .ttl, .res-kids .row.k-group .ttl, .res-kids .row.k-item .ttl, .res-kids .row.k-bullet .ttl, .res-kids .row.k-page .ttl { font-weight: 400; color: var(--text); }
 .res-kids .row.via .ttl { color: var(--muted); }
 .res-kids .row.k-ch { margin-top: 0; }
+.res-kids .row.k-ch .ttl, .res-kids .row.k-task .ttl { font-size: inherit; }
 .res-kids .row .num, .res-kids .row.k-ch .num, .res-kids .row.k-task .num { font-weight: 400; color: var(--muted); }
 .doc-grp.row-fold { cursor: pointer; display: block; }
 .doc-grp.row-fold:hover { color: var(--blue-text); }
