@@ -13,7 +13,15 @@
   window.pdfjsLib = pdfjsLib;
 </script>
 </head>
-<body>
+<body class="locked">
+<!-- 출입증 확인 전에는 이 화면만 보인다(관리 화면·메뉴는 숨김) -->
+<div id="gate" class="gate">
+  <div class="gate-box">
+    <h1>📚 관리자 도구</h1>
+    <p class="muted">관리자만 쓸 수 있는 화면입니다. 출입증 인증을 해 주세요.</p>
+    <div id="gateForm"><p class="muted">출입증을 확인하는 중…</p></div>
+  </div>
+</div>
 <header class="top">
   <div class="brand">📚 교무행정 통합검색 <span class="sub">/ 관리자 도구</span></div>
   <div class="top-right">

@@ -193,8 +193,9 @@
     const g = S.state.github || {};
     const detected = GH.detectRepo();
     const repoInput = h('input', { type: 'text', value: g.owner ? `${g.owner}/${g.repo}` : detected ? `${detected.owner}/${detected.repo}` : '', placeholder: '아이디/저장소이름 (예: myid/cne_policy_planning)' });
-    const tokenInput = h('input', { type: 'password', placeholder: 'github_pat_… 로 시작하는 출입증 붙여 넣기', autocomplete: 'off', spellcheck: false });
-    const periodSel = h('select', {}, ...PERIODS.map(([v, l]) => h('option', { value: v, selected: v === 'custom' }, l)));
+    const plain = !!opts.plain;   // 인증 화면: GitHub를 드러내는 안내 문구를 쓰지 않는다
+    const tokenInput = h('input', { type: 'password', placeholder: plain ? '출입증 붙여 넣기' : 'github_pat_… 로 시작하는 출입증 붙여 넣기', autocomplete: 'off', spellcheck: false });
+    const periodSel = h('select', {}, ...PERIODS.map(([v, l]) => h('option', { value: v, selected: v === 'custom' }, plain && v === 'custom' ? '만료일 직접 입력' : l)));
     const dateInput = h('input', { type: 'date', value: GH.ymd(GH.addDays(new Date(), 365)) });
     periodSel.onchange = () => dateInput.classList.toggle('hidden', periodSel.value !== 'custom');
     const remember = h('input', { type: 'checkbox', checked: g.remember !== false });
@@ -204,8 +205,8 @@
       const repo = GH.parseRepo(repoInput.value);
       if (!repo) { msg.className = 'notice err'; msg.textContent = '저장소를 "아이디/저장소이름" 형태로 입력해 주세요.'; return; }
       const token = tokenInput.value.trim();
-      if (!/^(github_pat_|ghp_)[A-Za-z0-9_]{20,}$/.test(token)) { msg.className = 'notice err'; msg.textContent = '출입증 형식이 아닙니다. GitHub에서 복사한 github_pat_로 시작하는 문자열 전체를 붙여 넣어 주세요.'; return; }
-      if (token.startsWith('ghp_')) { msg.className = 'notice warn'; msg.textContent = '예전 방식(classic) 출입증입니다. 연결은 되지만, 이 저장소에만 권한을 주는 Fine-grained 출입증을 권장합니다.'; }
+      if (!/^(github_pat_|ghp_)[A-Za-z0-9_]{20,}$/.test(token)) { msg.className = 'notice err'; msg.textContent = plain ? '출입증 형식이 아닙니다. 받은 출입증 전체를 그대로 붙여 넣어 주세요.' : '출입증 형식이 아닙니다. GitHub에서 복사한 github_pat_로 시작하는 문자열 전체를 붙여 넣어 주세요.'; return; }
+      if (token.startsWith('ghp_') && !plain) { msg.className = 'notice warn'; msg.textContent = '예전 방식(classic) 출입증입니다. 연결은 되지만, 이 저장소에만 권한을 주는 Fine-grained 출입증을 권장합니다.'; }
       const pv = periodSel.value;
       const expiresAt = pv === 'none' ? null : pv === 'custom' ? dateInput.value : GH.ymd(GH.addDays(new Date(), Number(pv)));
       if (pv === 'custom' && !expiresAt) { msg.className = 'notice err'; msg.textContent = '만료일을 입력해 주세요.'; return; }
@@ -219,9 +220,9 @@
       finally { go.disabled = false; }
     };
     return h('div', { class: 'token-box' },
-      field('저장소', repoInput, detected ? '사이트 주소에서 자동으로 채웠습니다.' : '사이트 주소(https://아이디.github.io/저장소/admin/)로 열면 자동으로 채워집니다.'),
-      field('출입증 (Fine-grained personal access token)', tokenInput, '이 PC의 브라우저에만 보관되고, 사이트 파일에는 들어가지 않습니다.'),
-      field('출입증 만료일', h('div', { class: 'row' }, periodSel, dateInput), 'GitHub에서 출입증을 만들 때 정한 만료일을 그대로 넣으세요. 이 날짜를 기준으로 30일·7일·1일 전에 알려 드립니다.'),
+      field('저장소', repoInput, plain ? '' : detected ? '사이트 주소에서 자동으로 채웠습니다.' : '사이트 주소(https://아이디.github.io/저장소/admin/)로 열면 자동으로 채워집니다.'),
+      field(plain ? '출입증' : '출입증 (Fine-grained personal access token)', tokenInput, '이 PC의 브라우저에만 보관되고, 사이트 파일에는 들어가지 않습니다.'),
+      field('출입증 만료일', h('div', { class: 'row' }, periodSel, dateInput), plain ? '출입증을 만들 때 정한 만료일을 넣으세요. 30일·7일·1일 전에 알려 드립니다.' : 'GitHub에서 출입증을 만들 때 정한 만료일을 그대로 넣으세요. 이 날짜를 기준으로 30일·7일·1일 전에 알려 드립니다.'),
       h('label', { class: 'inline' }, remember, '이 PC에 출입증 기억하기 (공용 PC라면 끄세요)'),
       h('div', { class: 'actions', style: 'margin-top:0' }, go), msg);
   }
@@ -257,7 +258,7 @@
       await alertDuplicates();
       await maybeAlertExpiry();
     } catch (e) {
-      if (e.kind === 'auth') { toast(e.message, 7000); renderConnectBox(); openTokenDialog(); return; }
+      if (e.kind === 'auth') { lockGate(e.message); return; }
       await modal(h('div', {}, h('h2', {}, '자료를 불러오지 못했습니다'), h('p', {}, e.message)));
       // 불러오지 못했어도 무엇이 바뀌었는지는 확인할 수 있게 한다
       await runActivityCheck();
@@ -334,7 +335,7 @@
           h('button', { class: 'ghost', style: 'flex:0', onclick: async () => { await S.setExpiry(null); toast('만료 없음으로 바꿨습니다.'); openTokenDialog(); } }, '만료 없음')));
       if (g.expiresAt) body.append(h('div', { class: 'actions' },
         h('button', { onclick: () => { S.download(new Blob([GH.calendarFile(g.expiresAt, `${g.owner}/${g.repo}`)], { type: 'text/calendar;charset=utf-8' }), `GitHub출입증_만료알림_${g.expiresAt}.ics`); toast('캘린더 파일을 받았습니다. 열어서 휴대폰·PC 캘린더에 추가하세요.', 6000); } }, '📅 캘린더에 알림 추가 (30일·7일·1일 전)'),
-        g.token ? h('button', { class: 'danger', onclick: async () => { if (await confirmBox('이 PC에서 출입증을 지울까요? 다시 반영하려면 출입증을 새로 입력해야 합니다.', '지우기', true)) { await S.forgetToken(); $('modal').classList.add('hidden'); renderConnectBox(); toast('출입증을 지웠습니다.'); } } }, '이 PC에서 출입증 지우기') : null));
+        g.token ? h('button', { class: 'danger', onclick: async () => { if (await confirmBox('이 PC에서 출입증을 지울까요? 다시 반영하려면 출입증을 새로 입력해야 합니다.', '지우기', true)) { await S.forgetToken(); lockGate('출입증을 지웠습니다. 다시 쓰려면 출입증을 인증해 주세요.'); } } }, '이 PC에서 출입증 지우기') : null));
       body.append(h('h3', {}, g.token ? '새 출입증으로 바꾸기' : '출입증 입력'));
     }
     body.append(tokenForm({ label: g && g.owner ? '바꾸고 연결 확인' : 'GitHub 연결', onDone: async () => {
@@ -413,12 +414,27 @@
     return finished;
   }
 
+  // ---------- 출입증 인증 화면(인증 전에는 관리 화면을 전혀 보여 주지 않는다) ----------
+  function lockGate(message) {
+    document.body.classList.add('locked');
+    $('modal').classList.add('hidden');
+    $('gateForm').replaceChildren(
+      message ? h('p', { class: 'notice err' }, message) : '',
+      tokenForm({ plain: true, label: '출입증 인증', onDone: async () => { unlockGate(); renderConnectBox(); renderTokenState(); await loadGithub(); } }));
+  }
+  function unlockGate() { document.body.classList.remove('locked'); $('gateForm').replaceChildren(); }
+
   async function initStart() {
     if (!S.fsSupported()) { $('fsNotice').classList.remove('hidden'); $('btnOpenFolder').disabled = true; }
     const last = await S.lastFolderName();
     if (last && S.fsSupported()) { $('btnReopen').textContent = `지난 폴더 다시 열기 (${last})`; $('btnReopen').classList.remove('hidden'); }
     const cfg = await S.loadGithubConfig();
     if (cfg) { S.state.github = cfg; }
+    // 저장해 둔 출입증도 열 때마다 GitHub에 다시 확인한다(만료·취소된 출입증이면 인증 화면으로)
+    if (!cfg || !cfg.token) { lockGate(); return; }
+    try { await S.connectGithub(Object.assign({}, cfg)); }
+    catch (e) { lockGate(e.kind === 'auth' || e.kind === 'permission' ? e.message : '출입증을 확인하지 못했습니다. ' + e.message); return; }
+    unlockGate();
     renderConnectBox(); renderTokenState();
     if (cfg && cfg.token) await loadGithub();
     else {
