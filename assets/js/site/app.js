@@ -374,7 +374,7 @@
   }
   // 첫 화면 검색 결과에서 고르면 그 자료의 그 위치로 연다
   $('homeResults').addEventListener('click', e => {
-    if (e.target.closest('a.open')) return;
+    if (e.target.closest('a.open, a.doc-all')) return;
     if (e.target.id === 'clearSearch') { setRoute({ q: '', t: '' }); return; }
     const rtg = e.target.closest('[data-rtg]');
     if (rtg) { toggleResult(rtg); return; }
@@ -657,7 +657,9 @@
       }
       const tag = m._c ? `<span class="lv-tag">공통 · ${esc(m._g || '')}</span> ` : '';
       // 찾은 목차가 있으면 자료 이름을 눌러 그 아래 목차를 접고 편다. 자료 이름만 맞은 자료는 눌러서 연다
-      const name = `${tag}${hl(p.title || m.t || '')}<span class="cnt">${hits.length ? hits.length + '건' : ''}</span>`;
+      // 문서 전체 보기: 검색어 없이 그 자료의 목차 전체로 간다
+      const all = `<a class="doc-all" href="${esc(hashFor({ slug: V.slug, doc: p.id }))}" title="이 자료의 목차 전체 보기">문서 전체 보기</a>`;
+      const name = `${tag}${hl(p.title || m.t || '')}<span class="cnt">${hits.length ? hits.length + '건' : ''}</span>${all}`;
       html += hits.length
         ? `<div class="doc-grp row-fold" data-fold="${esc(p.id)}" title="아래 목차 접기·펴기"><button type="button" class="df" aria-expanded="true" aria-label="아래 목차 접기">▾</button>${name}</div>`
         : `<div class="doc-grp row-doc" data-d="${esc(p.id)}" title="이 자료 열기">${name}</div>`;
@@ -926,7 +928,7 @@
 
   // ---------- 이벤트 ----------
   $('tree').addEventListener('click', async e => {
-    if (e.target.closest('a.open')) return;
+    if (e.target.closest('a.open, a.doc-all')) return;
     if (e.target.id === 'clearSearch') { setRoute({ q: '', t: '' }); return; }
     const rtg = e.target.closest('[data-rtg]');
     if (rtg) { toggleResult(rtg); return; }
