@@ -1,6 +1,6 @@
 {
  "schema_version": "2.0",
- "generated_at": "2026-11-06T05:33:18.590Z",
+ "generated_at": "2026-11-06T06:05:51.825Z",
  "count": 550,
  "documents": [
   {
@@ -1664,7 +1664,7 @@
    "category": "",
    "department": "유아교육복지과",
    "year": 2026,
-   "format": "hwpx",
+   "format": "pdf",
    "kind": "text",
    "works_url": "",
    "origin": {
@@ -1674,19 +1674,24 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 9,
+   "section_count": 18,
    "form_count": 0,
-   "updated_at": "2026-11-02T12:59:26.009Z",
-   "pdf": "",
+   "updated_at": "2026-11-06T05:52:10.178Z",
+   "pdf": "../cne_files_2026_3/files/doc-2026-1zi359.pdf",
    "original": {
+    "url": "../cne_files_2026_3/files/doc-2026-1zi359.pdf",
+    "name": "1. 2026년 교육복지지원사업 기본 계획.pdf",
+    "bytes": 6253394,
+    "format": "pdf"
+   },
+   "edit": {
     "url": "../cne_files_2026_1/files/doc-2026-1zi359.hwpx",
     "name": "1. 2026년 교육복지지원사업 기본 계획.hwpx",
     "bytes": 2262559,
     "format": "hwpx"
    },
-   "edit": null,
-   "pages": 1184,
-   "outline_count": 10
+   "pages": 21,
+   "outline_count": 28
   },
   {
    "id": "doc-2026-2363fo",
@@ -3563,7 +3568,7 @@
    "forms_bundle_url": "",
    "section_count": 2,
    "form_count": 0,
-   "updated_at": "2026-11-04T14:13:12.316Z",
+   "updated_at": "2026-11-06T05:46:28.482Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-5xaaln.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-5xaaln.pdf",
@@ -3578,7 +3583,7 @@
     "format": "hwp"
    },
    "pages": 4,
-   "outline_count": 16
+   "outline_count": 8
   },
   {
    "id": "doc-2026-5z1f8a",
@@ -4714,7 +4719,7 @@
    "forms_bundle_url": "",
    "section_count": 42,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:30.497Z",
+   "updated_at": "2026-11-06T05:52:10.185Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-7mj874.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-7mj874.pdf",
@@ -4724,7 +4729,7 @@
    },
    "edit": null,
    "pages": 80,
-   "outline_count": 35
+   "outline_count": 86
   },
   {
    "id": "doc-2026-7rrfrs",
@@ -4879,7 +4884,7 @@
    "forms_bundle_url": "",
    "section_count": 11,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:06.960Z",
+   "updated_at": "2026-11-06T05:52:10.171Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-81uyp9.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-81uyp9.pdf",
@@ -4889,7 +4894,7 @@
    },
    "edit": null,
    "pages": 158,
-   "outline_count": 115
+   "outline_count": 101
   },
   {
    "id": "doc-2026-829s02",
@@ -7263,7 +7268,7 @@
    "forms_bundle_url": "",
    "section_count": 26,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:35.789Z",
+   "updated_at": "2026-11-06T05:59:28.765Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-cb0s1d.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-cb0s1d.pdf",
@@ -7273,7 +7278,7 @@
    },
    "edit": null,
    "pages": 134,
-   "outline_count": 22
+   "outline_count": 79
   },
   {
    "id": "doc-2026-cdcslg",
@@ -8823,7 +8828,7 @@
    "forms_bundle_url": "",
    "section_count": 11,
    "form_count": 0,
-   "updated_at": "2026-11-04T14:13:11.136Z",
+   "updated_at": "2026-11-06T05:52:10.179Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-ffcow8.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-ffcow8.pdf",
@@ -8833,7 +8838,7 @@
    },
    "edit": null,
    "pages": 18,
-   "outline_count": 40
+   "outline_count": 35
   },
   {
    "id": "doc-2026-ffxqjs",
@@ -12526,7 +12531,7 @@
    "category": "",
    "department": "정책기획과",
    "year": 2026,
-   "format": "hwpx",
+   "format": "pdf",
    "kind": "text",
    "works_url": "",
    "origin": {
@@ -12536,19 +12541,24 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 33,
+   "section_count": 50,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:07.134Z",
-   "pdf": "",
+   "updated_at": "2026-11-06T05:59:28.768Z",
+   "pdf": "../cne_files_2026_3/files/doc-2026-maqwj7.pdf",
    "original": {
+    "url": "../cne_files_2026_3/files/doc-2026-maqwj7.pdf",
+    "name": "2026년 교육부 주요정책 안내.pdf",
+    "bytes": 22544277,
+    "format": "pdf"
+   },
+   "edit": {
     "url": "../cne_files_2026_1/files/doc-2026-maqwj7.hwpx",
     "name": "2026년 교육부 주요정책 안내.hwpx",
     "bytes": 425622,
     "format": "hwpx"
    },
-   "edit": null,
-   "pages": 2095,
-   "outline_count": 34
+   "pages": 83,
+   "outline_count": 156
   },
   {
    "id": "doc-2026-mg4p26",
@@ -12987,7 +12997,7 @@
    "forms_bundle_url": "",
    "section_count": 8,
    "form_count": 0,
-   "updated_at": "2026-11-02T21:31:47.453Z",
+   "updated_at": "2026-11-06T06:01:03.036Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-n8b8yj.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-n8b8yj.pdf",
@@ -12997,7 +13007,7 @@
    },
    "edit": null,
    "pages": 12,
-   "outline_count": 27
+   "outline_count": 21
   },
   {
    "id": "doc-2026-n8m7nc",
@@ -15215,7 +15225,7 @@
    "category": "",
    "department": "유아교육복지과",
    "year": 2026,
-   "format": "hwpx",
+   "format": "pdf",
    "kind": "text",
    "works_url": "",
    "origin": {
@@ -15225,19 +15235,24 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 7,
+   "section_count": 81,
    "form_count": 0,
-   "updated_at": "2026-11-02T12:59:21.078Z",
-   "pdf": "",
+   "updated_at": "2026-11-06T05:52:10.182Z",
+   "pdf": "../cne_files_2026_3/files/doc-2026-rqwqz6.pdf",
    "original": {
+    "url": "../cne_files_2026_3/files/doc-2026-rqwqz6.pdf",
+    "name": "2. 2026년 교육복지지원사업 주요업무계획.pdf",
+    "bytes": 30227473,
+    "format": "pdf"
+   },
+   "edit": {
     "url": "../cne_files_2026_1/files/doc-2026-rqwqz6.hwpx",
     "name": "2. 2026년 교육복지지원사업 주요업무계획.hwpx",
     "bytes": 3837495,
     "format": "hwpx"
    },
-   "edit": null,
-   "pages": 5539,
-   "outline_count": 8
+   "pages": 104,
+   "outline_count": 130
   },
   {
    "id": "doc-2026-rrx731",
@@ -16064,7 +16079,7 @@
    "forms_bundle_url": "",
    "section_count": 21,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:31.501Z",
+   "updated_at": "2026-11-06T05:59:28.761Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-t6f8dy.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-t6f8dy.pdf",
@@ -16079,7 +16094,7 @@
     "format": "hwp"
    },
    "pages": 96,
-   "outline_count": 38
+   "outline_count": 68
   },
   {
    "id": "doc-2026-t8yqbb",
@@ -16381,7 +16396,7 @@
    "forms_bundle_url": "",
    "section_count": 141,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:34.167Z",
+   "updated_at": "2026-11-06T05:52:10.176Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-tsplmp.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-tsplmp.pdf",
@@ -16391,7 +16406,7 @@
    },
    "edit": null,
    "pages": 242,
-   "outline_count": 154
+   "outline_count": 156
   },
   {
    "id": "doc-2026-tukl7g",
@@ -17409,7 +17424,7 @@
    "category": "",
    "department": "정책기획과",
    "year": 2026,
-   "format": "hwpx",
+   "format": "pdf",
    "kind": "text",
    "works_url": "",
    "origin": {
@@ -17419,19 +17434,24 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 8,
+   "section_count": 17,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:07.158Z",
-   "pdf": "",
+   "updated_at": "2026-11-06T06:03:47.157Z",
+   "pdf": "../cne_files_2026_3/files/doc-2026-wknzb4.pdf",
    "original": {
+    "url": "../cne_files_2026_3/files/doc-2026-wknzb4.pdf",
+    "name": "2026학년도 학교자체평가 운영 계획.pdf",
+    "bytes": 5199915,
+    "format": "pdf"
+   },
+   "edit": {
     "url": "../cne_files_2026_1/files/doc-2026-wknzb4.hwpx",
     "name": "2026학년도 학교자체평가 운영 계획.hwpx",
     "bytes": 553257,
     "format": "hwpx"
    },
-   "edit": null,
-   "pages": 895,
-   "outline_count": 9
+   "pages": 17,
+   "outline_count": 24
   },
   {
    "id": "doc-2026-wqhiz2",
@@ -17558,7 +17578,7 @@
    "forms_bundle_url": "",
    "section_count": 59,
    "form_count": 0,
-   "updated_at": "2026-11-02T07:00:10.240Z",
+   "updated_at": "2026-11-06T05:52:10.184Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-x7jcxt.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-x7jcxt.pdf",
@@ -17568,7 +17588,7 @@
    },
    "edit": null,
    "pages": 67,
-   "outline_count": 150
+   "outline_count": 49
   },
   {
    "id": "doc-2026-x7ug9a",
@@ -18401,7 +18421,7 @@
    "category": "",
    "department": "정책기획과",
    "year": 2026,
-   "format": "hwpx",
+   "format": "pdf",
    "kind": "text",
    "works_url": "",
    "origin": {
@@ -18411,19 +18431,24 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 11,
+   "section_count": 19,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:07.075Z",
-   "pdf": "",
+   "updated_at": "2026-11-06T05:52:10.181Z",
+   "pdf": "../cne_files_2026_3/files/doc-2026-yyypdj.pdf",
    "original": {
+    "url": "../cne_files_2026_3/files/doc-2026-yyypdj.pdf",
+    "name": "(붙임1) 2026 충남마을교육공동체(행복교육지구) 활성화 지원 계획(안내용).pdf",
+    "bytes": 8948004,
+    "format": "pdf"
+   },
+   "edit": {
     "url": "../cne_files_2026_1/files/doc-2026-yyypdj.hwpx",
     "name": "(붙임1) 2026 충남마을교육공동체(행복교육지구) 활성화 지원 계획(안내용).hwpx",
     "bytes": 3396432,
     "format": "hwpx"
    },
-   "edit": null,
-   "pages": 2458,
-   "outline_count": 12
+   "pages": 24,
+   "outline_count": 38
   },
   {
    "id": "doc-2026-z874tk",
@@ -19065,7 +19090,7 @@
    "forms_bundle_url": "",
    "section_count": 12,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:37.384Z",
+   "updated_at": "2026-11-06T05:52:10.174Z",
    "pdf": "../cne_files_2026_3/files/doc-2027-lr8d6v.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2027-lr8d6v.pdf",
@@ -19080,7 +19105,7 @@
     "format": "hwp"
    },
    "pages": 14,
-   "outline_count": 27
+   "outline_count": 29
   }
  ]
 }
