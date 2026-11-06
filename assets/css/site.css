@@ -124,6 +124,8 @@ body:has(#home:not(.hidden)) #home { flex: 1; }
 .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #c9d9f3; border-top-color: var(--blue); border-radius: 50%; animation: spin .8s linear infinite; vertical-align: -2px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 footer.site { border-top: 1px solid var(--line); background: #ffffffb3; padding: clamp(10px, 2vh, 20px) 0; font-size: 13.5px; color: var(--muted); }
+/* 위·아래 띠는 화면 양끝 가까이(가운데로 몰리지 않게) */
+header.top .wrap, footer.site .wrap { max-width: none; }
 footer.site .wrap { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
 footer.site .org { display: inline-flex; align-items: center; gap: 8px; color: var(--blue-text); font-weight: 600; font-size: 15px; }
 #level { padding-bottom: 50px; }
@@ -168,7 +170,14 @@ body.viewing footer.site, body.viewing .page-bg { display: none; }
 .v-tabs { display: none; gap: 6px; }
 .v-tabs button { flex: 1; justify-content: center; border-radius: 10px; padding: 7px; }
 .v-tabs button[aria-selected="true"] { background: var(--blue); border-color: var(--blue); color: #fff; }
-.v-cols { flex: 1; min-height: 0; display: grid; grid-template-columns: 220px minmax(300px, 400px) 1fr; gap: 10px; }
+.v-cols { position: relative; flex: 1; min-height: 0; display: grid; grid-template-columns: var(--w-docs, 220px) var(--w-toc, minmax(300px, 400px)) 1fr; gap: 10px; }
+/* 단 너비 조절 손잡이(단 사이를 끌어서 넓히고 좁힌다 · 두 번 누르면 처음 너비) */
+.v-split { position: absolute; top: 0; bottom: 0; width: 10px; margin-left: -5px; cursor: col-resize; z-index: 5; touch-action: none; }
+.v-split::after { content: ""; position: absolute; left: 4px; top: 50%; width: 2px; height: 44px; margin-top: -22px; border-radius: 2px; background: #c9d4e3; transition: background .12s, height .12s; }
+.v-split:hover::after, .v-split.on::after { background: var(--blue); height: 72px; margin-top: -36px; }
+.v-split[hidden] { display: none; }
+body.splitting, body.splitting * { cursor: col-resize !important; user-select: none !important; }
+body.splitting .v-viewer { pointer-events: none; }
 .v-pane { background: #fff; border: 1px solid var(--line); border-radius: 14px; min-height: 0; min-width: 0; display: flex; flex-direction: column; overflow: hidden; }
 .v-head { padding: 10px 12px; border-bottom: 1px solid var(--line2); display: flex; flex-direction: column; gap: 8px; }
 .v-head-row { flex-direction: row; align-items: center; flex-wrap: wrap; }
@@ -253,7 +262,7 @@ button.accent { color: #c2410c; border-color: #f5c9ad; background: #fff7f1; }
 @media (prefers-reduced-motion: reduce) { .flash { animation: none; opacity: .9; } }
 .toast { position: fixed; left: 50%; bottom: calc(22px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: #1d2939; color: #fff; padding: 10px 16px; border-radius: 10px; font-size: 14px; max-width: min(92vw, 560px); box-shadow: 0 6px 22px #0004; z-index: 30; }
 
-@media (max-width: 1200px) { .v-cols { grid-template-columns: minmax(280px, 360px) 1fr; } .v-docs { display: none; } }
+@media (max-width: 1200px) { .v-cols { grid-template-columns: var(--w-toc, minmax(280px, 360px)) 1fr; } .v-docs { display: none; } }
 @media (max-width: 900px) {
   body.viewing header.top .wrap { min-height: 48px; }
   .brand { font-size: 18px; }
@@ -375,7 +384,7 @@ details.lv-dept > summary i { font-style: normal; font-size: 13px; color: var(--
 .v-note.v-note-err { position: sticky; top: 0; z-index: 3; background: #fdecea; color: #b42318; box-shadow: 0 2px 6px #0002; }
 /* 검색 중에는 가운데 칸 결과 목록으로 충분하므로 왼쪽 자료 칸을 숨긴다 */
 .v-cols.searching .v-docs { display: none; }
-@media (min-width: 901px) { .v-cols.searching { grid-template-columns: minmax(340px, 460px) 1fr; } }
+@media (min-width: 901px) { .v-cols.searching { grid-template-columns: var(--w-toc, minmax(340px, 460px)) 1fr; } }
 
 .ttl .more { color: var(--muted); margin-left: 1px; }
 
@@ -385,6 +394,11 @@ details.lv-dept > summary i { font-style: normal; font-size: 13px; color: var(--
 .lv-item { display: flex; align-items: center; gap: 12px; padding: 11px 16px; text-decoration: none; color: var(--text); border-top: 1px solid var(--line2); }
 .lv-list > .lv-item:first-child { border-top: 0; }
 .lv-item:hover, .lv-item:focus-visible { background: var(--blue-soft); }
+/* 자료 형식 표시(왼쪽 자료 목록 · 검색 결과): 학교급 목록과 같은 색 */
+.fmt { display: inline-block; margin-right: 6px; padding: 0 6px; border-radius: 5px; font-size: 10.5px; font-weight: 700; line-height: 1.6; vertical-align: 1px; background: #eef2f7; color: #475467; letter-spacing: .02em; }
+.fmt.f-pdf { background: #fdecea; color: #b42318; }
+.fmt.f-hwpx, .fmt.f-hwp { background: #e8f0fc; color: #2462b3; }
+.fmt.f-xlsx, .fmt.f-xls, .fmt.f-xlsm { background: #e7f6ec; color: #1e7b45; }
 .lv-item .lv-fmt { flex: none; min-width: 46px; text-align: center; font-size: 11px; font-weight: 700; padding: 2px 6px; border-radius: 6px; background: #eef2f7; color: #475467; }
 .lv-item .lv-fmt.f-pdf { background: #fdecea; color: #b42318; }
 .lv-item .lv-fmt.f-hwpx, .lv-item .lv-fmt.f-hwp { background: #e8f0fc; color: #2462b3; }
