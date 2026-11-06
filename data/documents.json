@@ -1,6 +1,6 @@
 {
  "schema_version": "2.0",
- "generated_at": "2026-11-06T14:47:34.878Z",
+ "generated_at": "2026-11-06T15:13:28.570Z",
  "count": 549,
  "documents": [
   {
@@ -2577,7 +2577,7 @@
    "category": "",
    "department": "초등특수교육과",
    "year": 2026,
-   "format": "hwpx",
+   "format": "pdf",
    "kind": "text",
    "works_url": "",
    "origin": {
@@ -2587,19 +2587,24 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 7,
+   "section_count": 12,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:07.656Z",
-   "pdf": "",
+   "updated_at": "2026-11-06T15:10:04.086Z",
+   "pdf": "../cne_files_2026_2/files/doc-2026-437q5f.pdf",
    "original": {
+    "url": "../cne_files_2026_2/files/doc-2026-437q5f.pdf",
+    "name": "(최종)2026 한자교육 기본 계획.pdf",
+    "bytes": 4932592,
+    "format": "pdf"
+   },
+   "edit": {
     "url": "../cne_files_2026_2/files/doc-2026-437q5f.hwpx",
     "name": "(최종)2026 한자교육 기본 계획.hwpx",
     "bytes": 504955,
     "format": "hwpx"
    },
-   "edit": null,
-   "pages": 692,
-   "outline_count": 10
+   "pages": 17,
+   "outline_count": 33
   },
   {
    "id": "doc-2026-4584m3",
@@ -4070,7 +4075,7 @@
    "forms_bundle_url": "",
    "section_count": 10,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:32.015Z",
+   "updated_at": "2026-11-06T15:05:15.614Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-6mk2nd.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-6mk2nd.pdf",
@@ -4288,7 +4293,7 @@
    "forms_bundle_url": "",
    "section_count": 2,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:37.484Z",
+   "updated_at": "2026-11-06T14:56:27.535Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-6xuqta.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-6xuqta.pdf",
@@ -4303,7 +4308,7 @@
     "format": "hwp"
    },
    "pages": 6,
-   "outline_count": 8
+   "outline_count": 6
   },
   {
    "id": "doc-2026-7483e1",
@@ -5178,7 +5183,7 @@
    "forms_bundle_url": "",
    "section_count": 35,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:36.848Z",
+   "updated_at": "2026-11-06T15:10:04.091Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-8j1rg7.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-8j1rg7.pdf",
@@ -5193,7 +5198,7 @@
     "format": "hwp"
    },
    "pages": 53,
-   "outline_count": 23
+   "outline_count": 52
   },
   {
    "id": "doc-2026-8k9taq",
@@ -5632,7 +5637,7 @@
    "forms_bundle_url": "",
    "section_count": 9,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:31.884Z",
+   "updated_at": "2026-11-06T15:04:32.623Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-9h6yfy.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-9h6yfy.pdf",
@@ -10412,7 +10417,7 @@
    "forms_bundle_url": "",
    "section_count": 4,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:30.251Z",
+   "updated_at": "2026-11-06T15:10:04.074Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-ijh6dw.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-ijh6dw.pdf",
@@ -10427,7 +10432,7 @@
     "format": "hwp"
    },
    "pages": 15,
-   "outline_count": 12
+   "outline_count": 24
   },
   {
    "id": "doc-2026-ikmdbn",
@@ -11301,7 +11306,7 @@
   },
   {
    "id": "doc-2026-jwp4oj",
-   "title": "2026학년도 학교운동부 운영 안내서 인쇄본-복사 압축",
+   "title": "2026학년도 학교운동부 운영 안내서",
    "school_levels": [
     "공통"
    ],
@@ -11320,7 +11325,7 @@
    "forms_bundle_url": "",
    "section_count": 145,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:36.964Z",
+   "updated_at": "2026-11-06T15:10:04.096Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-jwp4oj.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-jwp4oj.pdf",
@@ -11330,7 +11335,7 @@
    },
    "edit": null,
    "pages": 308,
-   "outline_count": 119
+   "outline_count": 266
   },
   {
    "id": "doc-2026-jycy01",
@@ -11523,7 +11528,7 @@
    "forms_bundle_url": "",
    "section_count": 34,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:07.601Z",
+   "updated_at": "2026-11-06T15:10:04.079Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-k5x7l4.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-k5x7l4.pdf",
@@ -11533,7 +11538,7 @@
    },
    "edit": null,
    "pages": 149,
-   "outline_count": 288
+   "outline_count": 108
   },
   {
    "id": "doc-2026-k6s6b4",
@@ -13621,7 +13626,7 @@
    "forms_bundle_url": "",
    "section_count": 4,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:32.439Z",
+   "updated_at": "2026-11-06T15:08:43.835Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-o5z8b5.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-o5z8b5.pdf",
@@ -13636,7 +13641,7 @@
     "format": "hwp"
    },
    "pages": 24,
-   "outline_count": 14
+   "outline_count": 15
   },
   {
    "id": "doc-2026-o8rrp3",
@@ -14134,19 +14139,19 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 11,
+   "section_count": 35,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:39.354Z",
+   "updated_at": "2026-11-06T15:10:04.083Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-pfebet.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-pfebet.pdf",
-    "name": "학교 현장에서 배우는 외발자전거 타기(최종본_양면).pdf",
-    "bytes": 17619377,
+    "name": "학교 현장에서 배우는 외발자전거 타기(최종본_양면)-나눔.pdf",
+    "bytes": 17921411,
     "format": "pdf"
    },
    "edit": null,
-   "pages": 66,
-   "outline_count": 26
+   "pages": 130,
+   "outline_count": 93
   },
   {
    "id": "doc-2026-pgo72o",
@@ -15171,7 +15176,7 @@
    "forms_bundle_url": "",
    "section_count": 22,
    "form_count": 0,
-   "updated_at": "2026-11-02T06:31:02.705Z",
+   "updated_at": "2026-11-06T15:10:04.094Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-rpvgm3.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-rpvgm3.pdf",
@@ -15186,7 +15191,7 @@
     "format": "hwp"
    },
    "pages": 26,
-   "outline_count": 266
+   "outline_count": 32
   },
   {
    "id": "doc-2026-rqwqz6",
@@ -17966,7 +17971,7 @@
    "forms_bundle_url": "",
    "section_count": 14,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:36.886Z",
+   "updated_at": "2026-11-06T14:49:50.048Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-xrdrci.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-xrdrci.pdf",
