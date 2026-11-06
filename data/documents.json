@@ -1,6 +1,6 @@
 {
  "schema_version": "2.0",
- "generated_at": "2026-11-06T16:16:28.119Z",
+ "generated_at": "2026-11-06T16:32:20.092Z",
  "count": 549,
  "documents": [
   {
@@ -2029,7 +2029,7 @@
    "category": "",
    "department": "진로융합부",
    "year": 2026,
-   "format": "hwpx",
+   "format": "pdf",
    "kind": "text",
    "works_url": "",
    "origin": {
@@ -2039,18 +2039,23 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 13,
+   "section_count": 16,
    "form_count": 0,
-   "updated_at": "2026-11-04T16:00:08.108Z",
-   "pdf": "",
+   "updated_at": "2026-11-06T16:18:32.926Z",
+   "pdf": "../cne_files_2026_3/files/doc-2026-2t49ph.pdf",
    "original": {
+    "url": "../cne_files_2026_3/files/doc-2026-2t49ph.pdf",
+    "name": "2026 충남 진학교육 기본계획(학교안내용).pdf",
+    "bytes": 11053520,
+    "format": "pdf"
+   },
+   "edit": {
     "url": "../cne_files_2026_3/files/doc-2026-2t49ph.hwpx",
     "name": "2026 충남 진학교육 기본계획(학교안내용).hwpx",
     "bytes": 645775,
     "format": "hwpx"
    },
-   "edit": null,
-   "pages": 1625,
+   "pages": 40,
    "outline_count": 49
   },
   {
@@ -3784,7 +3789,7 @@
    "category": "",
    "department": "유아교육복지과",
    "year": 2026,
-   "format": "hwpx",
+   "format": "pdf",
    "kind": "text",
    "works_url": "",
    "origin": {
@@ -3794,19 +3799,24 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 7,
+   "section_count": 13,
    "form_count": 0,
-   "updated_at": "2026-11-02T12:49:17.623Z",
-   "pdf": "",
+   "updated_at": "2026-11-06T16:18:58.817Z",
+   "pdf": "../cne_files_2026_3/files/doc-2026-648ncf.pdf",
    "original": {
+    "url": "../cne_files_2026_3/files/doc-2026-648ncf.pdf",
+    "name": "★2026 자율형 사립고등학교 저소득층·다자녀 학생 교과서비 및 고교학비 지원 계획.pdf",
+    "bytes": 5081783,
+    "format": "pdf"
+   },
+   "edit": {
     "url": "../cne_files_2026_2/files/doc-2026-648ncf.hwpx",
     "name": "★2026 자율형 사립고등학교 저소득층·다자녀 학생 교과서비 및 고교학비 지원 계획.hwpx",
     "bytes": 446653,
     "format": "hwpx"
    },
-   "edit": null,
-   "pages": 643,
-   "outline_count": 9
+   "pages": 19,
+   "outline_count": 77
   },
   {
    "id": "doc-2026-65d7qx",
@@ -6041,7 +6051,7 @@
    "category": "",
    "department": "교무학사 공통자료",
    "year": 2026,
-   "format": "hwpx",
+   "format": "pdf",
    "kind": "text",
    "works_url": "",
    "origin": {
@@ -6051,19 +6061,24 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 37,
-   "form_count": 332,
-   "updated_at": "2026-10-31T19:34:09.286Z",
-   "pdf": "",
+   "section_count": 23,
+   "form_count": 0,
+   "updated_at": "2026-11-06T16:17:49.779Z",
+   "pdf": "../cne_files_2026_4/files/doc-2026-a875kh.pdf",
    "original": {
+    "url": "../cne_files_2026_4/files/doc-2026-a875kh.pdf",
+    "name": "특수학교 업무 도움자료.pdf",
+    "bytes": 20415594,
+    "format": "pdf"
+   },
+   "edit": {
     "url": "../cne_files_2026_3/files/doc-2026-a875kh.hwpx",
     "name": "특수학교 업무 도움자료.hwpx",
     "bytes": 34094907,
     "format": "hwpx"
    },
-   "edit": null,
-   "pages": 1638,
-   "outline_count": 463
+   "pages": 53,
+   "outline_count": 214
   },
   {
    "id": "doc-2026-a8iofi",
@@ -9399,7 +9414,7 @@
    "category": "",
    "department": "미래인재과",
    "year": 2026,
-   "format": "hwpx",
+   "format": "pdf",
    "kind": "text",
    "works_url": "",
    "origin": {
@@ -9409,19 +9424,24 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 20,
+   "section_count": 52,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:08.420Z",
-   "pdf": "",
+   "updated_at": "2026-11-06T16:18:08.767Z",
+   "pdf": "../cne_files_2026_3/files/doc-2026-gecmg8.pdf",
    "original": {
+    "url": "../cne_files_2026_3/files/doc-2026-gecmg8.pdf",
+    "name": "제55년차 전국영농축제(FFK2026대구대회) 대회지침서.pdf",
+    "bytes": 19038384,
+    "format": "pdf"
+   },
+   "edit": {
     "url": "../cne_files_2026_2/files/doc-2026-gecmg8.hwpx",
     "name": "제55년차 전국영농축제(FFK2026대구대회) 대회지침서.hwpx",
     "bytes": 941605,
     "format": "hwpx"
    },
-   "edit": null,
-   "pages": 3593,
-   "outline_count": 23
+   "pages": 72,
+   "outline_count": 236
   },
   {
    "id": "doc-2026-glbaku",
@@ -11767,7 +11787,7 @@
    "category": "",
    "department": "유아교육복지과",
    "year": 2026,
-   "format": "hwpx",
+   "format": "pdf",
    "kind": "text",
    "works_url": "",
    "origin": {
@@ -11777,19 +11797,24 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 7,
+   "section_count": 13,
    "form_count": 0,
-   "updated_at": "2026-11-02T12:49:21.500Z",
-   "pdf": "",
+   "updated_at": "2026-11-06T16:20:07.327Z",
+   "pdf": "../cne_files_2026_4/files/doc-2026-kq2kzn.pdf",
    "original": {
+    "url": "../cne_files_2026_4/files/doc-2026-kq2kzn.pdf",
+    "name": "★2026 고등학교 저소득층 학생 급식비 지원 계획.pdf",
+    "bytes": 4573423,
+    "format": "pdf"
+   },
+   "edit": {
     "url": "../cne_files_2026_2/files/doc-2026-kq2kzn.hwpx",
     "name": "★2026 고등학교 저소득층 학생 급식비 지원 계획.hwpx",
     "bytes": 910978,
     "format": "hwpx"
    },
-   "edit": null,
-   "pages": 609,
-   "outline_count": 9
+   "pages": 18,
+   "outline_count": 65
   },
   {
    "id": "doc-2026-ksqrd4",
@@ -18953,7 +18978,7 @@
    "category": "",
    "department": "민주시민교육과",
    "year": 2027,
-   "format": "hwpx",
+   "format": "pdf",
    "kind": "text",
    "works_url": "",
    "origin": {
@@ -18963,19 +18988,24 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 6,
+   "section_count": 21,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:08.444Z",
-   "pdf": "",
+   "updated_at": "2026-11-06T16:20:59.297Z",
+   "pdf": "../cne_files_2026_4/files/doc-2027-8lbjdw.pdf",
    "original": {
+    "url": "../cne_files_2026_4/files/doc-2027-8lbjdw.pdf",
+    "name": "2027학년도 중학교 교복 개별구매 운영 요령.pdf",
+    "bytes": 6577672,
+    "format": "pdf"
+   },
+   "edit": {
     "url": "../cne_files_2026_2/files/doc-2027-8lbjdw.hwpx",
     "name": "2027학년도 중학교 교복 개별구매 운영 요령.hwpx",
     "bytes": 449324,
     "format": "hwpx"
    },
-   "edit": null,
-   "pages": 848,
-   "outline_count": 7
+   "pages": 24,
+   "outline_count": 116
   },
   {
    "id": "doc-2027-9ex81p",
@@ -18986,7 +19016,7 @@
    "category": "",
    "department": "민주시민교육과",
    "year": 2027,
-   "format": "hwpx",
+   "format": "pdf",
    "kind": "text",
    "works_url": "",
    "origin": {
@@ -18996,19 +19026,24 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 10,
+   "section_count": 16,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:08.442Z",
-   "pdf": "",
+   "updated_at": "2026-11-06T16:20:38.568Z",
+   "pdf": "../cne_files_2026_4/files/doc-2027-9ex81p.pdf",
    "original": {
+    "url": "../cne_files_2026_4/files/doc-2027-9ex81p.pdf",
+    "name": "2027학년도 고등학교 교복 학교주관구매제도 운영 요령.pdf",
+    "bytes": 8257046,
+    "format": "pdf"
+   },
+   "edit": {
     "url": "../cne_files_2026_2/files/doc-2027-9ex81p.hwpx",
     "name": "2027학년도 고등학교 교복 학교주관구매제도 운영 요령.hwpx",
     "bytes": 326380,
     "format": "hwpx"
    },
-   "edit": null,
-   "pages": 543,
-   "outline_count": 11
+   "pages": 25,
+   "outline_count": 137
   },
   {
    "id": "doc-2027-9tz9uo",
@@ -19019,7 +19054,7 @@
    "category": "",
    "department": "민주시민교육과",
    "year": 2027,
-   "format": "hwpx",
+   "format": "pdf",
    "kind": "text",
    "works_url": "",
    "origin": {
@@ -19029,19 +19064,24 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 10,
+   "section_count": 21,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:08.446Z",
-   "pdf": "",
+   "updated_at": "2026-11-06T16:22:02.008Z",
+   "pdf": "../cne_files_2026_4/files/doc-2027-9tz9uo.pdf",
    "original": {
+    "url": "../cne_files_2026_4/files/doc-2027-9tz9uo.pdf",
+    "name": "2027학년도 중학교 교복 개별구매 운영 요령.pdf",
+    "bytes": 6577672,
+    "format": "pdf"
+   },
+   "edit": {
     "url": "../cne_files_2026_2/files/doc-2027-9tz9uo.hwpx",
     "name": "2027학년도 중학교 교복 학교주관구매제도 운영 요령.hwpx",
     "bytes": 326719,
     "format": "hwpx"
    },
-   "edit": null,
-   "pages": 550,
-   "outline_count": 11
+   "pages": 24,
+   "outline_count": 116
   },
   {
    "id": "doc-2027-bbu08g",
