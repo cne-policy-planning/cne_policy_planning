@@ -363,9 +363,9 @@
   /** 자료 한 줄(목록형): 형식 · 자료명 · 연도·쪽수·업무·서식 수 */
   function docRow(slug, d, nodes, showDept) {
     const n = nodes || [];
-    const tasks = n.filter(x => x.k === 'task').length, forms = n.filter(x => x.ty === '서식').length;
+    const forms = n.filter(x => x.ty === '서식').length;
     const fmt = (d.f || '').toUpperCase();
-    const meta = [d.y ? d.y + '년' : '', d.f === 'pdf' && d.n ? d.n + '쪽' : '', tasks ? `업무 ${tasks}` : '', forms ? `서식 ${forms}` : '',
+    const meta = [d.y ? d.y + '년' : '', d.f === 'pdf' && d.n ? d.n + '쪽' : '', forms ? `서식 ${forms}` : '',
       showDept && d.dp ? d.dp : '', d.o ? '출처 ' + d.o : ''].filter(Boolean).join(' · ');
     return h('a', { class: 'lv-item', href: hashFor({ slug, doc: d.id }) },
       h('span', { class: 'lv-fmt f-' + (d.f || 'etc') }, fmt || '자료'),
@@ -446,11 +446,14 @@
     await renderPages();
   }
 
+  /** 자료 형식 표시(PDF·HWPX·XLSX…): 학교급 목록과 같은 색 */
+  const fmtClass = f => 'fmt f-' + (String(f || 'etc').toLowerCase().replace(/[^a-z0-9]/g, '') || 'etc');
+  const fmtBadge = f => h('span', { class: fmtClass(f) }, String(f || '자료').toUpperCase());
   function renderDocList(activeId) {
     const searching = !!(V.q || V.t);
     const item = (d, hits) => h('a', { class: 'v-doc' + (d.id === activeId ? ' on' : ''), href: hashFor({ slug: V.slug, doc: d.id, q: searching ? V.q : '', t: searching ? V.t : '' }), 'aria-current': d.id === activeId ? 'true' : null },
-      h('b', {}, d.t), h('span', {}, searching && hits ? h('span', { class: 'hits' }, `${hits}건 · `) : null,
-        [d.y ? d.y + '년' : '', d.f === 'pdf' && d.n ? d.n + '쪽' : '', (d.f || '').toUpperCase(), d.f === 'pdf' && !d.p ? '쪽 보기 준비 중' : ''].filter(Boolean).join(' · ')));
+      h('b', {}, d.t), h('span', {}, fmtBadge(d.f), searching && hits ? h('span', { class: 'hits' }, `${hits}건 · `) : null,
+        [d.y ? d.y + '년' : '', d.f === 'pdf' && d.n ? d.n + '쪽' : '', d.f === 'pdf' && !d.p ? '쪽 보기 준비 중' : ''].filter(Boolean).join(' · ')));
     const out = [];
     // 검색 중: 찾은 자료만 학교급별로(지금 학교급 → 공통 → 다른 학교급)
     if (searching) {
@@ -659,7 +662,8 @@
       // 찾은 목차가 있으면 자료 이름을 눌러 그 아래 목차를 접고 편다. 자료 이름만 맞은 자료는 눌러서 연다
       // 문서 전체 보기: 검색어 없이 그 자료의 목차 전체로 간다
       const all = `<a class="doc-all" href="${esc(hashFor({ slug: V.slug, doc: p.id }))}" title="이 자료의 목차 전체 보기">문서 전체 보기</a>`;
-      const name = `${tag}${hl(p.title || m.t || '')}<span class="cnt">${hits.length ? hits.length + '건' : ''}</span>${all}`;
+      const fb = `<span class="${fmtClass(m.f)}">${esc(String(m.f || '자료').toUpperCase())}</span>`;
+      const name = `${tag}${fb}${hl(p.title || m.t || '')}<span class="cnt">${hits.length ? hits.length + '건' : ''}</span>${all}`;
       html += hits.length
         ? `<div class="doc-grp row-fold" data-fold="${esc(p.id)}" title="아래 목차 접기·펴기"><button type="button" class="df" aria-expanded="true" aria-label="아래 목차 접기">▾</button>${name}</div>`
         : `<div class="doc-grp row-doc" data-d="${esc(p.id)}" title="이 자료 열기">${name}</div>`;
@@ -978,6 +982,55 @@
   }
   $('tabToc').onclick = () => show('toc');
   $('tabDoc').onclick = () => show('doc');
+  // ---------- 단 너비 조절: 단 사이 손잡이를 끌면 왼쪽 단 너비가 바뀐다(이 브라우저에 기억) ----------
+  (function splitters() {
+    const cols = $('cols');
+    const panes = { docs: cols.querySelector('.v-docs'), toc: cols.querySelector('.v-toc') };
+    const LIM = { docs: [150, 480], toc: [240, 900] };
+    const KEY = 'sas-colw';
+    let saved = {};
+    try { saved = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { saved = {}; }
+    const apply = () => ['docs', 'toc'].forEach(k => { if (saved[k]) cols.style.setProperty('--w-' + k, saved[k] + 'px'); else cols.style.removeProperty('--w-' + k); });
+    const store = () => { try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) { /* 저장 못 해도 지금 화면에는 적용 */ } };
+    apply();
+    const bars = {};
+    Object.keys(panes).forEach(k => {
+      const b = h('div', { class: 'v-split', 'data-k': k, role: 'separator', 'aria-orientation': 'vertical', title: '끌어서 너비 조절 · 두 번 누르면 처음 너비' });
+      cols.appendChild(b); bars[k] = b;
+      b.addEventListener('pointerdown', e => {
+        if (e.button !== 0) return;
+        e.preventDefault(); b.setPointerCapture(e.pointerId);
+        const left = panes[k].getBoundingClientRect().left;
+        const max = Math.min(LIM[k][1], cols.clientWidth - 360);   // 오른쪽 본문은 적어도 360px 남긴다
+        b.classList.add('on'); document.body.classList.add('splitting');
+        const move = ev => {
+          const w = Math.round(Math.max(LIM[k][0], Math.min(max, ev.clientX - left - 5)));
+          saved[k] = w; apply(); place();
+        };
+        const up = () => {
+          b.removeEventListener('pointermove', move); b.removeEventListener('pointerup', up); b.removeEventListener('pointercancel', up);
+          b.classList.remove('on'); document.body.classList.remove('splitting');
+          store(); if (V.pdf) redrawAll();
+        };
+        b.addEventListener('pointermove', move); b.addEventListener('pointerup', up); b.addEventListener('pointercancel', up);
+      });
+      b.addEventListener('dblclick', () => { delete saved[k]; apply(); store(); place(); if (V.pdf) redrawAll(); });
+    });
+    // 손잡이 자리: 그 단의 오른쪽 끝과 다음 단 사이(단이 숨겨져 있거나 좁은 화면이면 숨김)
+    function place() {
+      Object.keys(panes).forEach(k => {
+        const p = panes[k], b = bars[k];
+        const show = !isNarrow() && p.offsetWidth > 0 && getComputedStyle(p).display !== 'none';
+        b.hidden = !show;
+        if (show) b.style.left = (p.offsetLeft + p.offsetWidth + 5) + 'px';
+      });
+    }
+    if (window.ResizeObserver) { const ro = new ResizeObserver(place); ro.observe(cols); Object.values(panes).forEach(p => ro.observe(p)); }
+    new MutationObserver(place).observe(cols, { attributes: true, attributeFilter: ['class', 'data-show'] });
+    window.addEventListener('resize', place);
+    place();
+  })();
+
   let resizeTimer, lastW = window.innerWidth;
   window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { if (Math.abs(window.innerWidth - lastW) > 40 && V.pdf) { lastW = window.innerWidth; redrawAll(); } }, 250); });
 
