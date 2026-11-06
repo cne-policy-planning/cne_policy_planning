@@ -1,6 +1,6 @@
 {
  "schema_version": "2.0",
- "generated_at": "2026-11-06T06:05:51.825Z",
+ "generated_at": "2026-11-06T08:11:43.693Z",
  "count": 550,
  "documents": [
   {
@@ -4428,14 +4428,14 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 2,
+   "section_count": 7,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:31.475Z",
+   "updated_at": "2026-11-06T06:15:27.591Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-77qwsb.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-77qwsb.pdf",
-    "name": "11. 12. 19. 2026 외국어교육(외국어교육 추진 실적, 국제교육 활성화, 올해의 영어교사상) 유공 교육감 표창 계획.pdf",
-    "bytes": 428500,
+    "name": "11. 12. 19. 2026 외국어교육(외국어교육 추진 실적, 국제교육 활성화, 올해의 영어교사상) 유공 교육감 표창 계획-나눔.pdf",
+    "bytes": 657852,
     "format": "pdf"
    },
    "edit": {
@@ -4444,7 +4444,7 @@
     "bytes": 206336,
     "format": "hwp"
    },
-   "pages": 8,
+   "pages": 16,
    "outline_count": 10
   },
   {
@@ -5021,7 +5021,7 @@
    "forms_bundle_url": "",
    "section_count": 9,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:32.543Z",
+   "updated_at": "2026-11-06T06:13:20.526Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-89ql41.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-89ql41.pdf",
@@ -11445,14 +11445,14 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 4,
+   "section_count": 6,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:32.516Z",
+   "updated_at": "2026-11-06T06:12:20.034Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-k3bgsk.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-k3bgsk.pdf",
-    "name": "2026 세계시민교육 추진계획(탑재용).pdf",
-    "bytes": 461330,
+    "name": "2026 세계시민교육 추진계획(탑재용)-나눔.pdf",
+    "bytes": 540576,
     "format": "pdf"
    },
    "edit": {
@@ -11461,7 +11461,7 @@
     "bytes": 912384,
     "format": "hwp"
    },
-   "pages": 7,
+   "pages": 14,
    "outline_count": 6
   },
   {
