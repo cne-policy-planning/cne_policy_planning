@@ -1,6 +1,6 @@
 {
  "schema_version": "2.0",
- "generated_at": "2026-11-06T15:24:02.886Z",
+ "generated_at": "2026-11-06T15:37:36.917Z",
  "count": 549,
  "documents": [
   {
@@ -2280,19 +2280,19 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 15,
+   "section_count": 24,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:38.517Z",
+   "updated_at": "2026-11-06T15:34:04.174Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-3ctkx8.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-3ctkx8.pdf",
-    "name": "성인 학력인정 문해교육 프로그램 설치 지정 및 운영지침_10차 개정.pdf",
-    "bytes": 1241139,
+    "name": "성인 학력인정 문해교육 프로그램 설치 지정 및 운영지침_10차 개정-나눔.pdf",
+    "bytes": 2469049,
     "format": "pdf"
    },
    "edit": null,
-   "pages": 37,
-   "outline_count": 32
+   "pages": 74,
+   "outline_count": 112
   },
   {
    "id": "doc-2026-3eets2",
@@ -2653,7 +2653,7 @@
    "category": "",
    "department": "초등특수교육과",
    "year": 2026,
-   "format": "hwpx",
+   "format": "pdf",
    "kind": "text",
    "works_url": "",
    "origin": {
@@ -2663,19 +2663,24 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 4,
+   "section_count": 21,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:07.697Z",
-   "pdf": "",
+   "updated_at": "2026-11-06T15:34:04.172Z",
+   "pdf": "../cne_files_2026_2/files/doc-2026-488ax8.pdf",
    "original": {
+    "url": "../cne_files_2026_2/files/doc-2026-488ax8.pdf",
+    "name": "2026학년도 학부모 종합 지원정책 기본계획.pdf",
+    "bytes": 7921835,
+    "format": "pdf"
+   },
+   "edit": {
     "url": "../cne_files_2026_2/files/doc-2026-488ax8.hwpx",
     "name": "2026학년도 학부모 종합 지원정책 기본계획.hwpx",
     "bytes": 678241,
     "format": "hwpx"
    },
-   "edit": null,
-   "pages": 1324,
-   "outline_count": 8
+   "pages": 29,
+   "outline_count": 51
   },
   {
    "id": "doc-2026-49q32g",
@@ -5708,7 +5713,7 @@
    "forms_bundle_url": "",
    "section_count": 63,
    "form_count": 0,
-   "updated_at": "2026-11-06T15:21:25.598Z",
+   "updated_at": "2026-11-06T15:34:04.168Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-9st24t.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-9st24t.pdf",
@@ -5723,7 +5728,7 @@
     "format": "hwpx"
    },
    "pages": 94,
-   "outline_count": 351
+   "outline_count": 110
   },
   {
    "id": "doc-2026-9w1xhp",
@@ -8047,18 +8052,18 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 54,
+   "section_count": 76,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:39.577Z",
+   "updated_at": "2026-11-06T15:32:39.165Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-dnjvxa.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-dnjvxa.pdf",
-    "name": "학력인정 성인문해교육 프로그램 질의응답 사례집.pdf",
-    "bytes": 10739835,
+    "name": "학력인정 성인문해교육 프로그램 질의응답 사례집-나눔.pdf",
+    "bytes": 11966165,
     "format": "pdf"
    },
    "edit": null,
-   "pages": 79,
+   "pages": 154,
    "outline_count": 41
   },
   {
@@ -11122,7 +11127,7 @@
    "forms_bundle_url": "",
    "section_count": 14,
    "form_count": 0,
-   "updated_at": "2026-11-02T07:00:10.532Z",
+   "updated_at": "2026-11-06T15:34:04.170Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-jk94ir.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-jk94ir.pdf",
@@ -11132,7 +11137,7 @@
    },
    "edit": null,
    "pages": 16,
-   "outline_count": 29
+   "outline_count": 47
   },
   {
    "id": "doc-2026-jl1rtx",
@@ -12249,19 +12254,19 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 40,
+   "section_count": 61,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:38.155Z",
-   "pdf": "../cne_files_2026_2/files/doc-2026-lwhksw.pdf",
+   "updated_at": "2026-11-06T15:34:04.166Z",
+   "pdf": "../cne_files_2026_3/files/doc-2026-lwhksw.pdf",
    "original": {
-    "url": "../cne_files_2026_2/files/doc-2026-lwhksw.pdf",
-    "name": "국어책임관 길잡이.pdf",
-    "bytes": 3649893,
+    "url": "../cne_files_2026_3/files/doc-2026-lwhksw.pdf",
+    "name": "국어책임관 길잡이-나눔.pdf",
+    "bytes": 8909792,
     "format": "pdf"
    },
    "edit": null,
-   "pages": 75,
-   "outline_count": 34
+   "pages": 150,
+   "outline_count": 58
   },
   {
    "id": "doc-2026-lwrhyj",
@@ -16718,7 +16723,7 @@
    "forms_bundle_url": "",
    "section_count": 5,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:33.542Z",
+   "updated_at": "2026-11-06T15:34:04.163Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-ufjb5m.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-ufjb5m.pdf",
@@ -16728,7 +16733,7 @@
    },
    "edit": null,
    "pages": 54,
-   "outline_count": 26
+   "outline_count": 54
   },
   {
    "id": "doc-2026-ufvl1s",
@@ -18555,7 +18560,7 @@
    "category": "",
    "department": "초등특수교육과",
    "year": 2026,
-   "format": "hwpx",
+   "format": "pdf",
    "kind": "text",
    "works_url": "",
    "origin": {
@@ -18565,19 +18570,24 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 6,
+   "section_count": 12,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:07.699Z",
-   "pdf": "",
+   "updated_at": "2026-11-06T15:34:04.158Z",
+   "pdf": "../cne_files_2026_3/files/doc-2026-zc28ai.pdf",
    "original": {
+    "url": "../cne_files_2026_3/files/doc-2026-zc28ai.pdf",
+    "name": "2026학년도 학부모 학교참여 지원사업 추진 계획.pdf",
+    "bytes": 4405345,
+    "format": "pdf"
+   },
+   "edit": {
     "url": "../cne_files_2026_2/files/doc-2026-zc28ai.hwpx",
     "name": "2026학년도 학부모 학교참여 지원사업 추진 계획.hwpx",
     "bytes": 189787,
     "format": "hwpx"
    },
-   "edit": null,
-   "pages": 548,
-   "outline_count": 10
+   "pages": 17,
+   "outline_count": 56
   },
   {
    "id": "doc-2026-zd5sb6",
