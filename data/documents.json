@@ -1,7 +1,7 @@
 {
  "schema_version": "2.0",
- "generated_at": "2026-11-06T08:42:47.604Z",
- "count": 550,
+ "generated_at": "2026-11-06T14:47:34.878Z",
+ "count": 549,
  "documents": [
   {
    "id": "doc-2018-9sjbw2",
@@ -1623,39 +1623,6 @@
    "outline_count": 24
   },
   {
-   "id": "doc-2026-1jx8mh",
-   "title": "2026건강관리업무, 한눈에 쏙!",
-   "school_levels": [
-    "공통"
-   ],
-   "category": "",
-   "department": "체육건강과",
-   "year": 2026,
-   "format": "pdf",
-   "kind": "text",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 24,
-   "form_count": 0,
-   "updated_at": "2026-11-02T21:33:03.940Z",
-   "pdf": "../cne_files_2026_2/files/doc-2026-1jx8mh.pdf",
-   "original": {
-    "url": "../cne_files_2026_2/files/doc-2026-1jx8mh.pdf",
-    "name": "★2026건강관리업무, 한눈에 쏙!(인쇄용)★.pdf",
-    "bytes": 35008475,
-    "format": "pdf"
-   },
-   "edit": null,
-   "pages": 236,
-   "outline_count": 1446
-  },
-  {
    "id": "doc-2026-1zi359",
    "title": "2026년 교육복지지원사업 기본 계획",
    "school_levels": [
@@ -2386,7 +2353,7 @@
    "forms_bundle_url": "",
    "section_count": 9,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:34.446Z",
+   "updated_at": "2026-11-06T14:26:15.362Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-3gjcv4.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-3gjcv4.pdf",
@@ -2401,7 +2368,7 @@
     "format": "hwp"
    },
    "pages": 13,
-   "outline_count": 6
+   "outline_count": 12
   },
   {
    "id": "doc-2026-3lyyx5",
@@ -3921,14 +3888,14 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 7,
+   "section_count": 10,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:35.596Z",
+   "updated_at": "2026-11-06T14:45:56.631Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-6fd1fu.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-6fd1fu.pdf",
-    "name": "2026년 학생건강증진(학교급식)분야 유공자 표창 계획(안) (1).pdf",
-    "bytes": 476459,
+    "name": "2026년 학생건강증진(학교급식)분야 유공자 표창 계획(안) (1)-나눔.pdf",
+    "bytes": 894814,
     "format": "pdf"
    },
    "edit": {
@@ -3937,8 +3904,8 @@
     "bytes": 238592,
     "format": "hwp"
    },
-   "pages": 7,
-   "outline_count": 5
+   "pages": 14,
+   "outline_count": 24
   },
   {
    "id": "doc-2026-6fww6c",
@@ -6244,14 +6211,14 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 4,
+   "section_count": 8,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:37.796Z",
+   "updated_at": "2026-11-06T14:45:56.640Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-ac6jte.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-ac6jte.pdf",
-    "name": "[수정 10.7.]2026 학생건강증진 분야 유공자 교육감 표창계획.pdf",
-    "bytes": 449659,
+    "name": "[수정 10.7.]2026 학생건강증진 분야 유공자 교육감 표창계획-나눔.pdf",
+    "bytes": 648285,
     "format": "pdf"
    },
    "edit": {
@@ -6260,8 +6227,8 @@
     "bytes": 260608,
     "format": "hwp"
    },
-   "pages": 9,
-   "outline_count": 9
+   "pages": 18,
+   "outline_count": 27
   },
   {
    "id": "doc-2026-acqtfv",
@@ -10904,7 +10871,7 @@
    "forms_bundle_url": "",
    "section_count": 5,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:32.674Z",
+   "updated_at": "2026-11-06T14:22:58.180Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-j5g7em.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-j5g7em.pdf",
@@ -10919,7 +10886,7 @@
     "format": "hwp"
    },
    "pages": 11,
-   "outline_count": 5
+   "outline_count": 11
   },
   {
    "id": "doc-2026-jbep97",
@@ -11622,7 +11589,7 @@
    "forms_bundle_url": "",
    "section_count": 134,
    "form_count": 0,
-   "updated_at": "2026-11-02T07:00:10.274Z",
+   "updated_at": "2026-11-06T14:45:56.650Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-k6sr2h.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-k6sr2h.pdf",
@@ -11632,7 +11599,7 @@
    },
    "edit": null,
    "pages": 178,
-   "outline_count": 345
+   "outline_count": 39
   },
   {
    "id": "doc-2026-kaw2xq",
@@ -11655,7 +11622,7 @@
    "forms_bundle_url": "",
    "section_count": 14,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:36.664Z",
+   "updated_at": "2026-11-06T14:43:32.855Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-kaw2xq.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-kaw2xq.pdf",
@@ -11670,7 +11637,7 @@
     "format": "hwp"
    },
    "pages": 17,
-   "outline_count": 17
+   "outline_count": 16
   },
   {
    "id": "doc-2026-kd91ml",
@@ -12515,7 +12482,7 @@
    "forms_bundle_url": "",
    "section_count": 45,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:07.532Z",
+   "updated_at": "2026-11-06T14:45:56.648Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-m9di6h.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-m9di6h.pdf",
@@ -12525,7 +12492,7 @@
    },
    "edit": null,
    "pages": 164,
-   "outline_count": 273
+   "outline_count": 89
   },
   {
    "id": "doc-2026-maqwj7",
@@ -13725,7 +13692,7 @@
    "forms_bundle_url": "",
    "section_count": 10,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:36.182Z",
+   "updated_at": "2026-11-06T14:41:19.279Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-o9gr11.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-o9gr11.pdf",
@@ -13735,7 +13702,7 @@
    },
    "edit": null,
    "pages": 28,
-   "outline_count": 25
+   "outline_count": 26
   },
   {
    "id": "doc-2026-oafv8e",
@@ -14339,7 +14306,7 @@
    "forms_bundle_url": "",
    "section_count": 3,
    "form_count": 0,
-   "updated_at": "2026-11-04T14:13:11.400Z",
+   "updated_at": "2026-11-06T14:45:56.645Z",
    "pdf": "",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-pmcp71.hwpx",
@@ -14349,7 +14316,7 @@
    },
    "edit": null,
    "pages": 8408,
-   "outline_count": 160
+   "outline_count": 161
   },
   {
    "id": "doc-2026-prnfpp",
@@ -14474,19 +14441,19 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 3,
+   "section_count": 4,
    "form_count": 0,
-   "updated_at": "2026-11-04T14:13:11.768Z",
+   "updated_at": "2026-11-06T14:45:56.604Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-qa2j9t.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-qa2j9t.pdf",
-    "name": "2026년도 제1회 충청남도교육청학교급식위원회 회의록.pdf",
-    "bytes": 148504,
+    "name": "2026년도 제1회 충청남도교육청학교급식위원회 회의록-나눔.pdf",
+    "bytes": 232470,
     "format": "pdf"
    },
    "edit": null,
-   "pages": 5,
-   "outline_count": 4
+   "pages": 10,
+   "outline_count": 11
   },
   {
    "id": "doc-2026-qhmnv2",
@@ -14996,7 +14963,7 @@
    "forms_bundle_url": "",
    "section_count": 78,
    "form_count": 0,
-   "updated_at": "2026-11-02T21:32:57.009Z",
+   "updated_at": "2026-11-06T14:45:56.636Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-rl1hds.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-rl1hds.pdf",
@@ -15011,7 +14978,7 @@
     "format": "hwp"
    },
    "pages": 122,
-   "outline_count": 596
+   "outline_count": 78
   },
   {
    "id": "doc-2026-rm314t",
@@ -16807,7 +16774,7 @@
    "forms_bundle_url": "",
    "section_count": 24,
    "form_count": 0,
-   "updated_at": "2026-11-02T06:31:02.640Z",
+   "updated_at": "2026-11-06T14:45:56.652Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-ugu2u1.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-ugu2u1.pdf",
@@ -16822,7 +16789,7 @@
     "format": "hwp"
    },
    "pages": 264,
-   "outline_count": 462
+   "outline_count": 146
   },
   {
    "id": "doc-2026-umec7x",
@@ -18606,7 +18573,7 @@
    "category": "",
    "department": "체육건강과",
    "year": 2026,
-   "format": "hwpx",
+   "format": "pdf",
    "kind": "text",
    "works_url": "",
    "origin": {
@@ -18616,19 +18583,24 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 4,
+   "section_count": 58,
    "form_count": 0,
-   "updated_at": "2026-11-02T12:55:43.893Z",
-   "pdf": "",
+   "updated_at": "2026-11-06T14:45:56.642Z",
+   "pdf": "../cne_files_2026_2/files/doc-2026-zd5sb6.pdf",
    "original": {
+    "url": "../cne_files_2026_2/files/doc-2026-zd5sb6.pdf",
+    "name": "2. 2026 학교체육 연간운영계획서(초중고).pdf",
+    "bytes": 17781173,
+    "format": "pdf"
+   },
+   "edit": {
     "url": "../cne_files_2026_1/files/doc-2026-zd5sb6.hwpx",
     "name": "2. 2026 학교체육 연간운영계획서(초중고).hwpx",
     "bytes": 210929,
     "format": "hwpx"
    },
-   "edit": null,
-   "pages": 2261,
-   "outline_count": 6
+   "pages": 62,
+   "outline_count": 234
   },
   {
    "id": "doc-2026-zdq428",

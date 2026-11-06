@@ -1,8 +1,8 @@
 {
  "schema_version": "2.0",
- "generated_at": "2026-11-06T08:42:47.604Z",
+ "generated_at": "2026-11-06T14:47:34.878Z",
  "shard_count": 128,
- "document_count": 550,
+ "document_count": 549,
  "levels": {
   "kindergarten": {
    "name": "유아",
@@ -26,8 +26,8 @@
   },
   "common": {
    "name": "공통",
-   "documents": 325,
-   "sections": 8329
+   "documents": 324,
+   "sections": 8367
   }
  },
  "departments": {
@@ -36,7 +36,7 @@
   "미래인재과": 45,
   "민주시민교육과": 88,
   "정책기획과": 42,
-  "체육건강과": 43,
+  "체육건강과": 42,
   "감사관": 20,
   "중등교육과": 46,
   "교원인사과": 13,
