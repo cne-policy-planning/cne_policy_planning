@@ -1,8 +1,8 @@
 {
  "schema_version": "2.0",
- "generated_at": "2026-11-05T07:49:52.199Z",
+ "generated_at": "2026-11-06T05:33:18.590Z",
  "shard_count": 128,
- "document_count": 551,
+ "document_count": 550,
  "levels": {
   "kindergarten": {
    "name": "유아",
@@ -26,8 +26,8 @@
   },
   "common": {
    "name": "공통",
-   "documents": 326,
-   "sections": 8163
+   "documents": 325,
+   "sections": 8200
   }
  },
  "departments": {
@@ -40,7 +40,7 @@
   "감사관": 20,
   "중등교육과": 46,
   "교원인사과": 13,
-  "유아교육복지과": 99,
+  "유아교육복지과": 98,
   "교육과정평가지원부": 1,
   "소통담당관": 3,
   "안전총괄과": 6,

@@ -1,7 +1,7 @@
 {
  "schema_version": "2.0",
- "generated_at": "2026-11-05T07:49:52.199Z",
- "count": 551,
+ "generated_at": "2026-11-06T05:33:18.590Z",
+ "count": 550,
  "documents": [
   {
    "id": "doc-2018-9sjbw2",
@@ -1932,7 +1932,7 @@
    "forms_bundle_url": "",
    "section_count": 8,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:06.947Z",
+   "updated_at": "2026-11-06T05:26:15.341Z",
    "pdf": "",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-2i5udj.hwpx",
@@ -1942,7 +1942,7 @@
    },
    "edit": null,
    "pages": 973,
-   "outline_count": 9
+   "outline_count": 26
   },
   {
    "id": "doc-2026-2jb0dh",
@@ -2792,7 +2792,7 @@
    "forms_bundle_url": "",
    "section_count": 13,
    "form_count": 0,
-   "updated_at": "2026-11-02T06:31:02.556Z",
+   "updated_at": "2026-11-06T05:27:17.169Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-4c57le.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-4c57le.pdf",
@@ -2807,7 +2807,7 @@
     "format": "hwp"
    },
    "pages": 19,
-   "outline_count": 51
+   "outline_count": 26
   },
   {
    "id": "doc-2026-4fjtnr",
@@ -3005,7 +3005,7 @@
    "forms_bundle_url": "",
    "section_count": 35,
    "form_count": 0,
-   "updated_at": "2026-11-02T21:30:56.670Z",
+   "updated_at": "2026-11-06T05:30:21.264Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-4k9k0k.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-4k9k0k.pdf",
@@ -3015,7 +3015,7 @@
    },
    "edit": null,
    "pages": 43,
-   "outline_count": 70
+   "outline_count": 36
   },
   {
    "id": "doc-2026-4om682",
@@ -3878,14 +3878,14 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 19,
+   "section_count": 37,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:35.261Z",
+   "updated_at": "2026-11-06T04:59:21.440Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-6dytf7.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-6dytf7.pdf",
-    "name": "2026년 재난상황관리 훈련 계획(충남교육청).pdf",
-    "bytes": 1630088,
+    "name": "2026년 재난상황관리 훈련 계획(충남교육청)-나눔.pdf",
+    "bytes": 3473680,
     "format": "pdf"
    },
    "edit": {
@@ -3894,8 +3894,8 @@
     "bytes": 4818432,
     "format": "hwp"
    },
-   "pages": 20,
-   "outline_count": 16
+   "pages": 40,
+   "outline_count": 33
   },
   {
    "id": "doc-2026-6fd1fu",
@@ -4572,7 +4572,7 @@
    "forms_bundle_url": "",
    "section_count": 17,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:33.514Z",
+   "updated_at": "2026-11-06T05:16:50.550Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-7g8bnf.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-7g8bnf.pdf",
@@ -5419,7 +5419,7 @@
    "forms_bundle_url": "",
    "section_count": 179,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:37.027Z",
+   "updated_at": "2026-11-06T05:14:36.707Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-8y3o2a.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-8y3o2a.pdf",
@@ -5429,7 +5429,7 @@
    },
    "edit": null,
    "pages": 299,
-   "outline_count": 162
+   "outline_count": 163
   },
   {
    "id": "doc-2026-932wmz",
@@ -6497,7 +6497,7 @@
    "forms_bundle_url": "",
    "section_count": 16,
    "form_count": 0,
-   "updated_at": "2026-11-02T21:31:36.194Z",
+   "updated_at": "2026-11-06T05:26:53.359Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-alezbg.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-alezbg.pdf",
@@ -6512,7 +6512,7 @@
     "format": "hwp"
    },
    "pages": 62,
-   "outline_count": 53
+   "outline_count": 42
   },
   {
    "id": "doc-2026-aozdus",
@@ -6913,7 +6913,7 @@
    "forms_bundle_url": "",
    "section_count": 4,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:34.418Z",
+   "updated_at": "2026-11-06T04:53:03.196Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-blf2su.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-blf2su.pdf",
@@ -6928,7 +6928,7 @@
     "format": "hwp"
    },
    "pages": 18,
-   "outline_count": 7
+   "outline_count": 14
   },
   {
    "id": "doc-2026-bmmr0c",
@@ -7717,7 +7717,7 @@
    "forms_bundle_url": "",
    "section_count": 96,
    "form_count": 0,
-   "updated_at": "2026-11-02T07:00:10.574Z",
+   "updated_at": "2026-11-06T05:26:28.719Z",
    "pdf": "../cne_files_2026_2/files/doc-2026-d1vcg0.pdf",
    "original": {
     "url": "../cne_files_2026_2/files/doc-2026-d1vcg0.pdf",
@@ -7727,7 +7727,7 @@
    },
    "edit": null,
    "pages": 128,
-   "outline_count": 385
+   "outline_count": 41
   },
   {
    "id": "doc-2026-d6vnad",
@@ -8400,7 +8400,7 @@
    "category": "",
    "department": "유아교육복지과",
    "year": 2026,
-   "format": "hwpx",
+   "format": "pdf",
    "kind": "text",
    "works_url": "",
    "origin": {
@@ -8410,19 +8410,24 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 10,
+   "section_count": 15,
    "form_count": 0,
-   "updated_at": "2026-11-02T21:31:31.059Z",
-   "pdf": "",
+   "updated_at": "2026-11-06T05:28:12.041Z",
+   "pdf": "../cne_files_2026_2/files/doc-2026-elm2q5.pdf",
    "original": {
+    "url": "../cne_files_2026_2/files/doc-2026-elm2q5.pdf",
+    "name": "★2026 초·중·고 수학여행비 지원 계획.pdf",
+    "bytes": 5347849,
+    "format": "pdf"
+   },
+   "edit": {
     "url": "../cne_files_2026_1/files/doc-2026-elm2q5.hwpx",
     "name": "★2026 초·중·고 수학여행비 지원 계획.hwpx",
     "bytes": 519602,
     "format": "hwpx"
    },
-   "edit": null,
-   "pages": 698,
-   "outline_count": 12
+   "pages": 21,
+   "outline_count": 26
   },
   {
    "id": "doc-2026-ewj1zg",
@@ -9468,7 +9473,7 @@
    "category": "",
    "department": "안전총괄과",
    "year": 2026,
-   "format": "hwpx",
+   "format": "pdf",
    "kind": "text",
    "works_url": "",
    "origin": {
@@ -9478,19 +9483,24 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 11,
+   "section_count": 28,
    "form_count": 0,
-   "updated_at": "2026-11-02T21:30:47.035Z",
-   "pdf": "",
+   "updated_at": "2026-11-06T04:53:55.533Z",
+   "pdf": "../cne_files_2026_3/files/doc-2026-gltgbv.pdf",
    "original": {
+    "url": "../cne_files_2026_3/files/doc-2026-gltgbv.pdf",
+    "name": "[충남교육청] 2026 안전점검의날 추진계획.pdf",
+    "bytes": 6895991,
+    "format": "pdf"
+   },
+   "edit": {
     "url": "../cne_files_2026_1/files/doc-2026-gltgbv.hwpx",
     "name": "[충남교육청] 2026 안전점검의날 추진계획.hwpx",
     "bytes": 1517462,
     "format": "hwpx"
    },
-   "edit": null,
-   "pages": 896,
-   "outline_count": 12
+   "pages": 29,
+   "outline_count": 33
   },
   {
    "id": "doc-2026-gq6udq",
@@ -10742,7 +10752,7 @@
    "forms_bundle_url": "",
    "section_count": 93,
    "form_count": 0,
-   "updated_at": "2026-11-02T06:31:02.514Z",
+   "updated_at": "2026-11-06T05:00:21.884Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-iv4brt.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-iv4brt.pdf",
@@ -10757,7 +10767,7 @@
     "format": "hwp"
    },
    "pages": 108,
-   "outline_count": 649
+   "outline_count": 59
   },
   {
    "id": "doc-2026-izoeyk",
@@ -12911,7 +12921,7 @@
    "forms_bundle_url": "",
    "section_count": 35,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:36.995Z",
+   "updated_at": "2026-11-06T05:14:47.487Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-n3fl7s.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-n3fl7s.pdf",
@@ -12921,7 +12931,7 @@
    },
    "edit": null,
    "pages": 196,
-   "outline_count": 50
+   "outline_count": 64
   },
   {
    "id": "doc-2026-n6epf3",
@@ -14281,7 +14291,7 @@
    "forms_bundle_url": "",
    "section_count": 51,
    "form_count": 0,
-   "updated_at": "2026-10-31T19:34:06.804Z",
+   "updated_at": "2026-11-06T05:07:51.947Z",
    "pdf": "../cne_files_2026_1/files/doc-2026-pj7g12.pdf",
    "original": {
     "url": "../cne_files_2026_1/files/doc-2026-pj7g12.pdf",
@@ -14291,7 +14301,7 @@
    },
    "edit": null,
    "pages": 87,
-   "outline_count": 501
+   "outline_count": 71
   },
   {
    "id": "doc-2026-pmcp71",
@@ -14462,44 +14472,6 @@
    "edit": null,
    "pages": 5,
    "outline_count": 4
-  },
-  {
-   "id": "doc-2026-qc9p4h",
-   "title": "2026 저소득층 학생 교육정보화 지원 기본계획",
-   "school_levels": [
-    "공통"
-   ],
-   "category": "",
-   "department": "유아교육복지과",
-   "year": 2026,
-   "format": "pdf",
-   "kind": "text",
-   "works_url": "",
-   "origin": {
-    "site": "",
-    "url": "",
-    "note": ""
-   },
-   "search_keywords": [],
-   "forms_bundle_url": "",
-   "section_count": 6,
-   "form_count": 0,
-   "updated_at": "2026-11-02T06:31:02.559Z",
-   "pdf": "../cne_files_2026_3/files/doc-2026-qc9p4h.pdf",
-   "original": {
-    "url": "../cne_files_2026_3/files/doc-2026-qc9p4h.pdf",
-    "name": "2026 저소득층 학생 교육정보화 지원 기본계획.pdf",
-    "bytes": 303897,
-    "format": "pdf"
-   },
-   "edit": {
-    "url": "../cne_files_2026_1/files/doc-2026-qc9p4h.hwp",
-    "name": "2026 저소득층 학생 교육정보화 지원 기본계획.hwp",
-    "bytes": 221184,
-    "format": "hwp"
-   },
-   "pages": 11,
-   "outline_count": 19
   },
   {
    "id": "doc-2026-qhmnv2",
@@ -15950,7 +15922,7 @@
    "forms_bundle_url": "",
    "section_count": 10,
    "form_count": 0,
-   "updated_at": "2026-11-03T00:34:30.339Z",
+   "updated_at": "2026-11-06T05:23:08.102Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-soyumt.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-soyumt.pdf",
@@ -15965,7 +15937,7 @@
     "format": "hwp"
    },
    "pages": 15,
-   "outline_count": 7
+   "outline_count": 14
   },
   {
    "id": "doc-2026-svf9u3",
@@ -17789,7 +17761,7 @@
    "forms_bundle_url": "",
    "section_count": 29,
    "form_count": 1,
-   "updated_at": "2026-11-03T00:34:33.212Z",
+   "updated_at": "2026-11-06T04:49:56.833Z",
    "pdf": "../cne_files_2026_3/files/doc-2026-xerpij.pdf",
    "original": {
     "url": "../cne_files_2026_3/files/doc-2026-xerpij.pdf",
@@ -18878,7 +18850,7 @@
    "category": "",
    "department": "유아교육복지과",
    "year": 2026,
-   "format": "hwpx",
+   "format": "pdf",
    "kind": "text",
    "works_url": "",
    "origin": {
@@ -18888,19 +18860,24 @@
    },
    "search_keywords": [],
    "forms_bundle_url": "",
-   "section_count": 10,
+   "section_count": 13,
    "form_count": 0,
-   "updated_at": "2026-11-02T21:31:28.659Z",
-   "pdf": "",
+   "updated_at": "2026-11-06T05:28:41.705Z",
+   "pdf": "../cne_files_2026_3/files/doc-2026-zu18ep.pdf",
    "original": {
+    "url": "../cne_files_2026_3/files/doc-2026-zu18ep.pdf",
+    "name": "★2026 저소득층·다자녀 학생 수련활동비 지원 계획.pdf",
+    "bytes": 4952740,
+    "format": "pdf"
+   },
+   "edit": {
     "url": "../cne_files_2026_1/files/doc-2026-zu18ep.hwpx",
     "name": "★2026 저소득층·다자녀 학생 수련활동비 지원 계획.hwpx",
     "bytes": 516395,
     "format": "hwpx"
    },
-   "edit": null,
-   "pages": 612,
-   "outline_count": 12
+   "pages": 21,
+   "outline_count": 26
   },
   {
    "id": "doc-2026-zwe8g1",
