@@ -412,3 +412,72 @@ details.lv-dept > summary i { font-style: normal; font-size: 13px; color: var(--
 .lv-sub { font-size: 12.5px; color: var(--muted); }
 .lv-go { flex: none; color: #98a2b3; font-size: 20px; line-height: 1; }
 @media (max-width: 640px) { .lv-item { padding: 10px 12px; gap: 10px; } .lv-item .lv-fmt { min-width: 40px; } }
+
+/* ===== v1.1 (선생님 피드백 반영) ===== */
+/* 한글 낱말이 중간에서 잘리지 않게(모바일): 낱말 단위로 줄을 바꾸고, 너무 긴 낱말만 나눈다 */
+body { word-break: keep-all; overflow-wrap: anywhere; }
+.v-text, .snippet, .detail .body, .v-page.flow p { word-break: keep-all; overflow-wrap: anywhere; }
+
+/* 머리말: 홈 아이콘 */
+.brand { display: inline-flex; align-items: center; gap: 8px; }
+.brand .home-ic { color: var(--blue); flex: none; }
+.brand:hover .home-ic { color: var(--blue-text); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* 검색창 한 줄: 돌아가기 · 범위 · 검색창 · 이 자료 수치/종류 단추 */
+.v-top { flex-wrap: nowrap; gap: 10px; }
+.v-top .search-box { flex: 1 1 360px; align-items: center; min-width: 0; }
+.v-top .search-box input { width: 0; }
+.v-top .v-statbar { flex: 0 1 auto; min-width: 0; padding: 6px 10px; }
+.v-top .v-statbar:not(:has(.st, button)) { display: none; }
+.v-backlink { flex: none; font-size: 13.5px; font-weight: 700; color: var(--blue-text); text-decoration: none; padding: 8px 12px; background: #fff; border: 1px solid #c7d9f6; border-radius: 10px; white-space: nowrap; }
+.v-backlink:hover { background: var(--blue-soft); }
+.scope { flex: none; display: flex; }
+.scope.hidden { display: none !important; }
+.scope select { font: inherit; font-size: 13.5px; font-weight: 600; color: var(--blue-text); background: var(--blue-soft); border: 1px solid #c7d9f6; border-radius: 8px; padding: 5px 8px; cursor: pointer; max-width: 9.5em; }
+.home-search .scope { display: none; }
+
+/* 검색 결과: 자료(문서) 위주 목록 */
+.res-h { align-items: center; flex-wrap: wrap; }
+.res-acts { display: inline-flex; gap: 14px; flex-wrap: wrap; }
+.doc-grp.row-fold { display: grid; grid-template-columns: auto 1fr auto; column-gap: 6px; row-gap: 3px; align-items: baseline; padding: 11px 12px 9px; }
+.doc-grp.row-doc { display: grid; grid-template-columns: 1fr auto; column-gap: 6px; row-gap: 3px; align-items: baseline; padding: 11px 12px 4px 26px; }
+.doc-grp .df { grid-row: 1 / span 3; align-self: start; padding-top: 4px; }
+.doc-grp .dg-top { grid-column: 2; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; font-size: 12px; }
+.doc-grp.row-doc .dg-top { grid-column: 1; }
+.doc-grp .dg-top .fmt { margin: 0; }
+.doc-grp .dg-name { grid-column: 2; line-height: 1.45; }
+.doc-grp.row-doc .dg-name { grid-column: 1; }
+.doc-grp .doc-all { grid-column: 3; grid-row: 1 / span 2; align-self: center; margin: 0; }
+.doc-grp.row-doc .doc-all { grid-column: 2; }
+.doc-grp .peek { grid-column: 2 / 4; display: none; font-size: 13.5px; font-weight: 500; color: var(--muted); line-height: 1.5; }
+.doc-grp.shut .peek { display: block; }
+.doc-grp .peek i { font-style: normal; color: #98a2b3; margin: 0 5px; }
+.lvb { display: inline-block; padding: 0 7px; border-radius: 5px; font-size: 11.5px; font-weight: 700; line-height: 1.7; background: #eef4fd; color: var(--blue-text); white-space: nowrap; }
+.lvb.com { background: #f1ecfd; color: #5b3fb8; }
+.pick { display: inline-block; padding: 0 7px; border-radius: 5px; font-size: 11.5px; font-weight: 800; line-height: 1.7; background: #fff3e6; color: #c2410c; border: 1px solid #f8d2b0; }
+#homeResults .res-kids { padding-bottom: 6px; }
+#homeResults .doc-grp:first-of-type { margin-top: 0; border-top: 0; }
+/* 종류 표시(서식·참고·법령·사이트)는 글자 그대로 */
+.badge { padding: 0 6px; font-size: 11.5px; }
+
+/* 모바일: 위쪽(머리말·검색창·수치 줄)이 화면을 덜 차지하게 */
+@media (max-width: 900px) {
+  body.viewing header.top .wrap { flex-wrap: nowrap; min-height: 46px; gap: 8px; }
+  body.viewing .brand span { display: none; }
+  body.viewing .level-nav { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; flex: 1; justify-content: flex-end; }
+  body.viewing .level-nav::-webkit-scrollbar { display: none; }
+  body.viewing .level-nav a { padding: 6px 11px; font-size: 14px; white-space: nowrap; }
+  #level { gap: 8px; padding-top: 8px; }
+  .v-top { flex-wrap: wrap; gap: 6px 8px; }
+  .v-top .search-box { order: 1; flex: 1 1 100%; }
+  .v-backlink { order: 0; padding: 4px 10px; font-size: 13px; }
+  .v-top .v-statbar { order: 2; flex: 1 1 100%; background: none; border: 0; padding: 0; }
+  .v-top .v-statbar .v-stats { display: none; }
+  .v-top .v-statbar .chips { flex-wrap: nowrap; overflow-x: auto; margin: 0; scrollbar-width: none; }
+  .scope select { max-width: 7.5em; font-size: 13px; padding: 4px 6px; }
+  .doc-grp.row-fold { grid-template-columns: auto 1fr; }
+  .doc-grp .doc-all { grid-column: 2; grid-row: auto; justify-self: start; }
+  .doc-grp.row-doc .doc-all { grid-column: 1; }
+  .res-h { padding: 10px 12px 4px; }
+}

@@ -383,6 +383,15 @@ atest('목차 없이 나눈 구간 이름은 업무명 검색에서 제외', asy
 atest('1글자 검색은 본문 검색 생략', async () => { const m = SS.metaSearch(sIdx, '원'); eq(await SS.bodyCandidates(sIdx, 'kindergarten', m.q, fetchOut, {}, m.seen), null); });
 atest('업무 상세: 현장체험학습 서식 179~188번', async () => { const d = SS.sectionDetail(detail, sec('현장체험학습 운영').id); eq(d.forms.map(f => f.no), [179, 180, 181, 182, 183, 184, 185, 186, 187, 188]); eq(d.blocks[0].pdf_page, 26); });
 atest('쪽 표시·안전한 링크', async () => { eq(SS.pageLabel([23, 24], [19, 20]), 'PDF 23~24쪽(인쇄 19~20쪽)'); eq(SS.safeUrl('javascript:alert(1)'), ''); eq(SS.safeUrl('https://works.do/a'), 'https://works.do/a'); });
+atest('깨진 한글 링크 고치기(법령 EUC-KR · 한글 도메인)', async () => {
+  const law = 'https://www.law.go.kr/%C2%B9%C3%BD%C2%B7%C3%89/%C3%83%C3%8A%C2%A4%C3%BD%C3%81%C3%9F%C2%B5%C3%AE%C2%B1%C2%B3%C3%80%C2%B0%C2%B9%C3%BD/(20251002,20862,20250401)/%C3%81%C2%A68%C3%81%C2%B6';
+  eq(decodeURI(SS.fixUrl(law, '초·중등교육법 제8조')), 'https://www.law.go.kr/법령/초ㆍ중등교육법/(20251002,20862,20250401)/제8조');
+  eq(SS.fixUrl('http://www.xn--3%20-weac5wlcd633bfzb.net/', 'ww.들락날락.net)'), 'http://www.들락날락.net/');
+  eq(SS.fixUrl('https://xn--%20-xcah1qey9ec6c968auvb.kr/', 'ps://디지털윤리.kr)'), 'https://디지털윤리.kr/');
+  eq(SS.fixUrl('javascript:alert(1)', 'x'), '');
+  eq(SS.fixUrl('https://works.do/a', 'a'), 'https://works.do/a');
+  eq(SS.fixUrl('https://ko.wikipedia.org/wiki/%ED%95%99%EA%B5%90', '학교'), 'https://ko.wikipedia.org/wiki/%ED%95%99%EA%B5%90');
+});
 atest('여러 단어 강조 + 이스케이프', async () => { const h = SS.highlightTerms('<b>소풍</b> 사전 답사', ['소풍', '사전답사']); ok(h.includes('<mark>소풍</mark>') && h.includes('<mark>사전 답사</mark>') && !h.includes('<b>')); });
 
 console.log('\n[폴더 일괄 등록]');

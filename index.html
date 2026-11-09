@@ -18,7 +18,7 @@
 <div class="page-bg" aria-hidden="true"></div>
 <header class="top">
   <div class="wrap">
-    <a class="brand" href="#/">교무업무 통합검색</a>
+    <a class="brand" href="#/" title="처음 화면으로"><svg class="home-ic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.5"/></svg><span>교무업무 통합검색</span></a>
     <nav id="levelNav" class="level-nav hidden" aria-label="학교급"></nav>
   </div>
 </header>
@@ -30,7 +30,7 @@
     <div class="hero">
       <div class="eyebrow">학교의 모든 교무업무 자료를 한 곳에서</div>
       <h1>어떤 <em>교무업무 자료</em>를 찾으세요?</h1>
-      <p>검색어를 넣으면 유아·초등·중등·특수·공통 자료를 한꺼번에 찾습니다.</p>
+      <p>필요한 자료를 검색해 보세요. 업무 이름이나 서식 이름으로 찾을 수 있습니다.</p>
     </div>
     <form id="homeSearch" class="search-box home-search" role="search">
       <input id="hq" type="search" autocomplete="off" placeholder="검색어 입력 (예: 졸업식, 현장체험학습)" aria-label="모든 학교급에서 검색">
@@ -38,23 +38,25 @@
     </form>
     <div class="home-or" aria-hidden="true"><span>또는 학교급을 골라 둘러보기</span></div>
     <div id="levelCards" class="level-cards"></div>
-    <p class="home-note">학교급을 누르면 그 학교급 자료와 모든 학교급에 해당하는 공통 자료가 함께 나옵니다.<br>학교급 화면에서 검색하면 그 학교급과 공통 자료에서 찾습니다.</p>
+    <p class="home-note">학교급을 누르면 그 학교급 자료와 모든 학교급에 해당하는 공통 자료가 함께 나옵니다.</p>
     <img class="deco left" src="assets/img/deco-left.png" alt="" aria-hidden="true">
     <img class="deco right" src="assets/img/deco-right.png" alt="" aria-hidden="true">
   </section>
 
   <!-- 학교급 화면: 왼쪽 자료 · 가운데 번호 목차 · 오른쪽 쪽 보기 -->
   <section id="level" class="hidden" aria-label="자료 보기">
+    <!-- 검색창 한 줄: 돌아가기 · 검색 범위 · 검색창 · (오른쪽) 이 자료 수치와 종류 단추 — 모바일에서 세로 공간을 덜 쓰도록 한 줄로 -->
     <div class="v-top">
+      <a id="backLink" class="v-backlink hidden" href="#/"></a>
       <form id="searchForm" class="search-box" role="search">
+        <label class="scope"><span class="sr">검색 범위</span><select id="scope" aria-label="검색 범위"></select></label>
         <input id="q" type="search" autocomplete="off" placeholder="업무·서식·법령 검색 (예: 졸업식, 현장체험학습)" aria-label="검색어">
         <button class="primary" type="submit">검색</button>
       </form>
-    </div>
-    <!-- 검색창과 문서 사이: 이 자료(또는 학교급 전체)의 항목 수 · 종류 모아 보기 -->
-    <div id="statBar" class="v-statbar">
-      <div id="docStats" class="v-stats"></div>
-      <div id="typeChips" class="chips" role="group" aria-label="자료 종류"></div>
+      <div id="statBar" class="v-statbar">
+        <div id="docStats" class="v-stats"></div>
+        <div id="typeChips" class="chips" role="group" aria-label="자료 종류"></div>
+      </div>
     </div>
     <!-- 학교급 첫 화면: 자료 목록 · 검색 결과 -->
     <div id="levelHome" class="lv-home hidden">
@@ -107,8 +109,8 @@
 
 <footer class="site">
   <div class="wrap" id="footer">
-    <span>교무업무 통합검색 · 원본 자료의 저작권은 각 발행 기관에 있습니다.</span>
-    <span class="org"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 6.5C10 5 7 4.5 3 4.8v13.4c4-.3 7 .2 9 1.8 2-1.6 5-2.1 9-1.8V4.8c-4-.3-7 .2-9 1.7z"/><path d="M12 6.5V20"/></svg>충청남도교육청 정책기획과</span>
+    <span>교무업무 통합검색 · 원본 자료의 저작권은 각 발행 기관(부서)에 있습니다.</span>
+    <span class="org"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 6.5C10 5 7 4.5 3 4.8v13.4c4-.3 7 .2 9 1.8 2-1.6 5-2.1 9-1.8V4.8c-4-.3-7 .2-9 1.7z"/><path d="M12 6.5V20"/></svg>충청남도교육청</span>
   </div>
 </footer>
 

@@ -150,6 +150,41 @@
   function safeUrl(u) { return /^https?:\/\//i.test(String(u || '').trim()) ? String(u).trim() : ''; }
 
   /**
+   * PDF 안 링크 고치기(한글 주소). safeUrl과 같이 http(s)만 통과시킨다.
+   *  ① 한글 도메인이 깨져 xn--%20… 처럼 된 주소: 링크 글자(예: 'www.들락날락.net)')에서 도메인을 되살린다
+   *  ② 한글 경로가 EUC-KR 글자로 두 번 바뀐 주소(법령 링크 %C2%B9%C3%BD… → /법령/…): 원래 한글로 되돌린다
+   * 고칠 수 없으면 원래 주소를 그대로 돌려준다.
+   */
+  function fixUrl(u, text) {
+    const s = safeUrl(u);
+    if (!s) return '';
+    const m = s.match(/^(https?:\/\/)([^/?#]*)(.*)$/i);
+    if (!m) return s;
+    let [, proto, host, rest] = m;
+    if (/[%\s]/.test(host)) {
+      const t = String(text || '').normalize('NFC');
+      const d = t.match(/(?:w{2,3}\.)?[0-9A-Za-z가-힣-]+(?:\.[0-9A-Za-z가-힣-]+)*\.(?:go\.kr|or\.kr|co\.kr|kr|net|com|org)(?![0-9A-Za-z가-힣-])/);
+      if (!d) return s;
+      host = d[0].replace(/^ww\./, 'www.');
+      rest = rest && rest !== '/' && !/%/.test(rest) ? rest : '/';
+    }
+    if (/%C[23]%[89AB][0-9A-F]/i.test(rest)) {
+      try {
+        const latin = decodeURIComponent(rest);
+        const high = [...latin].filter(c => c.charCodeAt(0) > 0x7f);
+        if (high.length && high.every(c => c.charCodeAt(0) <= 0xff) && typeof TextDecoder !== 'undefined') {
+          const bytes = Uint8Array.from([...latin].map(c => c.charCodeAt(0)));
+          let fixed = '';
+          try { fixed = new TextDecoder('utf-8', { fatal: true }).decode(bytes); }
+          catch (e) { try { fixed = new TextDecoder('euc-kr', { fatal: true }).decode(bytes); } catch (e2) { fixed = ''; } }
+          if (/[가-힣]/.test(fixed)) rest = encodeURI(fixed);
+        }
+      } catch (e) { /* 고치지 못하면 그대로 */ }
+    }
+    return proto + host + rest;
+  }
+
+  /**
    * 데이터 불러오기 도우미. base: 사이트 주소(끝에 /), fetchImpl: fetch
    * manifest는 매번 새로 받고, 나머지는 manifest 생성 시각을 붙여 캐시를 안전하게 쓴다.
    */
@@ -174,5 +209,5 @@
     };
   }
 
-  return { TIER, TIER_LABEL, parseQuery, prepareIndex, metaSearch, bodyCandidates, verifySection, sectionDetail, highlightTerms, pageLabel, safeUrl, createLoader };
+  return { TIER, TIER_LABEL, parseQuery, prepareIndex, metaSearch, bodyCandidates, verifySection, sectionDetail, highlightTerms, pageLabel, safeUrl, fixUrl, createLoader };
 });
