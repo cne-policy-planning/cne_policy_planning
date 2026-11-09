@@ -481,3 +481,40 @@ body { word-break: keep-all; overflow-wrap: anywhere; }
   .doc-grp.row-doc .doc-all { grid-column: 1; }
   .res-h { padding: 10px 12px 4px; }
 }
+
+/* ===== 즐겨찾기(자료 단위 · 이 브라우저에만 저장) ===== */
+button.fav { border: 0; background: none; padding: 2px 6px; font-size: 19px; line-height: 1; color: #b4bfcd; border-radius: 8px; }
+button.fav:hover { color: #e0a100; background: #fff7e0; }
+button.fav[aria-pressed="true"] { color: #f0a500; }
+.fav-btn[aria-pressed="true"] { color: #b26f00; border-color: #f4d48a; background: #fff8e6; font-weight: 700; }
+/* 학교급 자료 목록: ☆는 줄 오른쪽(› 앞)에 */
+.lv-wrap { position: relative; border-top: 1px solid var(--line2); }
+.lv-list > .lv-wrap:first-child { border-top: 0; }
+.lv-wrap .lv-item { border-top: 0; padding-right: 64px; }
+.lv-wrap .lv-fav { position: absolute; right: 34px; top: 50%; transform: translateY(-50%); }
+/* 검색 결과 머리: ☆ + 자료 열기 */
+.doc-grp .dg-acts { grid-column: 3; grid-row: 1 / span 2; align-self: center; display: inline-flex; align-items: center; gap: 4px; }
+.doc-grp.row-doc .dg-acts { grid-column: 2; }
+.doc-grp .dg-acts .doc-all { margin: 0; }
+/* 처음 화면: 내 즐겨찾기 */
+.fav-box { position: relative; z-index: 1; width: 100%; max-width: 760px; margin: 14px auto 0; padding: 10px 14px 12px; background: #fffdf6; border: 1px solid #f1e2b8; border-radius: 14px; box-sizing: border-box; }
+.fav-h { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; font-size: 14px; }
+.fav-h b { color: #9a6400; }
+.fav-h span { color: var(--muted); font-size: 12.5px; }
+.fav-list { display: flex; flex-wrap: wrap; gap: 6px; max-height: 168px; overflow: auto; }
+.fav-chip { display: inline-flex; align-items: center; max-width: 100%; background: #fff; border: 1px solid #e6dcc0; border-radius: 99px; padding: 0 2px 0 4px; }
+.fav-chip:hover { border-color: #d9b960; }
+.fav-chip a { display: inline-flex; align-items: center; gap: 6px; min-width: 0; padding: 5px 4px 5px 4px; color: var(--text); text-decoration: none; font-size: 14px; }
+.fav-chip .fav-t { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 30ch; }
+.fav-x { border: 0; background: none; color: #98a2b3; padding: 2px 8px; font-size: 16px; line-height: 1; border-radius: 99px; }
+.fav-x:hover { color: #b42318; background: #fdecea; }
+@media (max-width: 640px) {
+  .fav-box { padding: 9px 10px 10px; }
+  .fav-chip .fav-t { max-width: 18ch; }
+  .lv-wrap .lv-item { padding-right: 56px; }
+  .lv-wrap .lv-fav { right: 28px; }
+}
+@media (max-width: 900px) {
+  .doc-grp .dg-acts { grid-column: 2; grid-row: auto; justify-self: start; }
+  .doc-grp.row-doc .dg-acts { grid-column: 1; }
+}

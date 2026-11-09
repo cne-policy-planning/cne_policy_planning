@@ -98,6 +98,79 @@
   /** 주소만 바꾸고 다시 그리지 않는다(스크롤에 따른 현재위치 표시용) */
   function quietHash(r) { const nh = hashFor(r); if (location.hash !== nh) history.replaceState(null, '', nh); }
 
+  // ---------- 즐겨찾기(자료 단위 · 이 브라우저에만 저장) ----------
+  // 저장: localStorage 'sas-fav' = [{ id, t: 자료 이름, lv: 학교급 slug, f: 형식 }] (최근에 넣은 것이 앞)
+  // 자료 이름·학교급을 함께 적어 두어 첫 화면에서 큰 색인을 받지 않고 바로 보여 준다
+  // 자료 ID는 파일을 교체해도 바뀌지 않으므로 새 판으로 바꿔도 즐겨찾기가 남는다. 지워진 자료는 알게 되는 대로 조용히 뺀다
+  const FAV_KEY = 'sas-fav', FAV_MAX = 60;
+  function favLoad() {
+    try { const a = JSON.parse(localStorage.getItem(FAV_KEY) || '[]'); return Array.isArray(a) ? a.filter(x => x && typeof x.id === 'string' && x.id) : []; }
+    catch (e) { return []; }
+  }
+  function favSave(list) { try { localStorage.setItem(FAV_KEY, JSON.stringify(list.slice(0, FAV_MAX))); return true; } catch (e) { return false; } }
+  const isFav = id => favLoad().some(x => x.id === id);
+  function favToggle(id) {
+    const list = favLoad();
+    const i = list.findIndex(x => x.id === id);
+    if (i >= 0) { list.splice(i, 1); favSave(list); toast('즐겨찾기에서 뺐습니다.'); return; }
+    const d = metaOf(id) || {};
+    const t = d.t || (V.doc && V.doc.id === id ? V.doc.title : '');
+    if (list.length >= FAV_MAX) { toast(`즐겨찾기는 ${FAV_MAX}개까지 넣을 수 있습니다. 첫 화면에서 안 쓰는 자료를 빼 주세요.`); return; }
+    list.unshift({ id, t, lv: lvOf(id) || '', f: d.f || '' });
+    if (!favSave(list)) { toast('이 브라우저에서는 즐겨찾기를 저장할 수 없습니다(사생활 보호 모드 등).'); return; }
+    toast('즐겨찾기에 넣었습니다. 처음 화면에서 바로 열 수 있습니다. (이 브라우저에만 저장)');
+  }
+  function favRemove(id) { favSave(favLoad().filter(x => x.id !== id)); }
+  /** 자료 목록 정보를 알게 되면 즐겨찾기의 이름·학교급을 새로 맞춘다(새 판으로 교체되며 이름의 연도가 바뀐 경우 등) */
+  function favSync() {
+    const list = favLoad(); let changed = false;
+    list.forEach(x => { const d = metaOf(x.id); if (!d) return; const lv = lvOf(x.id); if ((d.t && d.t !== x.t) || (lv && lv !== x.lv) || (d.f && d.f !== x.f)) { x.t = d.t || x.t; x.lv = lv || x.lv; x.f = d.f || x.f; changed = true; } });
+    if (changed) favSave(list);
+  }
+  /** ☆ 단추(자료 목록·검색 결과·자료 화면) */
+  const favBtnHTML = id => `<button type="button" class="fav" data-fav="${esc(id)}" aria-pressed="false" aria-label="즐겨찾기에 넣기" title="즐겨찾기에 넣기">☆</button>`;
+  function paintFav(btn, on) {
+    btn.setAttribute('aria-pressed', String(on));
+    const label = on ? '즐겨찾기에서 빼기' : '즐겨찾기에 넣기';
+    btn.setAttribute('aria-label', label); btn.title = label;
+    if (btn.id === 'btnFav') btn.textContent = on ? '★ 즐겨찾기' : '☆ 즐겨찾기';
+    else btn.textContent = on ? '★' : '☆';
+  }
+  function refreshFav() {
+    const ids = new Set(favLoad().map(x => x.id));
+    document.querySelectorAll('[data-fav]').forEach(b => paintFav(b, ids.has(b.dataset.fav)));
+    const fb = $('btnFav');
+    if (fb) { fb.classList.toggle('hidden', !V.doc); if (V.doc) { fb.dataset.fav = V.doc.id; paintFav(fb, ids.has(V.doc.id)); } }
+  }
+  // 목록 줄·결과 머리 안의 ☆는 그 줄을 열거나 접지 않고 즐겨찾기만 바꾼다(먼저 받아서 멈춘다)
+  document.addEventListener('click', e => {
+    const b = e.target.closest('[data-fav]');
+    if (!b) return;
+    e.preventDefault(); e.stopPropagation();
+    favToggle(b.dataset.fav);
+    refreshFav();
+    if (!$('home').classList.contains('hidden')) renderFavs();
+  }, true);
+  /** 처음 화면: 내 즐겨찾기 */
+  function renderFavs() {
+    const box = $('favBox');
+    if (G.meta) favSync();
+    const list = favLoad();
+    if (!list.length) { box.classList.add('hidden'); box.replaceChildren(); return; }
+    box.replaceChildren(
+      h('div', { class: 'fav-h' }, h('b', {}, '★ 내 즐겨찾기'), h('span', {}, '이 브라우저에만 저장됩니다')),
+      h('div', { class: 'fav-list' }, ...list.map(x => {
+        const lvName = x.lv === COMMON ? '공통' : (SAS.levelName(x.lv) || '');
+        return h('span', { class: 'fav-chip' },
+          h('a', { href: x.lv ? hashFor({ slug: x.lv, doc: x.id }) : hashFor({ slug: ALL, doc: x.id }), title: x.t || x.id },
+            lvName ? h('span', { class: 'lvb' + (x.lv === COMMON ? ' com' : '') }, lvName) : null,
+            h('span', { class: 'fav-t' }, x.t || '(이름 없는 자료)')),
+          h('button', { type: 'button', class: 'fav-x', 'aria-label': `${x.t || '자료'} 즐겨찾기에서 빼기`, title: '즐겨찾기에서 빼기',
+            onclick: () => { favRemove(x.id); renderFavs(); } }, '×'));
+      })));
+    box.classList.remove('hidden');
+  }
+
   // ---------- 시작 ----------
   async function init() {
     const cfg = loadConfig();
@@ -127,6 +200,8 @@
     $('hq').value = '';
     document.body.classList.remove('viewing');
     $('home').classList.remove('hidden'); $('level').classList.add('hidden'); $('levelNav').classList.add('hidden');
+    V.doc = null; refreshFav();
+    renderFavs();
     const levels = (manifest && manifest.levels) || {};
     const nOf = slug => (levels[slug] && levels[slug].documents) || 0;
     const common = nOf(COMMON);
@@ -203,7 +278,9 @@
     if (r.doc && !metaOf(r.doc)) await ensureMeta().catch(() => null);
     if (parseHash().slug !== r.slug) return;
     // 학교급 첫 화면: 자료 목록과 검색(문서를 바로 열지 않는다)
-    if (!r.doc || !metaOf(r.doc)) { setMode('home'); return renderLevelHome(r); }
+    if (r.doc && !metaOf(r.doc) && G.meta) favRemove(r.doc);   // 지워진 자료: 즐겨찾기에서도 조용히 뺀다
+    if (V.meta.size) favSync();
+    if (!r.doc || !metaOf(r.doc)) { setMode('home'); V.doc = null; refreshFav(); return renderLevelHome(r); }
     setMode('doc');
     if (!V.doc || V.doc.id !== r.doc) await selectDoc(r.doc);
     else renderDocList(V.doc.id);   // 검색을 넣거나 지웠을 때 왼쪽 목록(찾은 자료만 ↔ 학교급 전체)을 다시 그린다
@@ -390,6 +467,7 @@
       $('homeResults').innerHTML = res.head + res.body;
       renderResultChips(res);
       restoreFolds($('homeResults'), res);
+      refreshFav();
       return;
     }
     // 목록에 업무·서식 수를 보여 주려고 가벼운 목차 색인을 쓴다(자료 상세를 하나하나 받지 않는다)
@@ -421,6 +499,7 @@
         h('div', { class: 'lv-list in-dept' }, ...list.map(d => docRow(r.slug, d, nodesOf(d.id), g === SAS.OTHER_DEPT)))))));
     } else if (isCommon) parts.push(h('div', { class: 'v-empty' }, '공통 자료는 아직 준비 중입니다.'));
     $('homeDocs').replaceChildren(...parts);
+    refreshFav();
   }
   /** 자료 한 줄(목록형): 형식 · 자료명 · 연도·쪽수·업무·서식 수 */
   function docRow(slug, d, nodes, showDept) {
@@ -429,10 +508,13 @@
     const fmt = (d.f || '').toUpperCase();
     const meta = [d.y ? d.y + '년' : '', d.f === 'pdf' && d.n ? d.n + '쪽' : '', forms ? `서식 ${forms}` : '',
       showDept && d.dp ? d.dp : '', d.o ? '출처 ' + d.o : ''].filter(Boolean).join(' · ');
-    return h('a', { class: 'lv-item', href: hashFor({ slug, doc: d.id }) },
-      h('span', { class: 'lv-fmt f-' + (d.f || 'etc') }, fmt || '자료'),
-      h('span', { class: 'lv-main' }, h('b', {}, d.t), meta ? h('span', { class: 'lv-sub' }, meta) : null),
-      h('span', { class: 'lv-go', 'aria-hidden': 'true' }, '›'));
+    // ☆는 줄(링크) 밖에 두어 누르면 즐겨찾기만 바뀐다
+    return h('div', { class: 'lv-wrap' },
+      h('a', { class: 'lv-item', href: hashFor({ slug, doc: d.id }) },
+        h('span', { class: 'lv-fmt f-' + (d.f || 'etc') }, fmt || '자료'),
+        h('span', { class: 'lv-main' }, h('b', {}, d.t), meta ? h('span', { class: 'lv-sub' }, meta) : null),
+        h('span', { class: 'lv-go', 'aria-hidden': 'true' }, '›')),
+      h('button', { type: 'button', class: 'fav lv-fav', 'data-fav': d.id, 'aria-pressed': 'false', 'aria-label': '즐겨찾기에 넣기', title: '즐겨찾기에 넣기' }, '☆'));
   }
   // 첫 화면 검색 결과에서 고르면 그 자료의 그 위치로 연다
   $('homeResults').addEventListener('click', e => {
@@ -506,6 +588,7 @@
     V.open = new Set(prep.nodes.filter(n => n.k === 'ch').map(n => n.c));
     V.foldSaved = null; foldLabel();
     $('docTitle').textContent = prep.title;
+    refreshFav();
     renderStats();
     crumb(null);
     renderToc();
@@ -763,9 +846,10 @@
       const open = `<a class="doc-all" href="${esc(hashFor({ slug: V.slug, doc: p.id }))}" title="이 자료 열기">자료 열기</a>`;
       const fb = `<span class="${fmtClass(m.f)}">${esc(String(m.f || '자료').toUpperCase())}</span>`;
       const pick = x.feat ? '<span class="pick">추천</span>' : '';
+      const star = favBtnHTML(p.id);
       // 접혀 있을 때 찾은 목차 두 개를 미리 보여 준다
       const peek = hits.length ? `<span class="peek">${hits.slice(0, 2).map(n => hl(cutTitle(n.t))).join('<i>·</i>')}${hits.length > 2 ? ` <i>외 ${hits.length - 2}건</i>` : ''}</span>` : '';
-      const name = `<span class="dg-top">${pick}${tag}${fb}</span><span class="dg-name">${hl(x.title)}<span class="cnt">${hits.length ? hits.length + '건' : ''}</span></span>${open}${peek}`;
+      const name = `<span class="dg-top">${pick}${tag}${fb}</span><span class="dg-name">${hl(x.title)}<span class="cnt">${hits.length ? hits.length + '건' : ''}</span></span><span class="dg-acts">${star}${open}</span>${peek}`;
       const isShut = shut.has(p.id);
       html += hits.length
         ? `<div class="doc-grp row-fold${isShut ? ' shut' : ''}" data-fold="${esc(p.id)}" title="찾은 목차 펼치기·접기"><button type="button" class="df" aria-expanded="${!isShut}" aria-label="${isShut ? '찾은 목차 펴기' : '찾은 목차 접기'}">▾</button>${name}</div>`
@@ -812,6 +896,7 @@
     renderDocList(V.doc && V.doc.id);
     $('tree').innerHTML = r.head + r.body;
     restoreFolds($('tree'), r);
+    refreshFav();
     // 자료 화면의 검색 결과에서는 지금 보는 자료의 결과를 펼쳐 둔다
     if (!cached && V.doc) { const hd = $('tree').querySelector(`.row-fold[data-fold="${CSS.escape(V.doc.id)}"]`); if (hd) { setDocFold(hd, true); r.shut.delete(V.doc.id); } }
     renderResultChips(r);

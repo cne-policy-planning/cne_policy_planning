@@ -36,6 +36,8 @@
       <input id="hq" type="search" autocomplete="off" placeholder="검색어 입력 (예: 졸업식, 현장체험학습)" aria-label="모든 학교급에서 검색">
       <button class="primary" type="submit">검색</button>
     </form>
+    <!-- 내 즐겨찾기(이 브라우저에만 저장, 없으면 숨김) -->
+    <div id="favBox" class="fav-box hidden" aria-label="내 즐겨찾기"></div>
     <div class="home-or" aria-hidden="true"><span>또는 학교급을 골라 둘러보기</span></div>
     <div id="levelCards" class="level-cards"></div>
     <p class="home-note">학교급을 누르면 그 학교급 자료와 모든 학교급에 해당하는 공통 자료가 함께 나옵니다.</p>
@@ -77,6 +79,7 @@
         <div class="v-head">
           <div id="docTitle" class="v-title"></div>
           <div class="v-btns">
+            <button id="btnFav" type="button" class="small fav-btn hidden" aria-pressed="false" title="즐겨찾기에 넣기">☆ 즐겨찾기</button>
             <button id="btnFold" type="button" class="small">목차 접기</button>
             <button id="btnHere" type="button" class="small accent">◉ 현재위치</button>
             <button id="btnShare" type="button" class="small">현재 위치 공유</button>
